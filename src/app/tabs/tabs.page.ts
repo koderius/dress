@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-tabs',
@@ -8,6 +7,6 @@ import {AuthService} from '../services/auth.service';
 })
 export class TabsPage {
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
 }

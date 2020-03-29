@@ -16,21 +16,6 @@ export interface UserDoc extends UserInfo {
   size?: string;
 }
 
-export enum AuthStatus {
-
-  NOT_LOADED = -1,
-
-  NO_USER = 0,
-
-  RESET_PASSWORD_EMAIL_SENT = 41,
-  ENTERED_WITH_RESET_PASSWORD_LINK = 42,
-
-  VERIFICATION_SENT = 91,
-
-  AUTH_USER = 100,
-
-}
-
 /**
  * This service is used for signing-in users in different methods.
  * When a new user is created, it creates a document with his details in the users collection in firestore.
@@ -65,13 +50,9 @@ export class AuthService {
   /** Get a reference to some user's document (if UID not provided, get current user) */
   public userProfileDoc = (uid?: string) => this.USERS_COLLECTION.doc(uid || this._user.uid);
 
-  /** The user authentication status (see enum) */
-  private _authStatus: AuthStatus = AuthStatus.NOT_LOADED;
-
-  /** A code that was read from the URL (email verification, reset password...) */
-  private oobCode: string;
-
-  /** The user's email which the URL sent to (email verification, reset password...) */
+  /** The params that was read from the URL (email verification, reset password...) */
+  private _mode: string;
+  private _oobCode: string;
   private _emailFromURL: string;
 
   /** A function to invoke when there is an error */
@@ -107,12 +88,8 @@ export class AuthService {
       if(user) {
 
         // If email is not verified, do not proceed
-        if(!user.emailVerified) {
-          this._authStatus = AuthStatus.VERIFICATION_SENT;
+        if(!user.emailVerified)
           return;
-        }
-
-        this._authStatus = AuthStatus.AUTH_USER;
 
         try {
           this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
@@ -128,7 +105,6 @@ export class AuthService {
       }
 
       else {
-        this._authStatus = AuthStatus.NO_USER;
         this._currentUserDoc = null;
         this.navCtrl.navigateRoot(this.LOGIN_PAGE);
       }
@@ -138,8 +114,8 @@ export class AuthService {
   }
 
 
-  get authStatus() : AuthStatus {
-    return this._authStatus;
+  get mode() : string {
+    return this._mode;
   }
 
   get emailFromURL() : string {
@@ -147,7 +123,7 @@ export class AuthService {
   }
 
 
-  /** Get the current user info (null if no signed in user) */
+  /** Get the current user info (null if no signed in user or email is not verified) */
   get currentUser(): UserDoc | null {
     return this._currentUserDoc;
   }
@@ -158,22 +134,22 @@ export class AuthService {
 
     this.activatedRoute.queryParams.subscribe(async (params)=>{
 
-      if(params['mode']) {
-        this.oobCode = params['oobCode'];
+      this._mode = params['mode'];
+
+      if(this._mode) {
+        this._oobCode = params['oobCode'];
         try {
-          switch (params['mode']) {
+          switch (this._mode) {
 
             case 'resetPassword':
-              this._emailFromURL = await this.auth.verifyPasswordResetCode(this.oobCode);
-              if(this._emailFromURL)
-                this._authStatus = AuthStatus.ENTERED_WITH_RESET_PASSWORD_LINK;
+              this._emailFromURL = await this.auth.verifyPasswordResetCode(this._oobCode);
               break;
 
             case 'verifyEmail':
-              const info = await this.auth.checkActionCode(this.oobCode);
+              const info = await this.auth.checkActionCode(this._oobCode);
               if(info) {
                 this._emailFromURL = info.data.email;
-                await this.auth.applyActionCode(this.oobCode);
+                await this.auth.applyActionCode(this._oobCode);
                 await this._user.reload();
                 await this.createUserDocument(this._user);
                 this.navCtrl.navigateRoot(this.HOME_PAGE);
@@ -337,7 +313,6 @@ export class AuthService {
   async sendResetPasswordEmail(email: string) {
     try {
       await this.auth.sendPasswordResetEmail(email);
-      this._authStatus = AuthStatus.RESET_PASSWORD_EMAIL_SENT;
     }
     catch (e) {
       this.onAuthError(e);
@@ -348,9 +323,9 @@ export class AuthService {
   /** Reset the password after entering the app through the reset password link */
   async resetPassword(newPassword: string) : Promise<void> {
     try {
-      if(this.oobCode) {
-        await this.auth.confirmPasswordReset(this.oobCode, newPassword);
-        this.oobCode = null;
+      if(this._oobCode) {
+        await this.auth.confirmPasswordReset(this._oobCode, newPassword);
+        this._oobCode = null;
         await this.signInWithEmail(this._emailFromURL, newPassword);
       }
     }

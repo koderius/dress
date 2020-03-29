@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService, AuthStatus} from '../services/auth.service';
-import {FirebaseError, UserInfo} from 'firebase';
+import {AuthService} from '../services/auth.service';
+import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
 import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../terms/terms.component';
@@ -24,8 +24,8 @@ enum PageStatus {
 })
 export class LandingPage implements OnInit {
 
-  private _pageStatus: PageStatus = PageStatus.LANDING;
   PageStatus = PageStatus;
+  pageStatus: PageStatus = PageStatus.LANDING;
 
   inputs = {
     name: '',
@@ -49,31 +49,18 @@ export class LandingPage implements OnInit {
   }
 
   ngOnInit() {
+    if(this.authService.mode == 'resetPassword')
+      this.pageStatus = PageStatus.NEW_PASSWORD;
   }
 
   // Do not show the page before auth was loaded
   get showPage() {
-    return this.authService.authStatus > AuthStatus.NOT_LOADED;
-  }
-
-  get pageStatus() : PageStatus {
-
-    if(this.authService.authStatus == AuthStatus.ENTERED_WITH_RESET_PASSWORD_LINK)
-      this._pageStatus = PageStatus.NEW_PASSWORD;
-    if(this.authService.authStatus == AuthStatus.VERIFICATION_SENT)
-      this._pageStatus = PageStatus.VERIFICATION_SENT;
-
-    return this._pageStatus;
-
-  }
-
-  set pageStatus(status: PageStatus) {
-    this._pageStatus = status;
+    return !this.authService.currentUser;
   }
 
 
   passwordPlaceholder() : string {
-    switch (this._pageStatus) {
+    switch (this.pageStatus) {
       case PageStatus.REGISTER: return 'Create Password';
       case PageStatus.NEW_PASSWORD: return 'New Password';
       default: return 'Password';
@@ -82,7 +69,7 @@ export class LandingPage implements OnInit {
 
   inputToShow(inputName: string) {
     let inputs = [];
-    switch (this._pageStatus) {
+    switch (this.pageStatus) {
       case PageStatus.REGISTER: inputs = ['name', 'email', 'password', 'passwordV']; break;
       case PageStatus.SIGN_IN: inputs = ['email', 'password']; break;
       case PageStatus.FORGOT_PASSWORD: inputs = ['email']; break;
@@ -102,6 +89,7 @@ export class LandingPage implements OnInit {
     if(this.checkFields()) {
       this.alertService.showLoader('Registering...');
       await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name);
+      this.pageStatus = PageStatus.VERIFICATION_SENT;
       this.alertService.dismissLoader();
     }
   }
@@ -122,7 +110,7 @@ export class LandingPage implements OnInit {
     if(this.checkFields()) {
       this.alertService.showLoader('Sending email...');
       await this.authService.sendResetPasswordEmail(this.inputs.email);
-      this._pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
+      this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
       this.alertService.dismissLoader();
     }
   }
