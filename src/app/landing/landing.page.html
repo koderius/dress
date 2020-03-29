@@ -1,23 +1,160 @@
-<ion-content class="background" *ngIf="pageStatus">
+<ion-content class="background" *ngIf="showPage">
 
-  <div class="logo">
+  <div class="logo" [ngClass]="pageStatus == PageStatus.LANDING ? 'large' : 'small'">
     <ion-img src="../../assets/logo/logo_large.png"></ion-img>
   </div>
 
-  <ion-row class="buttons" *ngIf="pageStatus == PageStatus.LANDING">
+  <div id="inner">
 
-    <ion-col>
-      <ion-button shape="round" color="tertiary" class="ion-float-end">
-        <ion-text>Login</ion-text>
-      </ion-button>
-    </ion-col>
+    <div *ngIf="pageStatus == PageStatus.LANDING">
 
-    <ion-col>
-      <ion-button shape="round" color="secondary">
-        <ion-text class="ion-padding-vertical">Register</ion-text>
-      </ion-button>
-    </ion-col>
+      <ion-row *ngIf="pageStatus == PageStatus.LANDING">
+        <ion-col>
+          <ion-button shape="round" color="tertiary" expand="full" (click)="pageStatus = PageStatus.SIGN_IN">
+            <ion-text>Login</ion-text>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button shape="round" color="secondary" expand="full" (click)="pageStatus = PageStatus.REGISTER">
+            <ion-text>Register</ion-text>
+          </ion-button>
+        </ion-col>
+      </ion-row>
 
-  </ion-row>
+      <ion-row class="button-with-lines" id="terms">
+        <ion-col>
+          <div></div>
+        </ion-col>
+        <ion-col size="3">
+          <ion-button fill="clear" expand="full" shape="round">
+            <ion-text>Terms</ion-text>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <div></div>
+        </ion-col>
+      </ion-row>
+
+    </div>
+
+
+    <div *ngIf="pageStatus != PageStatus.LANDING">
+
+      <div *ngIf="pageStatus == PageStatus.FORGOT_PASSWORD || pageStatus == PageStatus.NEW_PASSWORD"><br><br><br><br></div>
+
+      <ion-item *ngIf="inputToShow('name')">
+        <ion-icon src="../../assets/svg/icon_name.svg" slot="start"></ion-icon>
+        <ion-input placeholder="Full Name" [(ngModel)]="inputs.name" autocomplete="on"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="inputToShow('email')">
+        <ion-icon src="../../assets/svg/icon_email.svg" slot="start"></ion-icon>
+        <ion-input placeholder="Email" [(ngModel)]="inputs.email" type="email" autocomplete="on" [pattern]="authService.emailRegex"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="inputToShow('password')">
+        <ion-icon src="../../assets/svg/icon_password.svg" slot="start"></ion-icon>
+        <ion-input [placeholder]="passwordPlaceholder()" [(ngModel)]="inputs.password" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="authService.passwordRegex"></ion-input>
+        <ion-button *ngIf="pageStatus != PageStatus.SIGN_IN" fill="clear" slot="end" (click)="isPasswordShow = !isPasswordShow">{{isPasswordShow ? 'Hide' : 'Show'}}</ion-button>
+        <ion-button *ngIf="pageStatus == PageStatus.SIGN_IN" fill="clear" slot="end" (click)="pageStatus = PageStatus.FORGOT_PASSWORD">Forgot?</ion-button>
+      </ion-item>
+
+      <ion-item *ngIf="inputToShow('passwordV')">
+        <ion-icon src="../../assets/svg/icon_password.svg" slot="start"></ion-icon>
+        <ion-input placeholder="Confirm Password" [(ngModel)]="inputs.passwordV" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="authService.passwordRegex"></ion-input>
+        <ion-button fill="clear" slot="end" (click)="isPasswordShow = !isPasswordShow">{{isPasswordShow ? 'Hide' : 'Show'}}</ion-button>
+      </ion-item>
+
+      <div id="action-button">
+        <div *ngIf="pageStatus == PageStatus.REGISTER">
+          <ion-button expand="full" color="secondary" shape="round" (click)="registerClicked()">
+            <ion-text>Register</ion-text>
+          </ion-button>
+          <p>
+            <ion-text>Already Registered? </ion-text>
+            <a (click)="pageStatus = PageStatus.SIGN_IN">Login Now</a>
+          </p>
+        </div>
+
+        <div *ngIf="pageStatus == PageStatus.SIGN_IN">
+          <ion-button expand="full" color="primary" shape="round" (click)="loginClicked()">
+            <ion-text>Login</ion-text>
+          </ion-button>
+          <p>
+            <ion-text>New User? </ion-text>
+            <a (click)="pageStatus = PageStatus.REGISTER">Register Now</a>
+          </p>
+          <p>
+            <a (click)="pageStatus = PageStatus.FORGOT_PASSWORD">Forgot Password?</a>
+          </p>
+        </div>
+
+        <div *ngIf="pageStatus == PageStatus.FORGOT_PASSWORD">
+          <ion-button expand="full" color="secondary" shape="round" (click)="resetPasswordClicked()">
+            <ion-text>Confirm</ion-text>
+          </ion-button>
+          <p>
+            <a (click)="pageStatus = PageStatus.SIGN_IN">Back</a>
+          </p>
+        </div>
+
+        <div *ngIf="pageStatus == PageStatus.NEW_PASSWORD">
+          <ion-button expand="full" color="secondary" shape="round" (click)="newPasswordClicked()">
+            <ion-text>Submit</ion-text>
+          </ion-button>
+        </div>
+
+        <div *ngIf="pageStatus == PageStatus.VERIFICATION_SENT">
+          <br><br><br><br>
+          <p>
+            <ion-text>An email with verification link was sent to {{inputs.email}}</ion-text>
+          </p>
+          <ion-button color="secondary" shape="round" (click)="resendVerification()">
+            <ion-text>Send again</ion-text>
+          </ion-button>
+          <p>
+            <a (click)="authService.signOut(); pageStatus = PageStatus.LANDING">Back</a>
+          </p>
+        </div>
+
+        <div *ngIf="pageStatus == PageStatus.RESET_PASSWORD_EMAIL_SENT">
+          <br><br><br><br>
+          <p>
+            <ion-text>An email with reset password link was sent to {{inputs.email}}</ion-text>
+          </p>
+          <ion-button color="secondary" shape="round" (click)="resetPasswordClicked()">
+            <ion-text>Send again</ion-text>
+          </ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="pageStatus == PageStatus.SIGN_IN || pageStatus == PageStatus.REGISTER">
+        <ion-row class="button-with-lines">
+          <ion-col>
+            <div></div>
+          </ion-col>
+          <ion-col size="2">
+            <span id="or-circle">OR</span>
+          </ion-col>
+          <ion-col>
+            <div></div>
+          </ion-col>
+        </ion-row>
+
+        <ion-button fill="outline" expand="full" shape="round" id="facebook-btn" (click)="loginWithClicked('facebook')">
+          <ion-icon slot="start" src="../../assets/svg/icon_facebook.svg"></ion-icon>
+          <ion-text>Login with Facebook</ion-text>
+        </ion-button>
+
+        <ion-button fill="outline" expand="full" shape="round" id="google-btn" (click)="loginWithClicked('google')">
+          <ion-icon slot="start" src="../../assets/svg/icon_google.svg"></ion-icon>
+          <ion-text>Login with Google</ion-text>
+        </ion-button>
+      </div>
+
+    </div>
+
+  </div>
+
 
 </ion-content>

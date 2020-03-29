@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="44" height="32" viewBox="0 0 44 32">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #515151;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <image id="Background" width="44" height="32" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAgCAYAAABpRpp6AAAAQElEQVRYhe3OgQkAMAzDsKz//5xd4ULBukCvbXPIXMrG8ALDNMM0wzTDNMM0wzTDNMM0wzTDNMM0wzTDNMOoJB/88AQ8aUuNSwAAAABJRU5ErkJggg=="/>
+  <path id="Forma_1_copy" data-name="Forma 1 copy" class="cls-1" d="M42.793,0.4H1.424a0.984,0.984,0,0,0-.984.985V30.925a0.984,0.984,0,0,0,.984.985H42.793a0.985,0.985,0,0,0,.984-0.985V1.382A0.985,0.985,0,0,0,42.793.4ZM41.809,27.558l-12.2-12.2-1.393,1.392L41.4,29.94H2.813L16,16.752,14.611,15.36l-12.2,12.2V2.367h39.4V27.558ZM39.817,2.367L22.108,20.072,4.4,2.367H2.409V3.162l19,19a0.985,0.985,0,0,0,1.393,0l19-19V2.367H39.817Z"/>
+</svg>

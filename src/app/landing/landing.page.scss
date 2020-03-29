@@ -2,22 +2,129 @@ ion-content.background {
   --background: url("../../assets/backgrounds/background.png") 0 0/100% 100% no-repeat;
 }
 
-div.logo {
-  position: absolute;
-  left: 50%;
-  width: 40%;
-  top: 23%;
-  ion-img {
-    position: relative;
-    left: -50%;
+// All buttons
+ion-button {
+  font-weight: bolder;
+  text-transform: uppercase;
+  height: 3em;
+}
+
+p {
+  text-align: center;
+  font-weight: 500;
+  ion-text {
+    color: var(--ion-color-dark);
+  }
+  a {
+    color: var(--active-text-color);
   }
 }
 
-ion-row.buttons {
-  position: relative;
-  top: 55%;
-  ion-button {
-    width: 60%;
-    font-weight: bolder;
+// Input items
+ion-item {
+  height: 3em;
+  border: solid var(--ion-color-light) 1px;
+  border-radius: 1.5em;
+  margin-bottom: 1em;
+  //--highlight-height: 0;
+  --highlight-color-valid: transparent;
+    // Inputs icons
+  ion-icon {
+    height: 1.2em;
+    width: 1.2em;
+    margin: 0;
+    padding-right: 0.5em;
   }
+  // Buttons inside inputs
+  ion-button {
+    --color: var(--active-text-color);
+    margin: 0;
+    text-transform: capitalize;
+    font-size: 1em;
+    font-weight: normal;
+  }
+}
+
+.logo {
+  position: relative;
+  width: 100%;
+  ion-img {
+    height: 60%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+  }
+}
+.logo.large {
+  height: 40%;
+}
+.logo.small {
+  animation-name: logoSmaller;
+  animation-duration: 500ms;
+  animation-fill-mode: forwards;
+}
+@keyframes logoSmaller {
+  from {height: 40%}
+  to {height: 20%}
+}
+
+#inner {
+  width: 70%;
+  max-width: 600px;
+  margin: 3em auto;
+}
+
+.button-with-lines {
+  margin: 1.5em 0;
+  ion-col{
+    padding: 0;
+  }
+  ion-button {
+    --color: var(--active-text-color);
+  }
+  div {
+    width: 100%;
+    height: 1px;
+    position: relative;
+    top: 50%;
+  }
+  ion-col:first-child > div {
+    background-image: linear-gradient(to left, var(--ion-color-dark) , white);
+  }
+  ion-col:last-child > div {
+    background-image: linear-gradient(to right, var(--ion-color-dark) , white);
+  }
+}
+#terms {
+  margin-top: 3em;
+}
+#or-circle {
+  margin: auto;
+  display: block;
+  width: fit-content;
+  font-size: 0.75em;
+  font-weight: bold;
+  padding: 0.5em;
+  color: white;
+  background-color: var(--ion-color-dark);
+  border-radius: 50%;
+}
+
+#action-button {
+  margin: 2em 0;
+}
+
+#facebook-btn {
+  --color: #3b5998;
+  --border-color: #3b5998;
+  --background: white;
+  height: 3.3em;
+  margin-bottom: 1em;
+}
+
+#google-btn {
+  --color: #dd4c39;
+  --border-color: #dd4c39;
+  --background: white;
+  height: 3.3em;
 }

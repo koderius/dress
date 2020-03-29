@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
 import {FirebaseError, User, UserInfo} from 'firebase';
 import {NavController, Platform} from '@ionic/angular';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
-import {strictEqual} from 'assert';
 
 
 /** User's app data. It extends the basic firebase user info */
@@ -18,12 +18,14 @@ export interface UserDoc extends UserInfo {
 
 export enum AuthStatus {
 
+  NOT_LOADED = -1,
+
   NO_USER = 0,
 
   RESET_PASSWORD_EMAIL_SENT = 41,
   ENTERED_WITH_RESET_PASSWORD_LINK = 42,
 
-  EMAIL_NOT_VERIFIED = 90,
+  VERIFICATION_SENT = 91,
 
   AUTH_USER = 100,
 
@@ -61,10 +63,10 @@ export class AuthService {
   private readonly USERS_COLLECTION = firebase.firestore().collection('users');
 
   /** Get a reference to some user's document (if UID not provided, get current user) */
-  public userProfileDoc = (uid?: string) => this.USERS_COLLECTION.doc(uid || this._currentUserDoc.uid);
+  public userProfileDoc = (uid?: string) => this.USERS_COLLECTION.doc(uid || this._user.uid);
 
   /** The user authentication status (see enum) */
-  private _authStatus: AuthStatus;
+  private _authStatus: AuthStatus = AuthStatus.NOT_LOADED;
 
   /** A code that was read from the URL (email verification, reset password...) */
   private oobCode: string;
@@ -74,6 +76,12 @@ export class AuthService {
 
   /** A function to invoke when there is an error */
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);
+
+  /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
+  public passwordRegex = '^[a-zA-Z0-9_]{6,}$';
+
+  /** Regular expresion for email address */
+  public emailRegex = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$';
 
 
   constructor(
@@ -99,9 +107,8 @@ export class AuthService {
       if(user) {
 
         // If email is not verified, do not proceed
-        // (Although the user is still signed-in, the user's document will not be set, and the app will not get the user data)
         if(!user.emailVerified) {
-          this._authStatus = AuthStatus.EMAIL_NOT_VERIFIED;
+          this._authStatus = AuthStatus.VERIFICATION_SENT;
           return;
         }
 
@@ -167,6 +174,8 @@ export class AuthService {
               if(info) {
                 this._emailFromURL = info.data.email;
                 await this.auth.applyActionCode(this.oobCode);
+                await this._user.reload();
+                this.navCtrl.navigateRoot(this.HOME_PAGE);
               }
               break;
 
@@ -326,6 +335,7 @@ export class AuthService {
       if(this.oobCode) {
         await this.auth.confirmPasswordReset(this.oobCode, newPassword);
         this.oobCode = null;
+        await this.signInWithEmail(this._emailFromURL, newPassword);
       }
     }
     catch (e) {

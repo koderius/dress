@@ -3,6 +3,9 @@
 
 /** Ionic CSS Variables **/
 :root {
+
+  --ion-font-family: "open sans";
+
   --ion-color-primary: #de399b;
   --ion-color-primary-rgb: 222,57,155;
   --ion-color-primary-contrast: #ffffff;
@@ -65,6 +68,9 @@
   --ion-color-light-contrast-rgb: 0,0,0;
   --ion-color-light-shade: #848484;
   --ion-color-light-tint: #a1a1a1;
+
+  --active-text-color: #4F508A;
+
 }
 
 @media (prefers-color-scheme: dark) {
