@@ -50,7 +50,7 @@ export class AuthService {
   /** Firebase auth module **/
   private auth = firebase.auth();
 
-  /** The firebase user entity */
+  /** The firebase current user entity */
   private _user: User;
 
   /** Current user's document. Null if there is no signed-in user */
@@ -175,6 +175,7 @@ export class AuthService {
                 this._emailFromURL = info.data.email;
                 await this.auth.applyActionCode(this.oobCode);
                 await this._user.reload();
+                await this.createUserDocument(this._user);
                 this.navCtrl.navigateRoot(this.HOME_PAGE);
               }
               break;
@@ -191,7 +192,7 @@ export class AuthService {
 
 
   /** Sign up new users with email & password */
-  async signUpWithEmail(email: string, password: string) : Promise<UserCredential> {
+  async signUpWithEmail(email: string, password: string, name?: string, photo?: string) : Promise<UserCredential> {
 
     try {
 
@@ -201,11 +202,8 @@ export class AuthService {
       // Send verification email
       await this.sendEmailVerification();
 
-      // Create user document with his email, UID and additional info
-      await this.userProfileDoc(cred.user.uid).set({
-        uid: cred.user.uid,
-        email: email,
-      });
+      // Set basic details
+      await cred.user.updateProfile({displayName: name || null, photoURL: photo || null});
 
       return cred;
 
@@ -244,28 +242,24 @@ export class AuthService {
 
     // If method was not defined in the argument, choose it according to the platform
     if(!method)
-      method = this.platform.is('mobile') ? 'redirect' : 'popup';
+      // method = this.platform.is('mobile') ? 'redirect' : 'popup';
+      method = 'popup';
+    //TODO: Redirect does not work well
 
     try {
 
       // Use redirect or popup
       let cred: UserCredential;
+      if(method == 'popup')
+        cred = await this.auth.signInWithPopup(provider);
       if(method == 'redirect') {
         await this.auth.signInWithRedirect(provider);
         cred = await this.auth.getRedirectResult();
       }
-      if(method == 'popup')
-        cred = await this.auth.signInWithPopup(provider);
 
       // On the first sign-in, create user document
-      if(cred.additionalUserInfo.isNewUser) {
-        const user = cred.user;
-        await this.userProfileDoc(cred.user.uid).set({
-          ...user,
-          // TODO: Check cred.additionalUserInfo for additional info
-          profile: cred.additionalUserInfo.profile,
-        });
-      }
+      if(cred.additionalUserInfo.isNewUser)
+        await this.createUserDocument(cred.user);
 
       return cred;
 
@@ -273,6 +267,28 @@ export class AuthService {
     catch (e) {
       this.onAuthError(e);
     }
+
+  }
+
+
+  // Create user document only from user valid properties
+  private async createUserDocument(user: User) {
+
+    const doc: UserInfo = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber,
+      providerId: user.providerId,
+    };
+
+    // Delete all undefined
+    for(let p in user)
+      if(!user[p])
+        delete user[p];
+
+    await this.userProfileDoc(user.uid).set(doc);
 
   }
 

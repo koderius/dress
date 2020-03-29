@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService, AuthStatus} from '../services/auth.service';
 import {FirebaseError, UserInfo} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
+import {ModalController} from '@ionic/angular';
+import {TermsComponent} from '../terms/terms.component';
 
 enum PageStatus {
 
@@ -37,6 +39,7 @@ export class LandingPage implements OnInit {
   constructor(
     public authService: AuthService,
     private alertService: AlertsService,
+    private modalCtrl: ModalController,
   ) {
 
     this.authService.onAuthError = (e: FirebaseError) => {
@@ -89,18 +92,26 @@ export class LandingPage implements OnInit {
   }
 
 
+  async goToTerms() {
+    const m = await this.modalCtrl.create({component: TermsComponent});
+    m.present();
+  }
+
+
   async registerClicked() {
     if(this.checkFields()) {
-      // Create user
-      if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password))
-        // Update his name
-        await this.authService.editUserDocument({displayName: this.inputs.name} as UserInfo);
+      this.alertService.showLoader('Registering...');
+      await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name);
+      this.alertService.dismissLoader();
     }
   }
 
   async loginClicked() {
-    if(this.checkFields())
+    if(this.checkFields()) {
+      this.alertService.showLoader('Logging in...');
       await this.authService.signInWithEmail(this.inputs.email, this.inputs.password);
+      this.alertService.dismissLoader();
+    }
   }
 
   async loginWithClicked(provider: 'facebook' | 'google') {
@@ -109,14 +120,19 @@ export class LandingPage implements OnInit {
 
   async resetPasswordClicked() {
     if(this.checkFields()) {
+      this.alertService.showLoader('Sending email...');
       await this.authService.sendResetPasswordEmail(this.inputs.email);
       this._pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
+      this.alertService.dismissLoader();
     }
   }
 
   async newPasswordClicked() {
-    if(this.checkFields())
+    if(this.checkFields()) {
+      this.alertService.showLoader('Restarting password');
       await this.authService.resetPassword(this.inputs.password);
+      this.alertService.dismissLoader();
+    }
   }
 
   async resendVerification() {

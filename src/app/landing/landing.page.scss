@@ -1,12 +1,7 @@
+@import "../app.component.scss";
+
 ion-content.background {
   --background: url("../../assets/backgrounds/background.png") 0 0/100% 100% no-repeat;
-}
-
-// All buttons
-ion-button {
-  font-weight: bolder;
-  text-transform: uppercase;
-  height: 3em;
 }
 
 p {
