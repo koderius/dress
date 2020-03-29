@@ -1,0 +1,23 @@
+<ion-content class="background" *ngIf="pageStatus">
+
+  <div class="logo">
+    <ion-img src="../../assets/logo/logo_large.png"></ion-img>
+  </div>
+
+  <ion-row class="buttons" *ngIf="pageStatus == PageStatus.LANDING">
+
+    <ion-col>
+      <ion-button shape="round" color="tertiary" class="ion-float-end">
+        <ion-text>Login</ion-text>
+      </ion-button>
+    </ion-col>
+
+    <ion-col>
+      <ion-button shape="round" color="secondary">
+        <ion-text class="ion-padding-vertical">Register</ion-text>
+      </ion-button>
+    </ion-col>
+
+  </ion-row>
+
+</ion-content>

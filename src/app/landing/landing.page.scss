@@ -1,0 +1,23 @@
+ion-content.background {
+  --background: url("../../assets/backgrounds/background.png") 0 0/100% 100% no-repeat;
+}
+
+div.logo {
+  position: absolute;
+  left: 50%;
+  width: 40%;
+  top: 23%;
+  ion-img {
+    position: relative;
+    left: -50%;
+  }
+}
+
+ion-row.buttons {
+  position: relative;
+  top: 55%;
+  ion-button {
+    width: 60%;
+    font-weight: bolder;
+  }
+}
