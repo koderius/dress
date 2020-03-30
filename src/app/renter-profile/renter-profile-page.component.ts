@@ -34,7 +34,7 @@ export class RenterProfilePage implements OnInit {
   }
 
   goToEdit() {
-    this.navCtrl.navigateRoot('tabs/profile', {animationDirection: 'back'});
+    this.navCtrl.navigateForward('tabs/profile');
   }
 
 }

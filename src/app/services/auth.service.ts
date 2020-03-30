@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/functions';
 import {FirebaseError, User, UserInfo} from 'firebase';
-import {NavController, Platform} from '@ionic/angular';
+import {Platform} from '@ionic/angular';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 
@@ -62,10 +63,10 @@ export class AuthService {
   private _oobCode: string;
   private _emailFromURL: string;
 
-  /** A function to invoke when auth state changes */
-  public onAuthValid : (userId: string)=>void = ()=>{};
+  /** A function to invoke when there is a user signed in (for UI) */
+  public onUserAuth : (user: User)=>void = ()=>{};
 
-  /** A function to invoke when there is an error */
+  /** A function to invoke when there is an error (for UI) */
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);
 
   /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
@@ -78,8 +79,20 @@ export class AuthService {
   constructor(
     private platform : Platform,
     private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController,
   ) {
+
+    // /** MOCK */
+    // this._currentUserDoc = {
+    //   uid: 'abc123',
+    //   email: 'mestroti@gmail.com',
+    //   displayName: 'Moshe Estroti',
+    //   photoURL: 'https://lh3.googleusercontent.com/a-/AOh14Ggb7o8fqqNLVPi5eK-cLvAvLc4jU8rXk5ianNC1zQ=s96-cc-rg',
+    //   providerId: 'firebase',
+    //   phoneNumber: '0543055965',
+    // };
+    // this._user = this._currentUserDoc as User;
+    // return;
+    // /** MOCK */
 
     this.checkURL();
 
@@ -99,11 +112,12 @@ export class AuthService {
         // Subscribe the current user to its document changes.
         try {
           this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
+
             this._currentUserDoc = snapshot.data() as UserDoc;
 
-            // If document exists, the user is verified
-            if(this._currentUserDoc)
-              this.onAuthValid(user.uid);
+            // If user's document is not exist (usually when user is new), create it
+            if(!this._currentUserDoc)
+              this.createUserDocument();
 
           });
         }
@@ -111,12 +125,21 @@ export class AuthService {
           this.onAuthError(e);
         }
 
+        // If user is not verified, although signed in through provider, use cloud function to force verifying his email (e.g. Facebook)
+        if(!user.emailVerified)
+          if(user.providerData.length > 1 || user.providerData[0].providerId != 'password') {
+            const verifyEmail = firebase.functions().httpsCallable('tryVerifyUserEmail');
+            if(await verifyEmail())
+              await user.reload();
+          }
+
       }
 
-      else {
+      else
         this._currentUserDoc = null;
-        this.onAuthValid(null);
-      }
+
+      // After all process is done, notify the UI
+      this.onUserAuth(user);
 
     });
 
@@ -132,9 +155,9 @@ export class AuthService {
   }
 
 
-  /** Get the current user document (null if no signed in user or document does not exist) */
+  /** Get the current user document (null if no signed in user or the user is not verified) */
   get currentUser(): UserDoc | null {
-    return this._currentUserDoc ? {...this._currentUserDoc} : null;
+    return this._user && this._user.emailVerified ? {...this._currentUserDoc} : null;
   }
 
 
@@ -160,7 +183,6 @@ export class AuthService {
                 this._emailFromURL = info.data.email;
                 await this.auth.applyActionCode(this._oobCode);
                 await this._user.reload();
-                await this.createUserDocument(this._user);
               }
               break;
 
@@ -241,10 +263,6 @@ export class AuthService {
         cred = await this.auth.getRedirectResult();
       }
 
-      // On the first sign-in, create user document
-      if(cred.additionalUserInfo.isNewUser)
-        await this.createUserDocument(cred.user);
-
       return cred;
 
     }
@@ -256,7 +274,9 @@ export class AuthService {
 
 
   // Create user document only from user valid properties
-  private async createUserDocument(user: User) {
+  private async createUserDocument() {
+
+    const user = this._user;
 
     const doc: UserInfo = {
       uid: user.uid,
@@ -264,8 +284,7 @@ export class AuthService {
       displayName: user.displayName,
       photoURL: user.photoURL,
       phoneNumber: user.phoneNumber,
-      providerId: user.providerId,
-    };
+    } as UserInfo;
 
     // Delete all undefined
     for(let p in user)

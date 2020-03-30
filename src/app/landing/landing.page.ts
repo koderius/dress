@@ -36,7 +36,7 @@ export class LandingPage implements OnInit {
 
   isPasswordShow: boolean;
 
-  isTermsAgreed: boolean;
+  isTermsRead: boolean;
 
   constructor(
     public authService: AuthService,
@@ -45,11 +45,15 @@ export class LandingPage implements OnInit {
     private navCtrl: NavController,
   ) {
 
-    // Navigate to app when user is verified
-    this.authService.onAuthValid = (userId => {
-      if(userId)
-        this.navCtrl.navigateRoot('tabs');
-    });
+    // When user changed
+    this.authService.onUserAuth = async (user)=>{
+      if(user) {
+        if(user.emailVerified)
+          this.navCtrl.navigateRoot('tabs');
+        else
+          this.pageStatus = PageStatus.VERIFICATION_SENT;
+      }
+    };
 
     // Show error message when there is some auth error
     this.authService.onAuthError = (e: FirebaseError) => {
@@ -89,29 +93,21 @@ export class LandingPage implements OnInit {
   }
 
 
-  async goToTerms() : Promise<boolean> {
+  async goToTerms() {
     const m = await this.modalCtrl.create({component: TermsComponent});
     m.present();
-    this.isTermsAgreed = (await m.onDidDismiss()).role == 'AGREE';
-    return this.isTermsAgreed;
-  }
-
-
-  private async checkTerms() {
-    if(this.isTermsAgreed)
-      return true;
-    else
-      return await this.goToTerms();
+    if((await m.onDidDismiss()).role == 'AGREE')
+      this.isTermsRead = true;
   }
 
 
   async registerClicked() {
-    if(this.checkFields() && await this.checkTerms()) {
-      this.alertService.showLoader('Registering...');
-      if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name))
-        this.pageStatus = PageStatus.VERIFICATION_SENT;
-      this.alertService.dismissLoader();
-    }
+    if(!this.isTermsRead)
+      await this.goToTerms();
+    this.alertService.showLoader('Registering...');
+    if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name))
+      this.pageStatus = PageStatus.VERIFICATION_SENT;
+    this.alertService.dismissLoader();
   }
 
   async loginClicked() {
@@ -123,8 +119,9 @@ export class LandingPage implements OnInit {
   }
 
   async loginWithClicked(provider: 'facebook' | 'google') {
-    if(await this.checkTerms())
-      await this.authService.signInWithProvider(provider);
+    const cred = await this.authService.signInWithProvider(provider);
+    if(cred.additionalUserInfo.isNewUser)
+      await this.goToTerms();
   }
 
   async resetPasswordClicked() {

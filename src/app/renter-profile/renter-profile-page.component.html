@@ -17,12 +17,10 @@
           <img [src]="userDoc.photoURL" *ngIf="userDoc.photoURL">
         </ion-thumbnail>
         <div class="ion-padding-start">
-          <ion-row>
-            <ion-item>
-              <ion-label position="stacked" color="light">Full Name</ion-label>
-              <ion-input [value]="userDoc.displayName" readonly></ion-input>
-            </ion-item>
-          </ion-row>
+          <ion-item lines="none">
+            <ion-label position="stacked" color="light">Full Name</ion-label>
+            <ion-input [value]="userDoc.displayName" readonly></ion-input>
+          </ion-item>
           <ion-row *ngIf="isMe()">
             <ion-button shape="round" color="secondary" class="normal-btn" (click)="goToEdit()">Edit Profile</ion-button>
           </ion-row>

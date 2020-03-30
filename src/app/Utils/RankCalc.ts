@@ -28,7 +28,8 @@ export class RankCalc {
 
   static TotalRanks(rank: number[]) : number {
     let sum = 0;
-    rank.forEach((r)=>sum += (r || 0));
+    if(rank)
+      rank.forEach((r)=>sum += (r || 0));
     return sum;
   }
 
