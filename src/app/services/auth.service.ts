@@ -19,6 +19,18 @@ export interface UserDoc extends UserInfo {
 /**
  * This service is used for signing-in users in different methods.
  * When a new user is created, it creates a document with his details in the users collection in firestore.
+ *
+ * This service includes signing up with providers (google\facebook) or with email & password, reset password & deleting user.
+ *
+ * @User_document: For providers, the document is being created in firestore immediately after connection. For email + password, the document is being
+ * created only after entering with email verification link.
+ *
+ * @Email_verification: Since some providers (like facebook) are not considered as email verifiers, and since the email verification check
+ * does not work in the firestore rules, I decided to ignore the email verification property, and instead check the existence of user's
+ * document.
+ *
+ * @Deleting_user: A cloud function that handles the user's data deletion should be deployed
+ *
  */
 
 @Injectable({
@@ -84,13 +96,9 @@ export class AuthService {
       if(this.myProfileSubscription)
         this.myProfileSubscription();
 
-      // Subscribe the current user to its document changes
       if(user) {
 
-        // If email is not verified, do not proceed
-        if(!user.emailVerified)
-          return;
-
+        // Subscribe the current user to its document changes.
         try {
           this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
             this._currentUserDoc = snapshot.data() as UserDoc;
@@ -100,14 +108,16 @@ export class AuthService {
           this.onAuthError(e);
         }
 
-        this.navCtrl.navigateRoot(this.HOME_PAGE);
-
       }
 
-      else {
+      else
         this._currentUserDoc = null;
+
+      // Navigate to login page or into the app
+      if(this.currentUser)
+        this.navCtrl.navigateRoot(this.HOME_PAGE);
+      else
         this.navCtrl.navigateRoot(this.LOGIN_PAGE);
-      }
 
     });
 
@@ -123,9 +133,9 @@ export class AuthService {
   }
 
 
-  /** Get the current user info (null if no signed in user or email is not verified) */
+  /** Get the current user document (null if no signed in user or document does not exist) */
   get currentUser(): UserDoc | null {
-    return this._currentUserDoc;
+    return this._currentUserDoc ? {...this._currentUserDoc} : null;
   }
 
 

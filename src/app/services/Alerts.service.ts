@@ -35,17 +35,17 @@ export class AlertsService {
   }
 
 
-  async areYouSure(question : string, msg? : string) : Promise<boolean> {
+  async areYouSure(question : string, msg? : string, yesText?: string, noText?: string) : Promise<boolean> {
 
     const a = await this.alertCtrl.create({
       subHeader : question,
       message : msg,
       buttons : [
         {
-          text : 'No',
+          text : noText || 'No',
         },
         {
-          text : 'Yes',
+          text : yesText || 'Yes',
           role : 'yes',
         }
       ],

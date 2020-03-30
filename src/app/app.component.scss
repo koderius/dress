@@ -1,6 +1,40 @@
 // All buttons
-ion-button {
+ion-button.main-btn {
   font-weight: bolder;
   text-transform: uppercase;
   height: 3em;
+}
+
+ion-button.normal-btn {
+  text-transform: capitalize;
+  height: 2.3em;
+}
+
+// Lists
+.app-list {
+
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+
+  ion-list-header {
+    padding: 0;
+    ion-title {
+      padding: 0;
+      text-transform: uppercase;
+      font-size: 1em;
+    }
+  }
+
+  ion-item-group {
+    border-bottom: solid #dedede 1px;
+  }
+
+  ion-item {
+    ion-button {
+      position: relative;
+      top: 1em;
+    }
+  }
+
 }

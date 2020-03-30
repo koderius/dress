@@ -36,6 +36,8 @@ export class LandingPage implements OnInit {
 
   isPasswordShow: boolean;
 
+  isTermsAgreed: boolean;
+
   constructor(
     public authService: AuthService,
     private alertService: AlertsService,
@@ -79,17 +81,27 @@ export class LandingPage implements OnInit {
   }
 
 
-  async goToTerms() {
+  async goToTerms() : Promise<boolean> {
     const m = await this.modalCtrl.create({component: TermsComponent});
     m.present();
+    this.isTermsAgreed = (await m.onDidDismiss()).role == 'AGREE';
+    return this.isTermsAgreed;
+  }
+
+
+  private async checkTerms() {
+    if(this.isTermsAgreed)
+      return true;
+    else
+      return await this.goToTerms();
   }
 
 
   async registerClicked() {
-    if(this.checkFields()) {
+    if(this.checkFields() && await this.checkTerms()) {
       this.alertService.showLoader('Registering...');
-      await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name);
-      this.pageStatus = PageStatus.VERIFICATION_SENT;
+      if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name))
+        this.pageStatus = PageStatus.VERIFICATION_SENT;
       this.alertService.dismissLoader();
     }
   }
@@ -103,7 +115,8 @@ export class LandingPage implements OnInit {
   }
 
   async loginWithClicked(provider: 'facebook' | 'google') {
-    await this.authService.signInWithProvider(provider);
+    if(await this.checkTerms())
+      await this.authService.signInWithProvider(provider);
   }
 
   async resetPasswordClicked() {

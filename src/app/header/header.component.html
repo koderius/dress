@@ -1,0 +1,27 @@
+<ion-toolbar>
+
+  <ion-buttons slot="start">
+    <ion-back-button defaultHref="tabs/home"></ion-back-button>
+    <div id="logo">
+      <ion-img src="../../assets/logo/logo_small.png"></ion-img>
+    </div>
+  </ion-buttons>
+
+
+  <ion-buttons slot="end" *ngIf="type == 'buttons'">
+    <ion-button shape="round" color="dark" fill="solid">My<br>Products</ion-button>
+    <ion-button shape="round" color="secondary" fill="solid">
+      <ion-icon slot="start" src="../../assets/svg/icon_upload.svg"></ion-icon>
+      Upload
+    </ion-button>
+  </ion-buttons>
+
+  <ion-searchbar *ngIf="showSearchbar" (ionBlur)="showSearchbar = false"></ion-searchbar>
+
+  <ion-buttons slot="end" *ngIf="type == 'search'">
+    <ion-button (click)="searchClicked()">
+      <ion-icon slot="icon-only" src="../../assets/svg/icon_search.svg"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+
+</ion-toolbar>

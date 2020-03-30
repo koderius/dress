@@ -1,0 +1,21 @@
+#logo {
+  width: 35px;
+}
+
+ion-button {
+  text-transform: capitalize;
+  font-weight: normal;
+  font-size: 0.75em;
+  --padding-start: 1em;
+  --padding-end: 1em;
+  margin: 0 0.5em;
+  ion-icon {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
+ion-searchbar {
+  --box-shadow: none;
+  --icon-color: transparent;
+}

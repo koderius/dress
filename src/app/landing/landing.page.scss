@@ -4,6 +4,10 @@ ion-content.background {
   --background: url("../../assets/backgrounds/background.png") 0 0/100% 100% no-repeat;
 }
 
+ion-button {
+  @extend .main-btn;
+}
+
 p {
   text-align: center;
   font-weight: 500;
@@ -37,6 +41,7 @@ ion-item {
     text-transform: capitalize;
     font-size: 1em;
     font-weight: normal;
+    user-select: none;
   }
 }
 

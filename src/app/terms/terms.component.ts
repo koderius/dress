@@ -16,8 +16,7 @@ export class TermsComponent implements OnInit {
   ngOnInit() {}
 
   agree() {
-    this.modalCtrl.dismiss();
-    //TODO: Need to accept terms?
+    this.modalCtrl.dismiss(null, 'AGREE');
   }
 
 }
