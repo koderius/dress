@@ -41,6 +41,8 @@ export class AuthService {
   /** Firebase auth module - for the use of this service only **/
   private auth = firebase.auth();
 
+  private _active: boolean;
+
   /** The firebase current user entity (null if no user is signed in) */
   private _user: User;
 
@@ -91,6 +93,9 @@ export class AuthService {
     // this._user = this._currentUserDoc as User;
     // return;
     // /** MOCK */
+
+    // When first user is ready, or no user, set activity to true
+    this.onUserReady.subscribe(()=>this._active = true);
 
     this.checkURL();
 
@@ -154,6 +159,11 @@ export class AuthService {
 
   }
 
+
+  /** Whether the auth module has started to work after app loaded. User ready or no user */
+  get isActive() {
+    return this._active;
+  }
 
   /** Mode that redirected from URL (reset password / email verification) */
   get mode() : string {

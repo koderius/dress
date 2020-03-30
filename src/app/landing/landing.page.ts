@@ -3,7 +3,7 @@ import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
 import {ModalController, NavController} from '@ionic/angular';
-import {TermsComponent} from '../terms/terms.component';
+import {TermsComponent} from '../components/terms/terms.component';
 
 enum PageStatus {
 
@@ -24,7 +24,6 @@ enum PageStatus {
 })
 export class LandingPage implements OnInit {
 
-  showPage: boolean;
   PageStatus = PageStatus;
   pageStatus: PageStatus = PageStatus.LANDING;
 
@@ -49,9 +48,6 @@ export class LandingPage implements OnInit {
     // When user changed
     this.authService.onUserReady.subscribe(async (user)=>{
 
-      // Can show page after authentication started
-      this.showPage = true;
-
       // Check user status
       if(user) {
         // If user is verified, go into the app
@@ -71,12 +67,14 @@ export class LandingPage implements OnInit {
 
   }
 
+  // Check whether it's a reset password mode, and change the status accordingly
   ngOnInit() {
     if(this.authService.mode == 'resetPassword')
       this.pageStatus = PageStatus.NEW_PASSWORD;
   }
 
 
+  // The placeholder to show in the password inputs
   passwordPlaceholder() : string {
     switch (this.pageStatus) {
       case PageStatus.REGISTER: return 'Create Password';
@@ -85,6 +83,8 @@ export class LandingPage implements OnInit {
     }
   }
 
+
+  // Which inputs fields to show in each status
   inputToShow(inputName: string) {
     let inputs = [];
     switch (this.pageStatus) {
@@ -97,6 +97,7 @@ export class LandingPage implements OnInit {
   }
 
 
+  // Open terms in a modal
   async goToTerms() {
     const m = await this.modalCtrl.create({component: TermsComponent});
     m.present();
@@ -105,6 +106,7 @@ export class LandingPage implements OnInit {
   }
 
 
+  // Register with email & password. (1) Open terms, (2) Create user and (3) wait for verification (email was sent)
   async registerClicked() {
     if(!this.isTermsRead)
       await this.goToTerms();
@@ -114,6 +116,8 @@ export class LandingPage implements OnInit {
     this.alertService.dismissLoader();
   }
 
+
+  // Login with email & password (for already registered users)
   async loginClicked() {
     if(this.checkFields()) {
       this.alertService.showLoader('Logging in...');
@@ -122,12 +126,16 @@ export class LandingPage implements OnInit {
     }
   }
 
+
+  // Login with facebook or google. On the first time, open the terms
   async loginWithClicked(provider: 'facebook' | 'google') {
     const cred = await this.authService.signInWithProvider(provider);
     if(cred.additionalUserInfo.isNewUser)
       await this.goToTerms();
   }
 
+
+  // Send reset password email
   async resetPasswordClicked() {
     if(this.checkFields()) {
       this.alertService.showLoader('Sending email...');
@@ -137,6 +145,8 @@ export class LandingPage implements OnInit {
     }
   }
 
+
+  // Change password after redirected by the link
   async newPasswordClicked() {
     if(this.checkFields()) {
       this.alertService.showLoader('Restarting password');
@@ -145,11 +155,15 @@ export class LandingPage implements OnInit {
     }
   }
 
+
+  // Send verification email again
   async resendVerification() {
     await this.authService.sendEmailVerification();
     alert('Verification email was sent');
   }
 
+
+  // Check all required fields are filled and well formatted
   checkFields() : boolean {
 
     // Must enter name

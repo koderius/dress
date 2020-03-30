@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {TERMS} from '../../assets/TERMS';
+import {TERMS} from '../../../assets/TERMS';
 import {ModalController} from '@ionic/angular';
 
 @Component({

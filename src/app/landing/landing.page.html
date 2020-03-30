@@ -1,4 +1,4 @@
-<ion-content class="background" *ngIf="showPage">
+<ion-content class="background" *ngIf="authService.isActive">
 
   <div class="logo" [ngClass]="pageStatus == PageStatus.LANDING ? 'large' : 'small'">
     <ion-img src="../../assets/logo/logo_large.png"></ion-img>

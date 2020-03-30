@@ -1,1 +1,47 @@
+#options-menu {
 
+  position: absolute;
+  width: 100%;
+  z-index: 5;
+  bottom: -500px;
+
+  ion-list{
+    padding: 0;
+  }
+
+  ion-item {
+    border-top: solid #fcacc6 1px;
+    border-bottom: solid #f991ae 1px;
+  }
+
+}
+
+#options-menu.open {
+  animation-name: showMenu;
+  animation-duration: 300ms;
+  animation-fill-mode: both;
+}
+#options-menu.close {
+  animation-name: hideMenu;
+  animation-duration: 300ms;
+  animation-fill-mode: both;
+  animation-direction: reverse;
+}
+
+@keyframes showMenu {
+  from {bottom: -500px}
+  to {bottom: var(--tabs-height)}
+}
+
+@keyframes hideMenu {
+  from {bottom: -500px}
+  to {bottom: var(--tabs-height)}
+}
+
+
+.backdrop {
+  z-index: 1;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
