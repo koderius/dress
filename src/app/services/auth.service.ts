@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
@@ -14,6 +14,7 @@ export interface UserDoc extends UserInfo {
   address?: string;
   city?: string;
   state?: string;
+  zipCode?: string;
   size?: string;
   rank?: number[];
 }
@@ -24,12 +25,9 @@ export interface UserDoc extends UserInfo {
  *
  * This service includes signing up with providers (google\facebook) or with email & password, reset password & deleting user.
  *
- * @User_document: For providers, the document is being created in firestore immediately after connection. For email + password, the document is being
- * created only after entering with email verification link.
- *
- * @Email_verification: Since some providers (like facebook) are not considered as email verifiers, and since the email verification check
- * does not work in the firestore rules, I decided to ignore the email verification property, and instead check the existence of user's
- * document.
+ * @Email_verification: All providers, except email + password, will be considered as email verified (automatically by firebase, or manually
+ * through a cloud function that will force email verification).
+ * For email + password registration, an email with a link will be sent to the user for verification.
  *
  * @Deleting_user: A cloud function that handles the user's data deletion should be deployed
  *
@@ -40,10 +38,10 @@ export interface UserDoc extends UserInfo {
 })
 export class AuthService {
 
-  /** Firebase auth module **/
+  /** Firebase auth module - for the use of this service only **/
   private auth = firebase.auth();
 
-  /** The firebase current user entity */
+  /** The firebase current user entity (null if no user is signed in) */
   private _user: User;
 
   /** Current user's document. Null if there is no signed-in user */
@@ -58,22 +56,22 @@ export class AuthService {
   /** Get a reference to some user's document (if UID not provided, get current user) */
   public userProfileDoc = (uid?: string) => this.USERS_COLLECTION.doc(uid || this._user.uid);
 
-  /** The params that was read from the URL (email verification, reset password...) */
+  /** The params that are being read from the URL (for email verification, reset password...) */
   private _mode: string;
   private _oobCode: string;
   private _emailFromURL: string;
 
-  /** A function to invoke when there is a user signed in (for UI) */
-  public onUserAuth : (user: User)=>void = ()=>{};
+  /** An event that is emitted when there is a ready signed in user */
+  public onUserReady = new EventEmitter();
 
   /** A function to invoke when there is an error (for UI) */
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);
 
   /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
-  public passwordRegex = '^[a-zA-Z0-9_]{6,}$';
+  public readonly PASSWORD_REGEX = '^[a-zA-Z0-9_]{6,}$';
 
   /** Regular expresion for email address */
-  public emailRegex = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$';
+  public readonly EMAIL_REGEX = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$';
 
 
   constructor(
@@ -107,25 +105,10 @@ export class AuthService {
       if(this.myProfileSubscription)
         this.myProfileSubscription();
 
-      if(user) {
+      if (user) {
 
-        // Subscribe the current user to its document changes.
-        try {
-          this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
-
-            this._currentUserDoc = snapshot.data() as UserDoc;
-
-            // If user's document is not exist (usually when user is new), create it
-            if(!this._currentUserDoc)
-              this.createUserDocument();
-
-          });
-        }
-        catch(e) {
-          this.onAuthError(e);
-        }
-
-        // If user is not verified, although signed in through provider, use cloud function to force verifying his email (e.g. Facebook)
+        // If user is not verified, although signed in through a provider, use a cloud function to force verifying his email
+        // This call to the cloud function was added because authentication with facebook (unlike google) does not verify the email
         if(!user.emailVerified)
           if(user.providerData.length > 1 || user.providerData[0].providerId != 'password') {
             const verifyEmail = firebase.functions().httpsCallable('tryVerifyUserEmail');
@@ -133,35 +116,62 @@ export class AuthService {
               await user.reload();
           }
 
+        // Subscribe to the current user's document changes.
+        try {
+          this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
+
+            const data = snapshot.data() as UserDoc;
+
+            if(data) {
+
+              // On the first document snapshot, update the UI that the user is ready
+              if(!this._currentUserDoc)
+                this.onUserReady.emit(user);
+
+              // Update user document anyway
+              this._currentUserDoc = data;
+
+            }
+            // If user's document does not exist (usually for new users), create it
+            else
+              this.createUserDocument();
+
+
+          });
+        }
+        catch(e) {
+          this.onAuthError(e);
+        }
+
       }
 
-      else
+      else {
         this._currentUserDoc = null;
-
-      // After all process is done, notify the UI
-      this.onUserAuth(user);
+        this.onUserReady.emit(null);
+      }
 
     });
 
   }
 
 
+  /** Mode that redirected from URL (reset password / email verification) */
   get mode() : string {
     return this._mode;
   }
 
+  /** The email which the URL was sent */
   get emailFromURL() : string {
     return this._emailFromURL;
   }
 
-
-  /** Get the current user document (null if no signed in user or the user is not verified) */
+  /** Get the current user document (null if no signed in user or the user is not verified or the document is not exist/ready) */
   get currentUser(): UserDoc | null {
-    return this._user && this._user.emailVerified ? {...this._currentUserDoc} : null;
+    return this._user && this._user.emailVerified && this._currentUserDoc ? {...this._currentUserDoc} : null;
   }
 
 
-  /** Check URL for reset password or email verification */
+  /** Check the URL for reset password or email verification */
   private checkURL() {
 
     this.activatedRoute.queryParams.subscribe(async (params)=>{
@@ -273,7 +283,7 @@ export class AuthService {
   }
 
 
-  // Create user document only from user valid properties
+  /** Create user basic document from his first known properties */
   private async createUserDocument() {
 
     const user = this._user;
@@ -296,7 +306,7 @@ export class AuthService {
   }
 
 
-  /** Update user's document (MERGE) */
+  /** Update user's document (BY MERGE) */
   async editUserDocument(newUserDetails: UserDoc) : Promise<void> {
 
     // Cannot change UID
@@ -324,6 +334,7 @@ export class AuthService {
 
   }
 
+  /** Get some user's document data */
   async getUserDoc(uid: string) : Promise<UserDoc> {
     if(this._user && uid == this._user.uid)
       return this.currentUser;
@@ -343,7 +354,7 @@ export class AuthService {
   }
 
 
-  /** Send reset password email */
+  /** Send the user a reset password email */
   async sendResetPasswordEmail(email: string) {
     try {
       await this.auth.sendPasswordResetEmail(email);

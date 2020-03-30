@@ -24,6 +24,7 @@ enum PageStatus {
 })
 export class LandingPage implements OnInit {
 
+  showPage: boolean;
   PageStatus = PageStatus;
   pageStatus: PageStatus = PageStatus.LANDING;
 
@@ -46,14 +47,22 @@ export class LandingPage implements OnInit {
   ) {
 
     // When user changed
-    this.authService.onUserAuth = async (user)=>{
+    this.authService.onUserReady.subscribe(async (user)=>{
+
+      // Can show page after authentication started
+      this.showPage = true;
+
+      // Check user status
       if(user) {
+        // If user is verified, go into the app
         if(user.emailVerified)
           this.navCtrl.navigateRoot('tabs');
+
+        // Else stay in unverified user status
         else
           this.pageStatus = PageStatus.VERIFICATION_SENT;
       }
-    };
+    });
 
     // Show error message when there is some auth error
     this.authService.onAuthError = (e: FirebaseError) => {
@@ -65,11 +74,6 @@ export class LandingPage implements OnInit {
   ngOnInit() {
     if(this.authService.mode == 'resetPassword')
       this.pageStatus = PageStatus.NEW_PASSWORD;
-  }
-
-  // Do not show the page before auth was loaded
-  get showPage() {
-    return !this.authService.currentUser;
   }
 
 
@@ -155,13 +159,13 @@ export class LandingPage implements OnInit {
     }
 
     // Check email is well formatted
-    if(this.inputToShow('email') && !this.inputs.email.match(this.authService.emailRegex)) {
+    if(this.inputToShow('email') && !this.inputs.email.match(this.authService.EMAIL_REGEX)) {
       alert('Email is bad formatted');
       return false;
     }
 
     // Check password is valid
-    if(this.inputToShow('password') && !this.inputs.password.match(this.authService.passwordRegex)) {
+    if(this.inputToShow('password') && !this.inputs.password.match(this.authService.PASSWORD_REGEX)) {
       alert('Password must contain at least 6 characters of letters and numbers');
       return false;
     }
