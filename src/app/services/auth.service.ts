@@ -101,7 +101,15 @@ export class AuthService {
         // Subscribe the current user to its document changes.
         try {
           this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
+
             this._currentUserDoc = snapshot.data() as UserDoc;
+
+            // Navigate to login page or into the app
+            if(this._currentUserDoc)
+              this.navCtrl.navigateRoot(this.HOME_PAGE);
+            else
+              this.navCtrl.navigateRoot(this.LOGIN_PAGE);
+
           });
         }
         catch(e) {
@@ -112,12 +120,6 @@ export class AuthService {
 
       else
         this._currentUserDoc = null;
-
-      // Navigate to login page or into the app
-      if(this.currentUser)
-        this.navCtrl.navigateRoot(this.HOME_PAGE);
-      else
-        this.navCtrl.navigateRoot(this.LOGIN_PAGE);
 
     });
 

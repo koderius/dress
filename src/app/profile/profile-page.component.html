@@ -1,0 +1,120 @@
+<ion-header>
+  <app-header type="buttons"></app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="userDoc">
+
+  <ion-list [inset]="true" lines="full" class="app-list">
+
+    <ion-item-group>
+
+      <ion-list-header>
+        <ion-title>Profile</ion-title>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Username</ion-label>
+        <ion-input [(ngModel)]="userDoc.displayName"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Password</ion-label>
+        <ion-input type="password" readonly value="********"></ion-input>
+        <ion-button slot="end" fill="clear" id="changePasswordBtn">Change Password</ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Email</ion-label>
+        <ion-input type="email" readonly [(ngModel)]="userDoc.email"></ion-input>
+      </ion-item>
+
+    </ion-item-group>
+
+    <ion-item-group>
+
+      <ion-list-header>
+        <ion-title>Contact Details</ion-title>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Full Name</ion-label>
+        <ion-input></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Size</ion-label>
+        <ion-input></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Phone</ion-label>
+        <ion-input type="tel"></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Address</ion-label>
+        <ion-input></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">City</ion-label>
+        <ion-input></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Country</ion-label>
+        <ion-input></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Zip Code</ion-label>
+        <ion-input type="tel"></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+          <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+    </ion-item-group>
+
+    <ion-item-group>
+
+      <ion-list-header>
+        <ion-title>My Orders</ion-title>
+      </ion-list-header>
+
+      <ion-row id="orders-row">
+        <ion-col size="6" *ngFor="let order of myOrders">
+
+        </ion-col>
+      </ion-row>
+
+    </ion-item-group>
+
+  </ion-list>
+
+</ion-content>
+
+<ion-fab vertical="bottom" horizontal="end" *ngIf="hasChanges()" (click)="saveChanges()">
+  <ion-fab-button>
+    <ion-icon name="cloud-upload-outline"></ion-icon>
+    <!--    <ion-text>SAVE<br>CHANGES</ion-text>-->
+  </ion-fab-button>
+</ion-fab>
