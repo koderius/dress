@@ -1,0 +1,93 @@
+@import "../app.component.scss";
+
+
+#photo-item {
+  ion-thumbnail {
+    display: inline-block;
+    background-color: var(--ion-color-light);
+    height: 8em;
+    width: 7em;
+  }
+  div {
+    display: inline-block;
+    ion-item {
+      --padding-start: 0;
+    }
+    ion-button {
+      --padding-start: 1em;
+      --padding-end: 1em;
+    }
+  }
+}
+
+ion-item {
+  --highlight-height: 0;
+}
+
+#stars-item {
+  margin-top: 0.5em;
+  padding-left: 0.5em;
+  ion-text {
+    font-size: 1em;
+    line-height: 2;
+  }
+}
+
+#reviews-summery {
+  ion-label {
+    line-height: 3;
+  }
+}
+
+.review-card {
+  margin: 1em 0;
+  box-shadow: none;
+  div {
+    display: inline-block;
+  }
+  div:first-child {
+    vertical-align: top;
+    padding: 0.5em 0;
+  }
+  div:last-child {
+    width: calc(100% - 2em);
+    float: right;
+  }
+  ion-row {
+    padding: 0.5em 0;
+  }
+  ion-card-subtitle {
+    font-size: 1em;
+    line-height: 1.5;
+    color: black;
+  }
+  p {
+    color: black;
+    margin: 0;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+  ion-col {
+    padding: 0;
+  }
+}
+
+#my-review {
+  margin: 1em 0 3em 0;
+  font-size: 0.75em;
+  color: var(--ion-color-light);
+  ion-input, ion-textarea {
+    color: black;
+    --padding-top: 0.2em;
+    --padding-bottom: 0.2em;
+    border: solid var(--ion-color-light) 1px;
+    border-radius: 1em;
+  }
+  ion-input {
+    width: 40%;
+  }
+  ion-button {
+    font-weight: normal;
+    width: 35%;
+  }
+}

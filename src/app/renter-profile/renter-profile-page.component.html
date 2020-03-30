@@ -1,0 +1,103 @@
+<ion-header>
+  <app-header type="buttons"></app-header>
+</ion-header>
+
+<ion-content *ngIf="userDoc">
+
+  <ion-list class="app-list">
+
+    <ion-list-header>
+      <ion-title>Renter Profile</ion-title>
+    </ion-list-header>
+
+    <ion-item-group>
+
+      <div id="photo-item">
+        <ion-thumbnail slot="start">
+          <img [src]="userDoc.photoURL" *ngIf="userDoc.photoURL">
+        </ion-thumbnail>
+        <div class="ion-padding-start">
+          <ion-row>
+            <ion-item>
+              <ion-label position="stacked" color="light">Full Name</ion-label>
+              <ion-input [value]="userDoc.displayName" readonly></ion-input>
+            </ion-item>
+          </ion-row>
+          <ion-row *ngIf="isMe()">
+            <ion-button shape="round" color="secondary" class="normal-btn" (click)="goToEdit()">Edit Profile</ion-button>
+          </ion-row>
+        </div>
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked" color="light">Country</ion-label>
+        <ion-input readonly [value]="userDoc.state"></ion-input>
+      </ion-item>
+
+      <div id="stars-item">
+        <app-stars [rank]="userDoc.rank"></app-stars>
+        <ion-text>Positive Feedback</ion-text>
+      </div>
+
+    </ion-item-group>
+
+    <ion-item-group>
+
+      <div id="reviews-summery">
+
+        <ion-label>All Reviews</ion-label>
+
+        <div *ngFor="let rank of RankCalc.GetList(userDoc.rank).reverse(); let i = index">
+          <ion-text>{{(-i + 5) + ' stars '}}</ion-text>
+          <ion-text color="light">____________ </ion-text>
+          <ion-text>{{RankCalc.StarRate(userDoc.rank, (-i + 5))}}</ion-text>
+        </div>
+
+      </div>
+
+      <ion-card class="review-card">
+        <div>
+          <ion-note>1</ion-note>
+        </div>
+        <div>
+          <ion-row>
+            <ion-col>
+              <ion-card-subtitle>Username | Review Title</ion-card-subtitle>
+            </ion-col>
+            <ion-col size="5">
+              <app-stars [rank]="[4,5,19,23,15]" class="ion-float-end" size="1.3em"></app-stars>
+            </ion-col>
+          </ion-row>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took</p>
+        </div>
+      </ion-card>
+
+      <ion-row class="ion-margin-bottom">
+        <ion-button color="dark" shape="round" fill="outline" style="margin: auto; text-transform: capitalize">View All</ion-button>
+      </ion-row>
+
+    </ion-item-group>
+
+
+    <ion-item-group>
+
+      <ion-label>Leave Feedback</ion-label>
+      <ion-text>(For leaving a feedback you must sign in)</ion-text>
+
+      <div id="my-review">
+        <ion-label>Your rating</ion-label>
+        <app-stars></app-stars>
+        <ion-input placeholder="Title"></ion-input>
+        <ion-textarea placeholder="Your Feedback"></ion-textarea>
+        <ion-button color="dark" shape="round" size="small" class="ion-float-end">Confirm</ion-button>
+      </div>
+
+    </ion-item-group>
+
+    <ion-row>
+      <ion-button color="secondary" shape="round" class="normal-btn" style="margin: 1em auto">Connect With Renter</ion-button>
+    </ion-row>
+
+  </ion-list>
+
+</ion-content>

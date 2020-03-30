@@ -1,0 +1,7 @@
+<ion-row>
+
+  <ion-col *ngFor="let star of stars">
+    <ion-img [src]="roundedRank >= star ? starImg : emptyStarImg" [ngStyle]="{height: size, width: size}"></ion-img>
+  </ion-col>
+
+</ion-row>

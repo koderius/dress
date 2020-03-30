@@ -14,6 +14,7 @@ export interface UserDoc extends UserInfo {
   city?: string;
   state?: string;
   size?: string;
+  rank?: number[];
 }
 
 /**
@@ -38,12 +39,6 @@ export interface UserDoc extends UserInfo {
 })
 export class AuthService {
 
-  /** Page to navigate when there is no user */
-  private readonly LOGIN_PAGE = 'landing';
-
-  /** Page to navigate when user has signed-in */
-  private readonly HOME_PAGE = 'tabs';
-
   /** Firebase auth module **/
   private auth = firebase.auth();
 
@@ -66,6 +61,9 @@ export class AuthService {
   private _mode: string;
   private _oobCode: string;
   private _emailFromURL: string;
+
+  /** A function to invoke when auth state changes */
+  public onAuthValid : (userId: string)=>void = ()=>{};
 
   /** A function to invoke when there is an error */
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);
@@ -101,14 +99,11 @@ export class AuthService {
         // Subscribe the current user to its document changes.
         try {
           this.myProfileSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
-
             this._currentUserDoc = snapshot.data() as UserDoc;
 
-            // Navigate to login page or into the app
+            // If document exists, the user is verified
             if(this._currentUserDoc)
-              this.navCtrl.navigateRoot(this.HOME_PAGE);
-            else
-              this.navCtrl.navigateRoot(this.LOGIN_PAGE);
+              this.onAuthValid(user.uid);
 
           });
         }
@@ -118,8 +113,10 @@ export class AuthService {
 
       }
 
-      else
+      else {
         this._currentUserDoc = null;
+        this.onAuthValid(null);
+      }
 
     });
 
@@ -164,7 +161,6 @@ export class AuthService {
                 await this.auth.applyActionCode(this._oobCode);
                 await this._user.reload();
                 await this.createUserDocument(this._user);
-                this.navCtrl.navigateRoot(this.HOME_PAGE);
               }
               break;
 
@@ -307,6 +303,13 @@ export class AuthService {
       this.onAuthError(e);
     }
 
+  }
+
+  async getUserDoc(uid: string) : Promise<UserDoc> {
+    if(this._user && uid == this._user.uid)
+      return this.currentUser;
+    else
+      return (await this.userProfileDoc(uid).get()).data() as UserDoc;
   }
 
 

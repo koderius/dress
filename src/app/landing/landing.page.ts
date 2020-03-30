@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
-import {ModalController} from '@ionic/angular';
+import {ModalController, NavController} from '@ionic/angular';
 import {TermsComponent} from '../terms/terms.component';
 
 enum PageStatus {
@@ -42,8 +42,16 @@ export class LandingPage implements OnInit {
     public authService: AuthService,
     private alertService: AlertsService,
     private modalCtrl: ModalController,
+    private navCtrl: NavController,
   ) {
 
+    // Navigate to app when user is verified
+    this.authService.onAuthValid = (userId => {
+      if(userId)
+        this.navCtrl.navigateRoot('tabs');
+    });
+
+    // Show error message when there is some auth error
     this.authService.onAuthError = (e: FirebaseError) => {
       this.alertService.notice(e.message, 'Authentication Error', e.code);
     };

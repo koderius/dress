@@ -44,6 +44,10 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'renter-profile',
+        loadChildren: () => import('../renter-profile/renter-profile.module').then(m => m.RenterProfilePageModule),
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'
