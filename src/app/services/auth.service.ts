@@ -94,10 +94,8 @@ export class AuthService {
     // return;
     // /** MOCK */
 
-    // When first user is ready, or no user, set activity to true
+    // On user ready with his data, or when got no user, the auth module is active and the app can start
     this.onUserReady.subscribe(()=>this._active = true);
-
-    this.checkURL();
 
     // When user changes
     firebase.auth().onAuthStateChanged(async (user : User)=>{
@@ -106,7 +104,10 @@ export class AuthService {
 
       this._user = user;
 
-      // Stop previous user's subscription, if there is
+      // Get parameters from URL, and act accordingly
+      await this.checkURL();
+
+      // Stop previous user's document subscription, if there is
       if(this.myProfileSubscription)
         this.myProfileSubscription();
 
@@ -181,39 +182,36 @@ export class AuthService {
   }
 
 
-  /** Check the URL for reset password or email verification */
-  private checkURL() {
+  /** Act according to URL parameters */
+  private async checkURL() {
 
-    this.activatedRoute.queryParams.subscribe(async (params)=>{
+    // Get URL parameters
+    const params = this.activatedRoute.snapshot.queryParams;
+    this._mode = params['mode'];
+    this._oobCode = params['oobCode'];
 
-      this._mode = params['mode'];
+    try {
+      switch (this._mode) {
 
-      if(this._mode) {
-        this._oobCode = params['oobCode'];
-        try {
-          switch (this._mode) {
+        case 'resetPassword':
+          this._emailFromURL = await this.auth.verifyPasswordResetCode(this._oobCode);
+          break;
 
-            case 'resetPassword':
-              this._emailFromURL = await this.auth.verifyPasswordResetCode(this._oobCode);
-              break;
-
-            case 'verifyEmail':
-              const info = await this.auth.checkActionCode(this._oobCode);
-              if(info) {
-                this._emailFromURL = info.data.email;
-                await this.auth.applyActionCode(this._oobCode);
-                await this._user.reload();
-              }
-              break;
-
+        case 'verifyEmail':
+          const info = await this.auth.checkActionCode(this._oobCode);
+          if(info) {
+            this._emailFromURL = info.data.email;
+            await this.auth.applyActionCode(this._oobCode);
+            await this._user.reload();
           }
-        }
-        catch (e) {
-          this.onAuthError(e);
-        }
-      }
+          break;
 
-    });
+      }
+    }
+    catch (e) {
+      this.onAuthError(e);
+    }
+
   }
 
 
@@ -225,11 +223,14 @@ export class AuthService {
       // Create new user with email & password
       const cred = await this.auth.createUserWithEmailAndPassword(email, password);
 
-      // Send verification email
-      await this.sendEmailVerification();
-
       // Set basic details
-      await cred.user.updateProfile({displayName: name || null, photoURL: photo || null});
+      cred.user.updateProfile({
+        displayName: name || null,
+        photoURL: photo || null
+      } as UserDoc);
+
+      // Send verification email
+      this.sendEmailVerification();
 
       return cred;
 

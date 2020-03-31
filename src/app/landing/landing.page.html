@@ -107,9 +107,9 @@
         <div *ngIf="pageStatus == PageStatus.VERIFICATION_SENT">
           <br><br><br><br>
           <p>
-            <ion-text>An email with verification link was sent to {{authService.emailFromURL}}</ion-text>
+            <ion-text>An email with verification link was sent to {{inputs.email}}</ion-text>
           </p>
-          <ion-button color="secondary" shape="round" (click)="resendVerification()">
+          <ion-button expand="full" color="secondary" shape="round" (click)="resendVerification()">
             <ion-text>Send again</ion-text>
           </ion-button>
           <p>
@@ -122,7 +122,7 @@
           <p>
             <ion-text>An email with reset password link was sent to {{inputs.email}}</ion-text>
           </p>
-          <ion-button color="secondary" shape="round" (click)="resetPasswordClicked()">
+          <ion-button expand="full" color="secondary" shape="round" (click)="resetPasswordClicked()">
             <ion-text>Send again</ion-text>
           </ion-button>
         </div>

@@ -99,7 +99,11 @@ export class LandingPage implements OnInit {
 
   // Open terms in a modal
   async goToTerms() {
-    const m = await this.modalCtrl.create({component: TermsComponent});
+    const m = await this.modalCtrl.create({
+      component: TermsComponent,
+      backdropDismiss: false,
+      keyboardClose: false,
+    });
     m.present();
     if((await m.onDidDismiss()).role == 'AGREE')
       this.isTermsRead = true;
@@ -129,7 +133,9 @@ export class LandingPage implements OnInit {
 
   // Login with facebook or google. On the first time, open the terms
   async loginWithClicked(provider: 'facebook' | 'google') {
+    this.alertService.showLoader('Logging in...');
     const cred = await this.authService.signInWithProvider(provider);
+    this.alertService.dismissLoader();
     if(cred.additionalUserInfo.isNewUser)
       await this.goToTerms();
   }
