@@ -12,6 +12,14 @@ const routes: Routes = [
     path: 'landing',
     loadChildren: () => import('./landing/landing.module').then( m => m.LandingPageModule)
   },
+  {
+    path: 'dress-view',
+    loadChildren: () => import('./dress-view/dress-view.module').then( m => m.DressViewPageModule)
+  },
+  {
+    path: 'dress-edit',
+    loadChildren: () => import('./dress-edit/dress-edit.module').then( m => m.DressEditPageModule)
+  },
 ];
 @NgModule({
   imports: [

@@ -35,15 +35,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'options',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../options/options.module').then(m => m.OptionsPageModule)
-          }
-        ]
-      },
-      {
         path: 'renter-profile',
         loadChildren: () => import('../renter-profile/renter-profile.module').then(m => m.RenterProfilePageModule),
       },

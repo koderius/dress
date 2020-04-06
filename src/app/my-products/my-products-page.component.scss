@@ -1,0 +1,38 @@
+.grid {
+  --padding-start: 0.5em;
+  --padding-end: 0.5em;
+  border: none;
+  display: grid;
+  grid-template-columns: 10% 30% 30% 30%;
+  * {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.center {
+  justify-content: center;
+}
+
+.divider {
+  font-weight: lighter;
+  padding: 0.5em 0;
+  background-color: var(--ion-color-danger);
+  color:  white;
+}
+
+.row {
+  padding: 0.6em 0;
+  font-size: smaller;
+}
+
+.list-btn {
+  height: 1.5em;
+  font-weight: lighter;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+#gallery-btn {
+  margin: 2.5em auto;
+}

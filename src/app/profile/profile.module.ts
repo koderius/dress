@@ -12,11 +12,17 @@ import {LeaveProfileGuard} from './leave-profile-guard.service';
     IonicModule,
     CommonModule,
     FormsModule,
-    RouterModule.forChild([{
-      path: '',
-      component: ProfilePage,
-      canDeactivate: [LeaveProfileGuard],
-    }]),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ProfilePage,
+        canDeactivate: [LeaveProfileGuard],
+      },
+      {
+        path: 'my-products',
+        loadChildren: () => import('../my-products/my-products.module').then(m => m.MyProductsPageModule)
+      },
+    ]),
     ComponentsModule,
   ],
   declarations: [ProfilePage]

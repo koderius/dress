@@ -9,7 +9,7 @@
 
 
   <ion-buttons slot="end" *ngIf="type == 'buttons'">
-    <ion-button shape="round" color="dark" fill="solid">My<br>Products</ion-button>
+    <ion-button shape="round" color="medium" fill="solid" (click)="goToMyProducts()">My<br>Products</ion-button>
     <ion-button shape="round" color="secondary" fill="solid">
       <ion-icon slot="start" src="../../assets/svg/icon_upload.svg"></ion-icon>
       Upload

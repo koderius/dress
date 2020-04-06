@@ -1,0 +1,50 @@
+<ion-header>
+  <app-header type="buttons"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <ion-list class="app-list ion-no-padding">
+    <ion-list-header>
+      <ion-title>Dresses On Air</ion-title>
+    </ion-list-header>
+  </ion-list>
+
+  <div class="grid divider">
+    <div></div>
+    <div>Dress</div>
+    <div class="center">Status</div>
+  </div>
+
+  <div *ngFor="let dress of myDresses; let i = index" class="grid row">
+    <div class="center">{{i+1}}</div>
+    <div>{{dress.name}}</div>
+    <div class="center">
+      <ion-text [color]="dress.status == DressStatus.OPEN ? 'success' : 'danger'">{{dress.status == DressStatus.OPEN ? 'OPEN' : 'RENTED'}}</ion-text>
+    </div>
+    <ion-button color="medium" shape="round" class="normal-btn list-btn">More Details</ion-button>
+  </div>
+
+  <ion-row>
+    <ion-button id="gallery-btn" class="wider-btn" shape="round" fill="outline" color="dark">Gallery Mode</ion-button>
+  </ion-row>
+
+  <ion-list class="app-list ion-no-padding">
+    <ion-list-header>
+      <ion-title>Drafts Products</ion-title>
+    </ion-list-header>
+  </ion-list>
+
+  <div class="grid divider">
+    <div></div>
+    <div>Dress</div>
+  </div>
+
+  <div *ngFor="let dress of myDresses; let i = index" class="grid row">
+    <div class="center">{{i+1}}</div>
+    <div>{{dress.name}}</div>
+    <ion-button color="secondary" shape="round" class="normal-btn list-btn">PUBLISH</ion-button>
+    <ion-button color="medium" shape="round" class="normal-btn list-btn">More Details</ion-button>
+  </div>
+
+</ion-content>

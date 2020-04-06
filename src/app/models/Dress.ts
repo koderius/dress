@@ -117,6 +117,14 @@ export class Dress extends BaseModel implements DressProps {
     this._props.state = state;
   }
 
+  get status() {
+    return this._props.status;
+  }
+
+  set status(status: DressStatus) {
+    this._props.status = status;
+  }
+
   get fromDate() {
     return new Date(this._props.datesRange[0]);
   }
