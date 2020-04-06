@@ -8,7 +8,7 @@
     <h1>CATEGORIES</h1>
   </ion-item>
 
-  <div *ngFor="let c of categories" class="category" [ngStyle]="{width: (100 / imagesPerRow)+'%'}">
+  <div *ngFor="let c of categories" class="category" [ngStyle]="{width: (100 / imagesPerRow)+'%'}" (click)="filterByCategory(c.id)">
     <img [src]="c.image">
     <h6>{{c.title}}</h6>
   </div>

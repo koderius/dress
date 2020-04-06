@@ -11,7 +11,10 @@ import {ComponentsModule} from '../components/components.module';
     IonicModule,
     CommonModule,
     FormsModule,
-    RouterModule.forChild([{path: '', component: HomePage}]),
+    RouterModule.forChild([
+      {path: '', component: HomePage},
+      {path: 'search', component: HomePage},
+    ]),
     ComponentsModule
   ],
   declarations: [HomePage]
