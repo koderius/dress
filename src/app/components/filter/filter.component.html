@@ -1,0 +1,71 @@
+<div id="upper-line"></div>
+<ion-toolbar>
+  <div class="row" lines="none">
+
+    <ion-note slot="start">Quick<br>Search</ion-note>
+
+    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'categories' ? openedFilter = null : openedFilter = 'categories'">
+      Category
+      <ion-icon slot="end" name="chevron-down"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'dates' ? openedFilter = null : openedFilter = 'dates'">
+      Dates
+      <ion-icon slot="end" name="chevron-down"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'countries' ? openedFilter = null : openedFilter = 'countries'">
+      Country
+      <ion-icon slot="end" name="chevron-down"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="outline" shape="round" class="tiny-btn selected">FIND ME<br>DRESSES</ion-button>
+
+  </div>
+
+  <ion-row>
+    <ion-button fill="outline" shape="round" id="adv-btn" class="tiny-btn">ADVANCED FILTER</ion-button>
+  </ion-row>
+</ion-toolbar>
+
+<ion-list class="list" [ngClass]="openedFilter == 'categories' ? 'open' : 'close'">
+  <ion-item *ngFor="let c of categories" color="primary">
+    <ion-checkbox slot="start"></ion-checkbox>
+    <ion-label>{{c.title}}</ion-label>
+  </ion-item>
+</ion-list>
+
+<ion-list class="list" [ngClass]="openedFilter == 'countries' ? 'open' : 'close'">
+  <ion-searchbar color="primary" (ionChange)="getCountries($event.detail.value)"></ion-searchbar>
+  <ion-item *ngFor="let c of countries" color="primary">
+    <ion-checkbox slot="start"></ion-checkbox>
+    <ion-label>{{c}}</ion-label>
+  </ion-item>
+</ion-list>
+
+<ion-list class="list" [ngClass]="openedFilter == 'dates' ? 'open' : 'close'">
+  <ion-list-header color="primary">
+    <ion-title>DATES</ion-title>
+  </ion-list-header>
+  <div class="date-item">
+    <p>BETWEEN</p>
+    <div class="inputs">
+      <ion-input placeholder="dd" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="mm" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="yy" maxlength="2" type="tel"></ion-input>
+    </div>
+  </div>
+  <div class="date-item">
+    <p>TO</p>
+    <div class="inputs">
+      <ion-input placeholder="dd" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="mm" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="yy" maxlength="2" type="tel"></ion-input>
+    </div>
+  </div>
+  <div class="date-item">
+    <ion-button shape="round" id="confirm-btn" strong="true">CONFIRM</ion-button>
+  </div>
+</ion-list>
+
+<div id="backdrop" *ngIf="openedFilter" (click)="openedFilter = null"></div>

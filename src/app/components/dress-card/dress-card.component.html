@@ -1,0 +1,25 @@
+<ion-card *ngIf="dress">
+
+  <img [src]="dress.photo">
+
+  <ion-card-content class="ion-text-start">
+
+    <div>
+      <ion-text color="secondary" id="category-text">{{getCategoryName()}}</ion-text>
+      <app-stars [rank]="dress.ranks" size="1em" class="ion-float-end"></app-stars>
+    </div>
+
+    <div>
+      <ion-text>Price {{dress.price}}$</ion-text>
+      <ion-text class="ion-float-end">{{dress.state}}</ion-text>
+    </div>
+
+    <div>
+      <ion-text id="dates-text">Available Dates <br>{{(dress.fromDate | date : 'dd/MM/yy')}} - {{(dress.toDate | date : 'dd/MM/yy')}}</ion-text>
+    </div>
+
+    <ion-button color="secondary" shape="round" class="normal-btn">Check It</ion-button>
+
+  </ion-card-content>
+
+</ion-card>

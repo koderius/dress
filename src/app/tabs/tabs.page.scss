@@ -3,7 +3,6 @@
   position: absolute;
   width: 100%;
   z-index: 5;
-  bottom: -500px;
 
   ion-list{
     padding: 0;
@@ -16,12 +15,12 @@
 
 }
 
-#options-menu.open {
+#options-menu.openOptions {
   animation-name: showMenu;
   animation-duration: 300ms;
   animation-fill-mode: both;
 }
-#options-menu.close {
+#options-menu.closeOptions {
   animation-name: hideMenu;
   animation-duration: 300ms;
   animation-fill-mode: both;

@@ -1,7 +1,9 @@
-ion-row {
+#row {
   width: fit-content;
 }
 
-ion-col {
+.col {
+  display: inline-block;
+  vertical-align: middle;
   padding: 0.1em;
 }

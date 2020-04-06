@@ -1,3 +1,4 @@
+
 <ion-tabs *ngIf="authService.currentUser">
 
   <ion-tab-bar slot="bottom">
@@ -27,10 +28,10 @@
 
 
 
-  <div id="options-menu" [ngClass]="openOptions ? 'open' : 'close'">
+  <div id="options-menu" [ngClass]="openOptions ? 'openOptions' : 'closeOptions'">
     <ion-list>
 
-      <ion-item color="secondary" (click)="click()">
+      <ion-item color="secondary">
         <ion-label>Dress Upload</ion-label>
       </ion-item>
 

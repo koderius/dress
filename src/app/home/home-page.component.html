@@ -1,16 +1,56 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
-  </ion-toolbar>
+<ion-header [translucent]="true" #header>
+  <app-filter></app-filter>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" scrollEvents="true" appHideHeader [header]="header">
+
+  <div *ngIf="!isFiltered">
+    <div class="section">
+      <ion-item class="header" lines="none">
+        <h1>CATEGORIES</h1>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn" (click)="goToCategories()">View All</ion-button>
+      </ion-item>
+
+      <ion-slides [options]="categoriesSliderOptions">
+        <ion-slide *ngFor="let c of categories" class="category">
+          <img [src]="c.image">
+          <h6>{{c.title}}</h6>
+        </ion-slide>
+      </ion-slides>
+    </div>
+
+    <div class="section">
+      <ion-item class="header" lines="none">
+        <h1>Most Popular</h1>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn">View All</ion-button>
+      </ion-item>
+
+      <ion-slides [options]="dressSliderOptions">
+        <ion-slide *ngFor="let dress of popular">
+          <app-dress-card [dress]="dress"></app-dress-card>
+        </ion-slide>
+      </ion-slides>
+
+    </div>
+
+    <div class="section">
+      <ion-item class="header" lines="none">
+        <h1>Most Popular</h1>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn">View All</ion-button>
+      </ion-item>
+
+      <ion-slides [options]="dressSliderOptions">
+        <ion-slide *ngFor="let dress of forYou">
+          <app-dress-card [dress]="dress"></app-dress-card>
+        </ion-slide>
+      </ion-slides>
+
+    </div>
+  </div>
+
 
 </ion-content>
+
+<ion-footer *ngIf="isFiltered">
+  <ion-button class="main-btn" color="secondary" (click)="backToHome()">Back To Homepage</ion-button>
+</ion-footer>

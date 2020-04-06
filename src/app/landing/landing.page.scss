@@ -1,4 +1,4 @@
-@import "../app.component.scss";
+@import "../../global.scss";
 
 ion-content.background {
   --background: url("../../assets/backgrounds/background.png") 0 0/100% 100% no-repeat;
@@ -106,7 +106,7 @@ ion-item {
   font-weight: bold;
   padding: 0.5em;
   color: white;
-  background-color: var(--ion-color-dark);
+  background-color: #494949;
   border-radius: 50%;
 }
 

@@ -1,16 +1,16 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
-  </ion-toolbar>
+<ion-header [translucent]="true" #header>
+  <app-filter></app-filter>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" scrollEvents="true" appHideHeader [header]="header">
+
+  <ion-item class="header" lines="none">
+    <h1>CATEGORIES</h1>
+  </ion-item>
+
+  <div *ngFor="let c of categories" class="category" [ngStyle]="{width: (100 / imagesPerRow)+'%'}">
+    <img [src]="c.image">
+    <h6>{{c.title}}</h6>
+  </div>
 
 </ion-content>

@@ -58,6 +58,11 @@ export class LandingPage implements OnInit {
         else
           this.pageStatus = PageStatus.VERIFICATION_SENT;
       }
+
+      // Check whether it's a reset password mode, and change the status accordingly
+      if(this.authService.mode == 'resetPassword')
+        this.pageStatus = PageStatus.NEW_PASSWORD;
+
     });
 
     // Show error message when there is some auth error
@@ -67,10 +72,8 @@ export class LandingPage implements OnInit {
 
   }
 
-  // Check whether it's a reset password mode, and change the status accordingly
+
   ngOnInit() {
-    if(this.authService.mode == 'resetPassword')
-      this.pageStatus = PageStatus.NEW_PASSWORD;
   }
 
 

@@ -185,6 +185,10 @@ export class AuthService {
   /** Act according to URL parameters */
   private async checkURL() {
 
+    // Prevent reading URL twice
+    if(this._mode)
+      return;
+
     // Get URL parameters
     const params = this.activatedRoute.snapshot.queryParams;
     this._mode = params['mode'];
@@ -381,7 +385,6 @@ export class AuthService {
     try {
       if(this._oobCode) {
         await this.auth.confirmPasswordReset(this._oobCode, newPassword);
-        this._oobCode = null;
         await this.signInWithEmail(this._emailFromURL, newPassword);
       }
     }

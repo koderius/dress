@@ -35,10 +35,6 @@ export class TabsPage {
 
   }
 
-  click() {
-    alert('asdf');
-  }
-
   async openTerms() {
     this.openOptions = false;
     (await this.modalCtrl.create({component: TermsComponent})).present();
