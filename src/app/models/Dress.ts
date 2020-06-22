@@ -17,6 +17,8 @@ export type Color = {
   title: string;
 }
 
+export const DressSize = ['XS','S','M','L','XL','XXL','3XL'];
+
 /**
  * Dress status enum
  */
@@ -34,13 +36,15 @@ export interface DressProps extends BaseModelProps {
   category?: string;
   description?: string;
   style?: string;
+  size?: string;
   state?: string;
-  datesRange?: number[];
+  datesRange?: Date[];
   price?: number;
+  deposit?: number;
   ranks?: number[];
   color?: string;
-  supplyTime?: number;
-  returnTime?: number;
+  supplyDays?: number;
+  returnDays?: number;
   photos?: string[];
   status?: DressStatus;       // Property name is important for firestore rules
 }
@@ -58,6 +62,38 @@ export class Dress extends BaseModel implements DressProps {
 
   set name(name : string) {
     this._props.name = name;
+  }
+
+  get description() {
+    return this._props.description || '';
+  }
+
+  set description(description: string) {
+    this._props.description = description;
+  }
+
+  get style() {
+    return this._props.style;
+  }
+
+  set style(style : string) {
+    this._props.style = style;
+  }
+
+  get color() {
+    return this._props.color;
+  }
+
+  set color(color : string) {
+    this._props.color = color;
+  }
+
+  get size() {
+    return this._props.size;
+  }
+
+  set size(size : string) {
+    this._props.size = size;
   }
 
   get category() {
@@ -85,12 +121,17 @@ export class Dress extends BaseModel implements DressProps {
 
   /** Add photo to list */
   addPhoto(photo: string) {
+    if(!this._props.photos)
+      this._props.photos = [];
     this._props.photos.push(photo);
   }
 
   /** Remove photo from list */
   removePhoto(idx: number) {
-    this._props.photos.splice(idx, 1);
+    if(this._props.photos)
+      this._props.photos.splice(idx, 1);
+    if(!this._props.photos.length)
+      delete this._props.photos
   }
 
   get ranks() {
@@ -107,6 +148,14 @@ export class Dress extends BaseModel implements DressProps {
 
   set price(price: number) {
     this._props.price = price;
+  }
+
+  get deposit() {
+    return this._props.deposit;
+  }
+
+  set deposit(deposit: number) {
+    this._props.deposit = deposit;
   }
 
   get state() {
@@ -131,6 +180,22 @@ export class Dress extends BaseModel implements DressProps {
 
   get toDate() {
     return new Date(this._props.datesRange[1]);
+  }
+
+  get supplyDays() {
+    return this._props.supplyDays;
+  }
+
+  set supplyDays(supplyDays: DressStatus) {
+    this._props.supplyDays = supplyDays;
+  }
+
+  get returnDays() {
+    return this._props.returnDays;
+  }
+
+  set returnDays(returnDays: DressStatus) {
+    this._props.returnDays = returnDays;
   }
 
 }

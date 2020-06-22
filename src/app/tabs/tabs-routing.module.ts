@@ -36,7 +36,15 @@ const routes: Routes = [
       },
       {
         path: 'renter-profile',
-        loadChildren: () => import('../renter-profile/renter-profile.module').then(m => m.RenterProfilePageModule),
+        loadChildren: () => import('../renter-profile/renter-profile.module').then(m => m.RenterProfilePageModule)
+      },
+      {
+        path: 'dress-view',
+        loadChildren: () => import('../dress-view/dress-view.module').then( m => m.DressViewPageModule)
+      },
+      {
+        path: 'dress-edit',
+        loadChildren: () => import('../dress-edit/dress-edit.module').then( m => m.DressEditPageModule)
       },
       {
         path: '',

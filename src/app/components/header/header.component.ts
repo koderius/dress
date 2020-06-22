@@ -29,4 +29,8 @@ export class HeaderComponent implements OnInit {
     this.navCtrl.navigateForward('tabs/profile/my-products');
   }
 
+  goToUpload() {
+    this.navCtrl.navigateForward('tabs/dress-edit');
+  }
+
 }

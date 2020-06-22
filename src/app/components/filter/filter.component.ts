@@ -56,7 +56,8 @@ export class FilterComponent implements OnInit {
 
   /** Start filtering according to the selected filters (by navigating to home page under 'search' segment with query parameters */
   findDressClicked() {
-    this.navCtrl.navigateRoot('tabs/home/search', {queryParams: this.filters.toRaw()});
+    if(this.filters)
+      this.navCtrl.navigateRoot('tabs/home/search', {queryParams: this.filters.toRaw()});
   }
 
 }

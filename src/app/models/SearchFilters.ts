@@ -15,10 +15,10 @@ export class SearchFilters {
 
   constructor(raw?: SearchFiltersRaw) {
     if(raw) {
-      this.categories = raw.category.split('_');
-      this.countries = raw.country.split('_');
-      this.fromDate = new Date(raw.fromdate);
-      this.toDate = new Date(raw.todate);
+      this.categories = (raw.category || '').split('_');
+      this.countries = (raw.country || '').split('_');
+      this.fromDate = raw.fromdate ?  new Date(raw.fromdate) : null;
+      this.toDate = raw.todate ? new Date(raw.todate) : null;
     }
   }
 

@@ -10,7 +10,7 @@ import {DressCategory} from '../models/Dress';
 export class CategoriesService {
 
   // TODO: Temporary mocks
-  categories: DressCategory[] = [
+  private _categories: DressCategory[] = [
     {
       id: 'c1',
       title: 'Wedding',
@@ -36,6 +36,11 @@ export class CategoriesService {
   constructor() { }
 
   get allCategories() {
-    return this.categories.slice();
+    return this._categories.slice();
   }
+
+  getCategoryById(id: string) {
+    return this._categories.find((c)=>c.id == id);
+  }
+
 }

@@ -12,9 +12,6 @@ export class DressesService {
   /** Reference to all users dresses sub-collections (not including drafts) */
   private readonly DRESSES_COLLECTION = firebase.firestore().collectionGroup('dresses').where('status', '>', 0);
 
-  /** Returns reference to current user's dresses collection */
-  private myDressesCollection = () => this.authService.userProfileDoc().collection('dresses');
-
   private _dresses : DressProps[] = [];
 
   get dresses() {
