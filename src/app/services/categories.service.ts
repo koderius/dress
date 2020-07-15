@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import {DressCategory} from '../models/Dress';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 
 /**
  * This service contains all the dress categories data
@@ -9,31 +11,19 @@ import {DressCategory} from '../models/Dress';
 })
 export class CategoriesService {
 
-  // TODO: Temporary mocks
-  private _categories: DressCategory[] = [
-    {
-      id: 'c1',
-      title: 'Wedding',
-      image: '../../assets/categories/wedding.png'
-    },
-    {
-      id: 'c2',
-      title: 'Evening',
-      image: '../../assets/categories/evening.png'
-    },
-    {
-      id: 'c3',
-      title: 'Mini',
-      image: '../../assets/categories/mini.png'
-    },
-    {
-      id: 'c4',
-      title: 'Party',
-      image: '../../assets/categories/party.png'
-    }
-  ];
+  readonly categoriesRef = firebase.firestore().collection('categories');
 
-  constructor() { }
+  // TODO: Temporary mocks
+  private _categories: DressCategory[] = [];
+
+  constructor() {
+
+    // Observe the categories data
+    this.categoriesRef.onSnapshot(snapshot => {
+      this._categories = snapshot.docs.map((d)=>d.data() as DressCategory);
+    });
+
+  }
 
   get allCategories() {
     return this._categories.slice();

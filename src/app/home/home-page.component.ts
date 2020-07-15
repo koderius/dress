@@ -22,12 +22,13 @@ export class HomePage {
   dressSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 2 + 0.25};
   categoriesSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
 
-  /** All the categories */
-  categories: DressCategory[] = [];
-
   /** Dresses to show as default */
   popular: Dress[] = this.dressService.dresses;
   forYou: Dress[] = this.dressService.dresses;
+
+  get categories() {
+    return this.categoryService.allCategories;
+  }
 
   constructor(
     private authService: AuthService,
@@ -47,9 +48,6 @@ export class HomePage {
       if(this.isFiltered)
         this.filter(params);
     });
-
-    // Get all categories
-    this.categories = this.categoryService.allCategories;
 
   }
 
