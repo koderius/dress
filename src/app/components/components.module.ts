@@ -8,6 +8,7 @@ import {TermsComponent} from './terms/terms.component';
 import {DressCardComponent} from './dress-card/dress-card.component';
 import {FilterComponent} from './filter/filter.component';
 import {HideHeaderDirective} from '../directives/hide-header.directive';
+import {DressSizePipe} from '../pipe/dress-size.pipe';
 
 
 
@@ -24,6 +25,7 @@ import {HideHeaderDirective} from '../directives/hide-header.directive';
     DressCardComponent,
     FilterComponent,
     HideHeaderDirective,
+    DressSizePipe,
   ],
   exports: [
     HeaderComponent,
@@ -31,6 +33,7 @@ import {HideHeaderDirective} from '../directives/hide-header.directive';
     DressCardComponent,
     FilterComponent,
     HideHeaderDirective,
+    DressSizePipe,
   ],
   entryComponents: [TermsComponent]
 })

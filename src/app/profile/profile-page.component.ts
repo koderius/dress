@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService, UserDoc} from '../services/auth.service';
 import {Order} from '../models/Order';
 import {AlertsService} from '../services/Alerts.service';
+import {DressSize} from '../models/Dress';
+import {ObjectsUtil} from '../Utils/ObjectsUtil';
 
 
 @Component({
@@ -14,6 +16,8 @@ export class ProfilePage implements OnInit{
   userDoc: UserDoc;
 
   myOrders: Order[] = [];
+
+  DressSizes = DressSize;
 
   constructor(
     private authService: AuthService,
@@ -28,7 +32,7 @@ export class ProfilePage implements OnInit{
   }
 
   hasChanges() {
-    return JSON.stringify(this.userDoc) != JSON.stringify(this.authService.currentUser);
+    return !ObjectsUtil.SameValues(this.userDoc, this.authService.currentUser);
   }
 
   editClicked(ev) {
@@ -44,6 +48,45 @@ export class ProfilePage implements OnInit{
     await this.authService.editUserDocument(this.userDoc);
     this.userDoc = this.authService.currentUser;
     this.alertService.dismissLoader();
+  }
+
+
+  async changeUserName(withError?: boolean) {
+    const a = await this.alertService.alertCtrl.create({
+      header: 'Change your username',
+      message: withError ? 'User name must contain at least 6 alpha-numeric characters or lodash ("_"), without spaces' : '',
+      inputs: [{
+        placeholder: '@my-new-username',
+        name: 'username',
+      }],
+      buttons: [
+        {
+          text: 'Save',
+          handler: async (data)=>{
+            const username = data['username'] as string;
+            if(username && username.match(this.authService.PASSWORD_REGEX)) {
+              await this.authService.editUserDocument({displayName: username});
+              this.userDoc.displayName = username;
+              this.alertService.notice('Your username has been changed');
+            }
+            else
+              this.changeUserName(true);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
+    a.present();
+  }
+
+  async resetPassword() {
+    if(await this.alertService.areYouSure('Reset your password?', `A reset password link will be sent to your email (${this.userDoc.email})`, 'Send', 'Cancel')) {
+      await this.authService.sendResetPasswordEmail(this.userDoc.email);
+      this.alertService.notice('Email has been sent. Check your inbox');
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component } from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
@@ -22,7 +22,7 @@ enum PageStatus {
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
 })
-export class LandingPage implements OnInit {
+export class LandingPage {
 
   PageStatus = PageStatus;
   pageStatus: PageStatus = PageStatus.LANDING;
@@ -70,10 +70,6 @@ export class LandingPage implements OnInit {
       this.alertService.notice(e.message, 'Authentication Error', e.code);
     };
 
-  }
-
-
-  ngOnInit() {
   }
 
 

@@ -28,7 +28,7 @@ export class DressesService {
         category: 'c1',
         ranks: [132,43,123,563,123],
         price: 230,
-        datesRange: [Date.now(), Date.now() + 12345678],
+        datesRange: [new Date(), new Date(Date.now() + 12345678)],
         state: 'Israel',
         photos: ['../../assets/MOCKs/dress.PNG'],
       };

@@ -21,7 +21,7 @@ export class CategoriesPage {
   ) {
 
     // Number of images per row, according to the size of the screen
-    this.imagesPerRow = ScreenSizeUtil.CalcScreenSizeFactor() * 2;
+    this.imagesPerRow = ScreenSizeUtil.CalcScreenSizeFactor() * 2 + 0.25;
 
     // Get all categories
     this.categories = this.categoryService.allCategories;

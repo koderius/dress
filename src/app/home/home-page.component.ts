@@ -19,8 +19,8 @@ export class HomePage {
   isFiltered: boolean;
 
   /** Number of items per slider, according to screen's size */
-  dressSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 2};
-  categoriesSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3};
+  dressSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 2 + 0.25};
+  categoriesSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
 
   /** All the categories */
   categories: DressCategory[] = [];

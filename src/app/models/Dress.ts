@@ -17,7 +17,7 @@ export type Color = {
   title: string;
 }
 
-export const DressSize = ['XS','S','M','L','XL','XXL','3XL'];
+export const DressSize = ['','XS','S','M','L','XL','XXL','3XL'];
 
 /**
  * Dress status enum
@@ -175,11 +175,27 @@ export class Dress extends BaseModel implements DressProps {
   }
 
   get fromDate() {
-    return new Date(this._props.datesRange[0]);
+    if(this._props.datesRange && this._props.datesRange[0])
+      return new Date(this._props.datesRange[0]);
+  }
+
+  set fromDate(date: Date | number | string) {
+    if(!this._props.datesRange)
+      this._props.datesRange = [];
+    this._props.datesRange[0] = new Date(date);
+    if(this._props.datesRange[1] && this._props.datesRange[0].getTime() > this._props.datesRange[1].getTime())
+      this._props.datesRange[1] = this._props.datesRange[0];
   }
 
   get toDate() {
-    return new Date(this._props.datesRange[1]);
+    if(this._props.datesRange && this._props.datesRange[1])
+      return new Date(this._props.datesRange[1]);
+  }
+
+  set toDate(date: Date | number | string) {
+    if(!this._props.datesRange)
+      this._props.datesRange = [];
+    this._props.datesRange[1] = new Date(date);
   }
 
   get supplyDays() {

@@ -1,28 +1,44 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
-import {Dress, DressSize, DressStatus} from '../models/Dress';
+import {Dress, DressProps, DressSize, DressStatus} from '../models/Dress';
 import {ActivatedRoute} from '@angular/router';
 import {CategoriesService} from '../services/categories.service';
 import {FilesUploaderService} from '../services/files-uploader.service';
 import {DressEditorService} from '../services/dress-editor.service';
+import {IonInput} from '@ionic/angular';
+import {ObjectsUtil} from '../Utils/ObjectsUtil';
 
 @Component({
   selector: 'app-dress-edit',
   templateUrl: './dress-edit.page.html',
   styleUrls: ['./dress-edit.page.scss'],
 })
-export class DressEditPage implements OnInit {
+export class DressEditPage implements OnInit, OnDestroy {
+
+  routeSubscription;
 
   dress: Dress;
 
-  originalDress: string;
+  dressBeforeEdit: DressProps;
 
   isNew: boolean;
 
   DressSizes = DressSize;
 
-  photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 4};
+  photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 4 + 0.25};
   photosInProgress = [];
+
+  // Get today's date as ISO (yyyy-mm-dd)
+  get today() {
+    return new Date().toLocaleDateString('sv');
+  }
+
+  // Get the date of x years after the given date (or today's) as ISO (yyyy-mm-dd)
+  yearsAfter(date: Date = new Date(), years = 5) {
+    const d = new Date(date);
+    d.setFullYear(d.getFullYear() + years);
+    return d.toLocaleDateString('sv');
+  }
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -34,22 +50,29 @@ export class DressEditPage implements OnInit {
   ngOnInit() {
 
     // Get dress ID from URL and load it, or create new
-    const params = this.activatedRoute.snapshot.params;
-    if(params['id'] == 'new') {
-      this.dress = new Dress({id: this.dressEditor.generateNewId()});
-      this.isNew = true;
-    }
-    else {
-      // TODO: Get dress from server
-    }
+    this.routeSubscription = this.activatedRoute.params.subscribe((params)=>{
 
-    this.originalDress = JSON.stringify(this.dress);
+      if(params['id'] == 'new') {
+        this.dress = new Dress({id: this.dressEditor.generateNewId()});
+        this.isNew = true;
+      }
+      else {
+        // TODO: Get dress from server
+      }
 
+      this.dressBeforeEdit = this.dress.exportProperties();
+
+    });
+
+  }
+
+  ngOnDestroy(): void {
+    this.routeSubscription.unsubscribe();
   }
 
 
   hasChanges() : boolean {
-    return JSON.stringify(this.dress) != this.originalDress;
+    return !ObjectsUtil.SameValues(this.dress.exportProperties(), this.dressBeforeEdit);
   }
 
 
@@ -61,8 +84,10 @@ export class DressEditPage implements OnInit {
     }, 200);
   }
 
-  openCalendar(ev) {
-    // TODO: Date picker
+
+  async openColorPicker(input: IonInput) {
+    const el = await input.getInputElement();
+    el.click()
   }
 
   async onPhotosSelected(ev) {

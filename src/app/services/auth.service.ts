@@ -10,7 +10,9 @@ import {ActivatedRoute} from '@angular/router';
 
 
 /** User's app data. It extends the basic firebase user info */
-export interface UserDoc extends UserInfo {
+export interface UserDoc extends Partial<UserInfo> {
+  // DisplayName would be the username, apart from the fullName, which is the name for the contact info
+  fullName?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -303,13 +305,14 @@ export class AuthService {
 
     const user = this._user;
 
-    const doc: UserInfo = {
+    const doc: UserDoc = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
       phoneNumber: user.phoneNumber,
-    } as UserInfo;
+      fullName: user.displayName,
+    };
 
     // Delete all undefined
     for(let p in user)
@@ -322,19 +325,20 @@ export class AuthService {
 
 
   /** Update user's document (BY MERGE) */
-  async editUserDocument(newUserDetails: UserDoc) : Promise<void> {
+  async editUserDocument(newUserDetails: Partial<UserDoc>) : Promise<void> {
 
     // Cannot change UID
     delete newUserDetails.uid;
 
     try {
 
-      // Update the name & photo details in the firebase auth user (not so important)
+      // Update the name & photo details in the firebase auth user
       const fbProfile: {displayName?: string, photoURL?: string} = {};
       if(newUserDetails.displayName)
         fbProfile.displayName = newUserDetails.displayName;
       if(newUserDetails.photoURL)
         fbProfile.photoURL = newUserDetails.photoURL;
+
       this._user.updateProfile(fbProfile);
 
       // Set the user's document with the new data

@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit {
   }
 
   goToUpload() {
-    this.navCtrl.navigateForward('tabs/dress-edit');
+    this.navCtrl.navigateForward('tabs/profile/my-products/dress-edit');
   }
 
 }

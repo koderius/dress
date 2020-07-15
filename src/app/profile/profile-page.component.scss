@@ -8,7 +8,11 @@ ion-item {
   --highlight-height: 0;
 }
 
-#changePasswordBtn {
+ion-title {
+  font-weight: bold;
+}
+
+.changeBtn {
   margin: 0;
   position: relative;
   top: 50%;

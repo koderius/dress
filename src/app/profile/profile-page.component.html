@@ -14,17 +14,18 @@
 
       <ion-item>
         <ion-label position="stacked" color="light">Username</ion-label>
-        <ion-input [(ngModel)]="userDoc.displayName"></ion-input>
+        <ion-input [value]="userDoc.displayName" readonly=""></ion-input>
+        <ion-button slot="end" fill="clear" class="changeBtn" (click)="changeUserName()">Change Username</ion-button>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Password</ion-label>
+        <ion-label position="floating" color="light">Password</ion-label>
         <ion-input type="password" readonly value="********"></ion-input>
-        <ion-button slot="end" fill="clear" id="changePasswordBtn">Change Password</ion-button>
+        <ion-button slot="end" fill="clear" class="changeBtn" (click)="resetPassword()">Change Password</ion-button>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Email</ion-label>
+        <ion-label position="floating" color="light">Email</ion-label>
         <ion-input type="email" readonly [(ngModel)]="userDoc.email"></ion-input>
       </ion-item>
 
@@ -37,23 +38,26 @@
       </ion-list-header>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Full Name</ion-label>
-        <ion-input [(ngModel)]="userDoc.displayName"></ion-input>
+        <ion-label position="floating" color="light">Full Name</ion-label>
+        <ion-input [(ngModel)]="userDoc.fullName"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
         </ion-button>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Size</ion-label>
-        <ion-input [(ngModel)]="userDoc.size"></ion-input>
-        <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+        <ion-label position="floating" color="light">Size</ion-label>
+        <ion-input [value]="userDoc.size | dressSize" readonly></ion-input>
+        <ion-select [(ngModel)]="userDoc.size" class="ion-hide" #selectSize>
+          <ion-select-option *ngFor="let s of DressSizes" [value]="s">{{s | dressSize}}</ion-select-option>
+        </ion-select>
+        <ion-button slot="end" fill="clear" shape="round" (click)="selectSize.open()">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
         </ion-button>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Phone</ion-label>
+        <ion-label position="floating" color="light">Phone</ion-label>
         <ion-input type="tel" [(ngModel)]="userDoc.phoneNumber"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -61,7 +65,7 @@
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Address</ion-label>
+        <ion-label position="floating" color="light">Address</ion-label>
         <ion-input [(ngModel)]="userDoc.address"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -69,7 +73,7 @@
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">City</ion-label>
+        <ion-label position="floating" color="light">City</ion-label>
         <ion-input [(ngModel)]="userDoc.city"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -77,7 +81,7 @@
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Country</ion-label>
+        <ion-label position="floating" color="light">Country</ion-label>
         <ion-input [(ngModel)]="userDoc.state"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -85,7 +89,7 @@
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked" color="light">Zip Code</ion-label>
+        <ion-label position="floating" color="light">Zip Code</ion-label>
         <ion-input type="tel" [(ngModel)]="userDoc.zipCode"></ion-input>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -99,6 +103,10 @@
       <ion-list-header>
         <ion-title>My Orders</ion-title>
       </ion-list-header>
+
+      <ion-item *ngIf="!myOrders.length" lines="none">
+        <ion-label color="light"><i>No orders yet...</i></ion-label>
+      </ion-item>
 
       <ion-row id="orders-row">
         <ion-col size="6" *ngFor="let order of myOrders">

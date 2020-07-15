@@ -43,10 +43,6 @@ const routes: Routes = [
         loadChildren: () => import('../dress-view/dress-view.module').then( m => m.DressViewPageModule)
       },
       {
-        path: 'dress-edit',
-        loadChildren: () => import('../dress-edit/dress-edit.module').then( m => m.DressEditPageModule)
-      },
-      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'
