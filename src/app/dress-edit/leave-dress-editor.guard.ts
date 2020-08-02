@@ -22,13 +22,31 @@ export class LeaveDressEditorGuard implements CanDeactivate<DressEditPage> {
   ): Promise<boolean> {
 
     // If there are changes, show alert message
-    if(component.hasChanges()) {
+    if(component.hasChanges() || component.hasUploadsInProgress()) {
 
-      const answer = await this.alertService.areYouSure('Dress changes has not been saved', 'Leave this page without saving?', 'Discard', 'Stay');
+      let answer;
+      if(component.hasChanges()) {
+        answer = await this.alertService.areYouSure(
+          'Dress changes has not been saved',
+          'Leave this page without saving?',
+          'Discard',
+          'Stay'
+        );
+      }
+      else {
+        answer = await this.alertService.areYouSure(
+          'Some photos are still uploading.',
+          'Leave this page before done uploading?',
+          'Discard',
+          'Stay'
+        );
+      }
 
-      // On discard, delete all the new photos
-      if(answer)
+      // On discard, delete all the new photos, and cancel uploads in progress
+      if(answer) {
+        component.photosInProgress.forEach((p)=>p.task.cancel());
         this.fileUploader.commitChanges(true);
+      }
 
       return answer;
 

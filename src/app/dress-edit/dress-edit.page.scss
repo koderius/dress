@@ -16,8 +16,8 @@ ion-slides {
   width: 100%;
   ion-slide {
     height: 6em;
-    margin: 0 0.5em;
-    background-color: var(--ion-color-light);
+    width: 6em;
+    padding: 0 0.5em;
     .on-progress {
       height: 100%;
       width: 100%;

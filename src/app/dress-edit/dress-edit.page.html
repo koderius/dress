@@ -139,27 +139,26 @@
       <ion-button shape="round" color="secondary" class="normal-btn" id="photos-btn" (click)="inputImage.click()">Upload Photos</ion-button>
       <input type="file" accept="image/*" multiple class="ion-hide" #inputImage (change)="onPhotosSelected($event)">
     </ion-row>
-    <ion-item>
-      <ion-slides [options]="photosSliderOptions" *ngIf="dress.photos.length || photosInProgress.length">
-        <ion-slide *ngFor="let p of dress.photos; let idx = index" (click)="openPhotoActionSheet(p, idx)">
-          <img [src]="p">
-        </ion-slide>
-        <ion-slide *ngFor="let p of photosInProgress">
-          <div class="on-progress">
-            <ion-spinner color="light"></ion-spinner>
-            <div [ngStyle]="{width: p.progress+'%'}">
-              <ion-text>{{p.progress+'%'}}</ion-text>
-            </div>
+
+    <ion-slides [options]="photosSliderOptions">
+      <ion-slide *ngFor="let p of dress.photos; let idx = index" (click)="openPhotoActionSheet(p, idx)">
+        <img [src]="p">
+      </ion-slide>
+      <ion-slide *ngFor="let p of photosInProgress; let idx = index" (click)="openProgressActionSheet(p, idx)">
+        <div class="on-progress">
+          <ion-spinner color="light"></ion-spinner>
+          <div [ngStyle]="{width: p.progress+'%'}">
+            <ion-text>{{p.progress+'%'}}</ion-text>
           </div>
-        </ion-slide>
-      </ion-slides>
-    </ion-item>
+        </div>
+      </ion-slide>
+    </ion-slides>
 
   </ion-list>
 
 </ion-content>
 
 <ion-footer *ngIf="dress">
-  <ion-button expand="full" color="secondary" [disabled]="!hasChanges()" (click)="save(true)">Publish</ion-button>
-  <ion-button expand="full" color="medium" [disabled]="!hasChanges()" (click)="save()" *ngIf="!dress.status">Save as draft</ion-button>
+  <ion-button expand="full" color="secondary" [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save(true)">Publish</ion-button>
+  <ion-button expand="full" color="medium" [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save()" *ngIf="!dress.status">Save as draft</ion-button>
 </ion-footer>

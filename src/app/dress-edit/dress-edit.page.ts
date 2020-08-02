@@ -3,7 +3,7 @@ import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
 import {Dress, DressProps, DressSize} from '../models/Dress';
 import {ActivatedRoute} from '@angular/router';
 import {CategoriesService} from '../services/categories.service';
-import {FilesUploaderService} from '../services/files-uploader.service';
+import {FilesUploaderService, UploadProgress} from '../services/files-uploader.service';
 import {DressEditorService} from '../services/dress-editor.service';
 import {IonInput} from '@ionic/angular';
 import {ObjectsUtil} from '../Utils/ObjectsUtil';
@@ -33,8 +33,8 @@ export class DressEditPage implements OnInit, OnDestroy {
 
   DressSizes = DressSize;
 
-  photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 4 + 0.25};
-  photosInProgress = [];
+  photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
+  photosInProgress: UploadProgress[] = [];
 
   // Get the date of x years after the given date (or today's) as ISO (yyyy-mm-dd)
   yearsAfter(date: Date = new Date(), years = 5) {
@@ -89,6 +89,10 @@ export class DressEditPage implements OnInit, OnDestroy {
     return this.dress && !ObjectsUtil.SameValues(this.dress.exportProperties(), this.dressBeforeEdit);
   }
 
+  hasUploadsInProgress() : boolean {
+    return !!this.photosInProgress.length;
+  }
+
 
   editClicked(ev) {
     const inputEl = ev.target.parentElement.getElementsByTagName('input')[0];
@@ -112,10 +116,10 @@ export class DressEditPage implements OnInit, OnDestroy {
       files.push(fileList[i]);
 
     const progresses = await this.filesUploader.uploadDressPhotos(this.dress.id, files);
-    progresses.forEach((p, i)=>{
+    progresses.forEach((p)=>{
       this.photosInProgress.push(p);
       p.task.then(async (s)=>{
-        this.photosInProgress.splice(i,1);
+        this.photosInProgress = this.photosInProgress.filter((p)=>p.state != 'done');
         const photoURL = await s.ref.getDownloadURL();
         this.dress.addPhoto(photoURL);
       });
@@ -133,6 +137,13 @@ export class DressEditPage implements OnInit, OnDestroy {
           this.dress.removePhoto(idx);
         }
       });
+  }
+
+  async openProgressActionSheet(p: UploadProgress, idx: number) {
+    const res = await this.photoPopoverCtrl.openProgressActionSheet(p);
+    if(res.role == 'destructive') {
+      this.photosInProgress.splice(idx,1);
+    }
   }
 
 
