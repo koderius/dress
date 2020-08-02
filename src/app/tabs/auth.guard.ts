@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {AuthService} from '../services/auth.service';
-import {NavController} from '@ionic/angular';
+import {NavigationService} from '../services/navigation.service';
 
 /**
  * This guard check the authentication status in order to allow entering the app (under the tabs segment)
@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private authService: AuthService,
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) {}
 
   async canActivate(
@@ -38,7 +38,7 @@ export class AuthGuard implements CanActivate {
 
     // If no user, redirect to landing page
     if(!res)
-      this.navCtrl.navigateRoot('landing');
+      this.navService.landing();
 
     return res;
 

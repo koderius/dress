@@ -29,6 +29,11 @@ export class FilesUploaderService {
 
   readonly MAX_UPLOADS = 10;
 
+  // The photos that were uploaded in the current edit
+  private newUploadedPhotos: string[] = [];
+  // The photos that were requested to be delete in the current edit
+  private deleteQueue: string[] = [];
+
   constructor() {}
 
 
@@ -94,6 +99,7 @@ export class FilesUploaderService {
       async ()=>{
         progress.state = 'done';
         progress.url = await fileRef.getDownloadURL();
+        this.newUploadedPhotos.push(progress.url);
       });
 
     });
@@ -103,13 +109,8 @@ export class FilesUploaderService {
   }
 
 
-  async deletePhoto(photoUrl: string) {
-    try {
-      await firebase.storage().refFromURL(photoUrl).delete();
-    }
-    catch (e) {
-      console.error(e);
-    }
+  deletePhotoRequest(photoUrl: string) {
+    this.deleteQueue.push(photoUrl);
   }
 
 
@@ -121,5 +122,21 @@ export class FilesUploaderService {
       console.error(e);
     }
   }
+
+
+  /**
+   * Delete all URLs in the delete queue, and clear the queues.
+   * For cancel, delete all the new photos, and clear the queues.
+   */
+  commitChanges(cancel?: boolean) {
+    const listToDelete = cancel ? this.newUploadedPhotos : this.deleteQueue;
+    listToDelete.forEach(async (url)=>{
+      await firebase.storage().refFromURL(url).delete()
+        .catch((e)=>console.error(e));
+    });
+    this.deleteQueue.splice(0);
+    this.newUploadedPhotos.slice(0);
+  }
+
 
 }

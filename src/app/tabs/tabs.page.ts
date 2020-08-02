@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import {AuthService} from '../services/auth.service';
-import {ModalController, NavController} from '@ionic/angular';
+import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-tabs',
@@ -15,12 +16,12 @@ export class TabsPage {
   constructor(
     public authService: AuthService,
     private modalCtrl: ModalController,
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) {
 
     this.authService.onUserReady.subscribe((user)=>{
       if(!user)
-        this.navCtrl.navigateRoot('landing');
+        this.navService.landing();
     })
 
   }
@@ -35,6 +36,26 @@ export class TabsPage {
 
   }
 
+  async dressUpload() {
+    this.navService.editDress();
+    this.openOptions = false;
+  }
+
+  myProfile() {
+    this.navService.profile();
+    this.openOptions = false;
+  }
+
+  myOrders() {
+    alert('To do');
+    this.openOptions = false;
+  }
+
+  myProducts() {
+    this.navService.myProducts();
+    this.openOptions = false;
+  }
+
   async openTerms() {
     this.openOptions = false;
     (await this.modalCtrl.create({component: TermsComponent})).present();
@@ -43,7 +64,7 @@ export class TabsPage {
   async signOut() {
     this.openOptions = false;
     // Sign out if navigation is allowed by guards
-    if(await this.navCtrl.navigateRoot('landing'))
+    if(await this.navService.landing())
       this.authService.signOut();
   }
 

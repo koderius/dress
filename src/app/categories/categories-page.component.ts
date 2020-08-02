@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import {DressCategory} from '../models/Dress';
 import {CategoriesService} from '../services/categories.service';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
-import {NavController} from '@ionic/angular';
 import {SearchFiltersRaw} from '../models/SearchFilters';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-categories',
@@ -17,7 +17,7 @@ export class CategoriesPage {
 
   constructor(
     private categoryService: CategoriesService,
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) {
 
     // Number of images per row, according to the size of the screen
@@ -32,7 +32,7 @@ export class CategoriesPage {
   /** Go to home page and filter dresses by the selected category */
   filterByCategory(categoryId: string) {
     const filter: SearchFiltersRaw = {category: categoryId};
-    this.navCtrl.navigateRoot('tabs/home/search',{queryParams: filter});
+    this.navService.search(filter);
   }
 
 }

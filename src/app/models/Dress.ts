@@ -32,13 +32,14 @@ export enum DressStatus {
  * Dress properties
  */
 export interface DressProps extends BaseModelProps {
+  owner?: string;
   name?: string;
   category?: string;
   description?: string;
   style?: string;
   size?: string;
   state?: string;
-  datesRange?: Date[];
+  datesRange?: number[];
   price?: number;
   deposit?: number;
   ranks?: number[];
@@ -47,10 +48,15 @@ export interface DressProps extends BaseModelProps {
   returnDays?: number;
   photos?: string[];
   status?: DressStatus;       // Property name is important for firestore rules
+  created?: number;
+  modified?: number;
 }
 
 
 export class Dress extends BaseModel implements DressProps {
+
+  // Can be read only
+  readonly owner: string;
 
   constructor(protected _props : DressProps = {}) {
     super(_props);
@@ -130,8 +136,6 @@ export class Dress extends BaseModel implements DressProps {
   removePhoto(idx: number) {
     if(this._props.photos)
       this._props.photos.splice(idx, 1);
-    if(!this._props.photos.length)
-      delete this._props.photos
   }
 
   get ranks() {
@@ -167,7 +171,7 @@ export class Dress extends BaseModel implements DressProps {
   }
 
   get status() {
-    return this._props.status;
+    return this._props.status || DressStatus.DRAFT;
   }
 
   set status(status: DressStatus) {
@@ -179,11 +183,11 @@ export class Dress extends BaseModel implements DressProps {
       return new Date(this._props.datesRange[0]);
   }
 
-  set fromDate(date: Date | number | string) {
+  set fromDate(date: Date) {
     if(!this._props.datesRange)
       this._props.datesRange = [];
-    this._props.datesRange[0] = new Date(date);
-    if(this._props.datesRange[1] && this._props.datesRange[0].getTime() > this._props.datesRange[1].getTime())
+    this._props.datesRange[0] = new Date(date).getTime();
+    if(this._props.datesRange[1] && this._props.datesRange[0] > this._props.datesRange[1])
       this._props.datesRange[1] = this._props.datesRange[0];
   }
 
@@ -192,10 +196,10 @@ export class Dress extends BaseModel implements DressProps {
       return new Date(this._props.datesRange[1]);
   }
 
-  set toDate(date: Date | number | string) {
+  set toDate(date: Date) {
     if(!this._props.datesRange)
       this._props.datesRange = [];
-    this._props.datesRange[1] = new Date(date);
+    this._props.datesRange[1] = new Date(date).getTime();
   }
 
   get supplyDays() {

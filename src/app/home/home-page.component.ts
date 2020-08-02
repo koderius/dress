@@ -5,8 +5,8 @@ import {Dress, DressCategory} from '../models/Dress';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
 import {DressesService} from '../services/dresses.service';
 import {ActivatedRoute} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {SearchFilters, SearchFiltersRaw} from '../models/SearchFilters';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-home',
@@ -33,7 +33,7 @@ export class HomePage {
   constructor(
     private authService: AuthService,
     private activeRoute: ActivatedRoute,
-    private navCtrl: NavController,
+    private navService: NavigationService,
     private categoryService: CategoriesService,
     private dressService: DressesService,
   ) {
@@ -54,12 +54,12 @@ export class HomePage {
 
   /** If in filter mode, go to main homepage */
   backToHome() {
-    this.navCtrl.navigateRoot('tabs/home', {queryParams: {}, animationDirection: 'back'});
+    this.navService.home();
   }
 
   /** Navigate to categories tab */
   goToCategories() {
-    this.navCtrl.navigateRoot('tabs/categories');
+    this.navService.categories();
   }
 
   filter(params: SearchFiltersRaw) {

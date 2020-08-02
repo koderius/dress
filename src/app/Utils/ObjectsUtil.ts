@@ -15,7 +15,7 @@ export class ObjectsUtil {
       // Recursive on inner objects
       else if(typeof obj[key] == 'object') {
 
-        ObjectsUtil.ClearFalsies(obj, keepZeros);
+        ObjectsUtil.ClearFalsies(obj[key], keepZeros);
 
         // If the inner object is empty after the clearing, delete it
         if(!Object.keys(obj[key]).length)

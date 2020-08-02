@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
-import {ModalController, NavController} from '@ionic/angular';
+import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
+import {NavigationService} from '../services/navigation.service';
 
 enum PageStatus {
 
@@ -42,7 +43,7 @@ export class LandingPage {
     public authService: AuthService,
     private alertService: AlertsService,
     private modalCtrl: ModalController,
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) {
 
     // When user changed
@@ -52,7 +53,7 @@ export class LandingPage {
       if(user) {
         // If user is verified, go into the app
         if(user.emailVerified)
-          this.navCtrl.navigateRoot('tabs');
+          this.navService.app();
 
         // Else stay in unverified user status
         else

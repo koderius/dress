@@ -31,19 +31,19 @@
   <div id="options-menu" [ngClass]="openOptions ? 'openOptions' : 'closeOptions'">
     <ion-list>
 
-      <ion-item color="secondary">
+      <ion-item color="secondary" (click)="dressUpload()">
         <ion-label>Dress Upload</ion-label>
       </ion-item>
 
-      <ion-item color="secondary">
+      <ion-item color="secondary" (click)="myProfile()">
         <ion-label>My Profile</ion-label>
       </ion-item>
 
-      <ion-item color="secondary">
+      <ion-item color="secondary" (click)="myOrders()">
         <ion-label>My Orders</ion-label>
       </ion-item>
 
-      <ion-item color="secondary">
+      <ion-item color="secondary" (click)="myProducts()">
         <ion-label>My Products</ion-label>
       </ion-item>
 

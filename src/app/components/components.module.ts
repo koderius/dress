@@ -9,6 +9,7 @@ import {DressCardComponent} from './dress-card/dress-card.component';
 import {FilterComponent} from './filter/filter.component';
 import {HideHeaderDirective} from '../directives/hide-header.directive';
 import {DressSizePipe} from '../pipe/dress-size.pipe';
+import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
 
 
 
@@ -26,6 +27,7 @@ import {DressSizePipe} from '../pipe/dress-size.pipe';
     FilterComponent,
     HideHeaderDirective,
     DressSizePipe,
+    PhotoPopoverComponent,
   ],
   exports: [
     HeaderComponent,
@@ -34,7 +36,11 @@ import {DressSizePipe} from '../pipe/dress-size.pipe';
     FilterComponent,
     HideHeaderDirective,
     DressSizePipe,
+    PhotoPopoverComponent,
   ],
-  entryComponents: [TermsComponent]
+  entryComponents: [
+    TermsComponent,
+    PhotoPopoverComponent,
+  ]
 })
 export class ComponentsModule { }

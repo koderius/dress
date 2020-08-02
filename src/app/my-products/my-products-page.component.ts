@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {Dress, DressStatus} from '../models/Dress';
+import {DressesService} from '../services/dresses.service';
+import {AlertsService} from '../services/Alerts.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-uploads',
@@ -10,24 +13,34 @@ export class MyProductsPage implements OnInit {
 
   DressStatus = DressStatus;
 
-  myDresses: Dress[] = [
-    new Dress({
-      name: 'Lorem Ipsum',
-      status: DressStatus.OPEN,
-    }),
-    new Dress({
-      name: 'Lorem Ipsum',
-      status: DressStatus.RENTED,
-    }),
-    new Dress({
-      name: 'Lorem Ipsum',
-      status: DressStatus.OPEN,
-    })
-  ];
+  myDresses: Dress[] = [];
+  myDrafts: Dress[] = [];
 
-  constructor() { }
+  segment: string;
 
-  ngOnInit() {
+  constructor(
+    private dressesService: DressesService,
+    private alertsService: AlertsService,
+    private navService: NavigationService,
+  ) { }
+
+  async ngOnInit() {
+    try {
+
+      // Get all user's dresses and separate them into drafts and published
+      const dresses = await this.dressesService.getMyDresses();
+      dresses.forEach((d)=>{
+        (d.status == DressStatus.DRAFT ? this.myDrafts : this.myDresses).push(d);
+      });
+
+    }
+    catch (e) {
+      this.alertsService.notice('Could not get your data...', 'Error', e)
+    }
+  }
+
+  goToDressUpload(dressId: string) {
+    this.navService.editDress(dressId);
   }
 
 }

@@ -3,8 +3,8 @@ import {CategoriesService} from '../../services/categories.service';
 import {DressCategory} from '../../models/Dress';
 import {CountriesUtil} from '../../Utils/CountriesUtil';
 import {ActivatedRoute} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {SearchFilters} from '../../models/SearchFilters';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-filter',
@@ -27,7 +27,7 @@ export class FilterComponent implements OnInit {
   constructor(
     private categoriesService: CategoriesService,
     private activeRoute: ActivatedRoute,
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) {
 
     // Close the filters when the URL is changed
@@ -57,7 +57,7 @@ export class FilterComponent implements OnInit {
   /** Start filtering according to the selected filters (by navigating to home page under 'search' segment with query parameters */
   findDressClicked() {
     if(this.filters)
-      this.navCtrl.navigateRoot('tabs/home/search', {queryParams: this.filters.toRaw()});
+      this.navService.search(this.filters.toRaw());
   }
 
 }

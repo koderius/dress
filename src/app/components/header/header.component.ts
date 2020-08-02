@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {NavController} from '@ionic/angular';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +13,7 @@ export class HeaderComponent implements OnInit {
   showSearchbar: boolean;
 
   constructor(
-    private navCtrl: NavController,
+    private navService: NavigationService,
   ) { }
 
   ngOnInit() {}
@@ -25,12 +25,16 @@ export class HeaderComponent implements OnInit {
     }, 250);
   }
 
+  goHome() {
+    this.navService.home();
+  }
+
   goToMyProducts() {
-    this.navCtrl.navigateForward('tabs/profile/my-products');
+    this.navService.myProducts();
   }
 
   goToUpload() {
-    this.navCtrl.navigateForward('tabs/profile/my-products/dress-edit');
+    this.navService.editDress();
   }
 
 }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService, UserDoc} from '../services/auth.service';
 import {ActivatedRoute} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {RankCalc} from '../Utils/RankCalc';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -18,7 +18,7 @@ export class RenterProfilePage implements OnInit {
   constructor(
     private authService: AuthService,
     private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController,
+    private navService: NavigationService
   ) {}
 
   async ngOnInit() {
@@ -34,7 +34,7 @@ export class RenterProfilePage implements OnInit {
   }
 
   goToEdit() {
-    this.navCtrl.navigateForward('tabs/profile');
+    this.navService.profile();
   }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Dress, DressProps} from '../models/Dress';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import {AuthService} from './auth.service';
 
@@ -9,8 +9,10 @@ import {AuthService} from './auth.service';
 })
 export class DressesService {
 
-  /** Reference to all users dresses sub-collections (not including drafts) */
-  private readonly DRESSES_COLLECTION = firebase.firestore().collectionGroup('dresses').where('status', '>', 0);
+  readonly dressesRef = firebase.firestore().collection('dresses');
+
+  /** Reference to all non-draft dresses collections */
+  private readonly publicDressesRef = this.dressesRef.where('status', '>', 0);
 
   private _dresses : DressProps[] = [];
 
@@ -28,7 +30,7 @@ export class DressesService {
         category: 'c1',
         ranks: [132,43,123,563,123],
         price: 230,
-        datesRange: [new Date(), new Date(Date.now() + 12345678)],
+        datesRange: [Date.now(), Date.now() + 12345678],
         state: 'Israel',
         photos: ['../../assets/MOCKs/dress.PNG'],
       };
@@ -38,6 +40,14 @@ export class DressesService {
     //   this._dresses = snapshot.docs.map((d)=>d.data() as DressProps);
     // });
 
+  }
+
+  // Get all the user's dresses
+  async getMyDresses() {
+    const snapshot = await this.dressesRef.where('owner', '==', this.authService.currentUser.uid).get();
+    return snapshot.docs
+      .map((d)=>d.data() as DressProps)
+      .map((props)=>new Dress(props));
   }
 
 }
