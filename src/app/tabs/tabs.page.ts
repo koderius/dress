@@ -13,6 +13,8 @@ export class TabsPage {
 
   openOptions: boolean;
 
+  private tabChanged: boolean;
+
   constructor(
     public authService: AuthService,
     private modalCtrl: ModalController,
@@ -24,6 +26,14 @@ export class TabsPage {
         this.navService.landing();
     })
 
+  }
+
+  // When navigating into some tab (not including first loading), make sure to go to the tab root page, and not the last inner stack
+  goToTabsRoot(ev: {tab: string}) {
+    if(this.tabChanged)
+      this.navService.app(ev.tab);
+    else
+      this.tabChanged = true;
   }
 
   async showOptions() {

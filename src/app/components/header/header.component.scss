@@ -1,5 +1,10 @@
 #logo {
   width: 35px;
+  margin-inline-start: 1em;
+}
+
+ion-back-button {
+  --padding-end: 0;
 }
 
 ion-button {

@@ -1,9 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService, UserDoc} from '../services/auth.service';
-import {Order} from '../models/Order';
 import {AlertsService} from '../services/Alerts.service';
 import {DressSize} from '../models/Dress';
 import {ObjectsUtil} from '../Utils/ObjectsUtil';
+import {DefaultUserImage} from '../Utils/Images';
+import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
+import {FilesUploaderService} from '../services/files-uploader.service';
+import {Rent} from '../models/Rent';
 
 
 @Component({
@@ -13,15 +16,19 @@ import {ObjectsUtil} from '../Utils/ObjectsUtil';
 })
 export class ProfilePage implements OnInit{
 
+  DefaultUserImage = DefaultUserImage;
+
   userDoc: UserDoc;
 
-  myOrders: Order[] = [];
+  myRents: Rent[] = [];
 
   DressSizes = DressSize;
 
   constructor(
     private authService: AuthService,
     private alertService: AlertsService,
+    private photoPopover: PhotoPopoverCtrlService,
+    private fileUploader: FilesUploaderService,
   ) {}
 
   ngOnInit() {
@@ -80,6 +87,23 @@ export class ProfilePage implements OnInit{
       ]
     });
     a.present();
+  }
+
+  async userPhotoActionSheet() {
+    const res = await this.photoPopover.openActionSheet(this.userDoc.photoURL, true);
+    if(res.role == 'destructive') {
+      this.fileUploader.deleteUserPhoto(this.userDoc.uid);
+      this.userDoc.photoURL = null;
+      this.saveChanges();
+    }
+  }
+
+  async setUserPhoto(ev) {
+    const file = ev.target.files[0];
+    await this.alertService.showLoader('Uploading photo...');
+    this.userDoc.photoURL = await this.fileUploader.uploadUserPhoto(file, this.userDoc.uid);
+    await this.alertService.dismissLoader();
+    this.saveChanges();
   }
 
   async resetPassword() {

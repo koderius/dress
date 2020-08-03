@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
-import {Dress, DressProps, DressSize} from '../models/Dress';
+import {Dress, DressProps, DressSize, DressStatus} from '../models/Dress';
 import {ActivatedRoute} from '@angular/router';
 import {CategoriesService} from '../services/categories.service';
 import {FilesUploaderService, UploadProgress} from '../services/files-uploader.service';
@@ -11,6 +11,10 @@ import {AlertsService} from '../services/Alerts.service';
 import {DateUtil} from '../Utils/DateUtil';
 import {NavigationService} from '../services/navigation.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
+import {AuthService, UserDoc} from '../services/auth.service';
+import {DefaultUserImage} from '../Utils/Images';
+import {Rent} from '../models/Rent';
+import {RentService} from '../services/rent.service';
 
 @Component({
   selector: 'app-dress-edit',
@@ -18,6 +22,10 @@ import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover
   styleUrls: ['./dress-edit.page.scss'],
 })
 export class DressEditPage implements OnInit, OnDestroy {
+
+  DressStatus = DressStatus;
+
+  DefaultUserImage = DefaultUserImage;
 
   COIN_SIGN = '$';
 
@@ -36,6 +44,14 @@ export class DressEditPage implements OnInit, OnDestroy {
   photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
   photosInProgress: UploadProgress[] = [];
 
+  get rented() {
+    return this.dress.status == DressStatus.RENTED;
+  }
+
+  rentData: Rent;
+  rentingUser: UserDoc;
+  viewFullRenter: boolean;
+
   // Get the date of x years after the given date (or today's) as ISO (yyyy-mm-dd)
   yearsAfter(date: Date = new Date(), years = 5) {
     const d = new Date(date);
@@ -53,6 +69,8 @@ export class DressEditPage implements OnInit, OnDestroy {
     private photoPopoverCtrl: PhotoPopoverCtrlService,
     private fileService: FilesUploaderService,
     private alertsService: AlertsService,
+    private authService: AuthService,
+    private rentService: RentService,
   ) { }
 
   ngOnInit() {
@@ -61,17 +79,29 @@ export class DressEditPage implements OnInit, OnDestroy {
     this.routeSubscription = this.activatedRoute.params.subscribe(async (params)=>{
 
       const id = params['id'];
+
+      // Create new dress
       if(id == 'new-dress') {
         this.dress = new Dress();
         this.isNew = true;
       }
+
       else {
+
+        // Load dress by ID
         const dressDoc = await this.dressEditor.loadDress(id);
         if(!dressDoc) {
           this.navService.home();
           return;
         }
         this.dress = new Dress(dressDoc);
+
+        // Load dress renting details (if currently rented)
+        if(this.dress.status == DressStatus.RENTED) {
+          this.rentData = await this.rentService.getMyDressActiveRentDoc(this.dress.id);
+          this.rentingUser = await this.authService.getUserDoc(this.rentData.renterId);
+        }
+
       }
 
       this.dressBeforeEdit = this.dress.exportProperties();
@@ -129,7 +159,7 @@ export class DressEditPage implements OnInit, OnDestroy {
 
 
   async openPhotoActionSheet(url: string, idx: number) {
-    const res = await this.photoPopoverCtrl.openActionSheet(url);
+    const res = await this.photoPopoverCtrl.openActionSheet(url, !this.rented);
     if(res.role == 'destructive')
       this.alertsService.areYouSure('Delete this photo?').then(async (resp)=>{
         if(resp) {
@@ -140,6 +170,8 @@ export class DressEditPage implements OnInit, OnDestroy {
   }
 
   async openProgressActionSheet(p: UploadProgress, idx: number) {
+    if(this.rented)
+      return;
     const res = await this.photoPopoverCtrl.openProgressActionSheet(p);
     if(res.role == 'destructive') {
       this.photosInProgress.splice(idx,1);

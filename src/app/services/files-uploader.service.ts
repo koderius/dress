@@ -139,4 +139,15 @@ export class FilesUploaderService {
   }
 
 
+  async uploadUserPhoto(file: File, uid: string) : Promise<string> {
+    const ref = firebase.storage().ref('users/' + uid);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  }
+
+  deleteUserPhoto(uid: string) {
+    const ref = firebase.storage().ref('users/' + uid);
+    ref.delete().catch((e)=>console.error(e));
+  }
+
 }

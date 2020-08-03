@@ -13,8 +13,12 @@
       </ion-list-header>
 
       <ion-item>
+        <ion-avatar slot="start" (click)="userDoc.photoURL ? userPhotoActionSheet() : photoInput.click()">
+          <img [src]="userDoc.photoURL || DefaultUserImage">
+        </ion-avatar>
+        <input type="file" hidden accept="image/*" (change)="setUserPhoto($event)" #photoInput>
         <ion-label position="stacked" color="light">Username</ion-label>
-        <ion-input [value]="userDoc.displayName" readonly=""></ion-input>
+        <ion-input [value]="userDoc.displayName" readonly></ion-input>
         <ion-button slot="end" fill="clear" class="changeBtn" (click)="changeUserName()">Change Username</ion-button>
       </ion-item>
 
@@ -104,12 +108,12 @@
         <ion-title>My Orders</ion-title>
       </ion-list-header>
 
-      <ion-item *ngIf="!myOrders.length" lines="none">
+      <ion-item *ngIf="!myRents.length" lines="none">
         <ion-label color="light"><i>No orders yet...</i></ion-label>
       </ion-item>
 
       <ion-row id="orders-row">
-        <ion-col size="6" *ngFor="let order of myOrders">
+        <ion-col size="6" *ngFor="let order of myRents">
 
         </ion-col>
       </ion-row>

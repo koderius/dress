@@ -1,5 +1,5 @@
 
-<ion-tabs *ngIf="authService.currentUser">
+<ion-tabs *ngIf="authService.currentUser" (ionTabsWillChange)="goToTabsRoot($event)">
 
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="home">

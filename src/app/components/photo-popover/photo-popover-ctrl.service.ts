@@ -24,28 +24,28 @@ export class PhotoPopoverCtrlService {
     p.present();
   }
 
-  async openActionSheet(photoUrl: string) {
-    const a = await this.actionSheetCtrl.create({
-      buttons: [
-        {
-          text: 'Delete',
-          role: 'destructive',
-          icon: 'trash',
-        },
-        {
-          text: 'Preview',
-          icon: 'image',
-          handler: () => {
-            this.showPhoto(photoUrl);
-          }
-        },
-        {
-          text: 'Cancel',
-          icon: 'close',
-          role: 'cancel',
+  async openActionSheet(photoUrl: string, edit: boolean) {
+    const buttons = [
+      {
+        text: 'Preview',
+        icon: 'image',
+        handler: () => {
+          this.showPhoto(photoUrl);
         }
-      ]
-    });
+      },
+      {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+      }
+    ];
+    if(edit)
+      buttons.unshift({
+        text: 'Delete',
+        role: 'destructive',
+        icon: 'trash',
+      });
+    const a = await this.actionSheetCtrl.create({buttons});
     await a.present();
     return await a.onDidDismiss();
   }

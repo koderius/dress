@@ -3,6 +3,7 @@ import {Dress, DressStatus} from '../models/Dress';
 import {DressesService} from '../services/dresses.service';
 import {AlertsService} from '../services/Alerts.service';
 import {NavigationService} from '../services/navigation.service';
+import {DressEditorService} from '../services/dress-editor.service';
 
 @Component({
   selector: 'app-uploads',
@@ -20,6 +21,7 @@ export class MyProductsPage implements OnInit {
 
   constructor(
     private dressesService: DressesService,
+    private dressEditor: DressEditorService,
     private alertsService: AlertsService,
     private navService: NavigationService,
   ) { }
@@ -41,6 +43,13 @@ export class MyProductsPage implements OnInit {
 
   goToDressUpload(dressId: string) {
     this.navService.editDress(dressId);
+  }
+
+  async publish(dress: Dress) {
+    await this.dressEditor.saveDress(dress.exportProperties(), true);
+    this.myDresses = [];
+    this.myDrafts = [];
+    this.ngOnInit();
   }
 
 }

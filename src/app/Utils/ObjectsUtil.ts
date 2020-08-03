@@ -1,6 +1,6 @@
 export class ObjectsUtil {
 
-  static ClearFalsies(obj: any, keepZeros: boolean = false) : any {
+  static ClearFalsies(obj: object, keepZeros: boolean = false) : any {
 
     Object.keys(obj).forEach((key)=>{
 

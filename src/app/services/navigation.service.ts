@@ -9,14 +9,14 @@ export class NavigationService {
 
   constructor(
     private navCtrl: NavController,
-  ) { }
+  ) {}
 
   landing() {
     return this.navCtrl.navigateRoot('landing');
   }
 
-  app() {
-    return this.navCtrl.navigateRoot('tabs');
+  app(tabName?: string) {
+    return this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : ''));
   }
 
   home() {

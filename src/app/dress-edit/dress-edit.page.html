@@ -2,9 +2,74 @@
   <app-header type="buttons"></app-header>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="dress">
 
-  <ion-list class="app-list" *ngIf="dress">
+  <p class="ion-text-center" *ngIf="dress.status">
+    <b>
+      <ion-text color="primary">
+        {{dress.name}} |
+        <ion-text [color]="dress.status == DressStatus.OPEN ? 'success' : 'danger'">{{dress.status == DressStatus.OPEN ? 'OPEN' : 'RENTED'}}</ion-text>
+      </ion-text>
+    </b>
+  </p>
+
+  <ion-list class="app-list" *ngIf="rented && rentingUser">
+
+    <ion-list-header>
+      <ion-title>Customer Details</ion-title>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-avatar slot="start" (click)="openPhotoActionSheet(rentingUser.photoURL, null)">
+        <img [src]="rentingUser.photoURL || DefaultUserImage">
+      </ion-avatar>
+      <ion-label position="stacked" color="light">Username</ion-label>
+      <ion-input [value]="rentingUser.displayName" readonly></ion-input>
+      <ion-button slot="end" fill="clear" shape="round"
+                  (click)="viewFullRenter = !viewFullRenter"
+      >
+        <ion-icon slot="icon-only" [name]="viewFullRenter ? 'chevron-down' : 'chevron-up'"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item-group *ngIf="viewFullRenter">
+
+      <ion-item>
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input [value]="rentingUser.email" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Phone</ion-label>
+        <ion-input [value]="rentingUser.phoneNumber" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Address</ion-label>
+        <ion-input [value]="rentingUser.address" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">City</ion-label>
+        <ion-input [value]="rentingUser.city" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Country</ion-label>
+        <ion-input [value]="rentingUser.state" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Zip Code</ion-label>
+        <ion-input [value]="rentingUser.zipCode" readonly></ion-input>
+      </ion-item>
+
+    </ion-item-group>
+
+
+  </ion-list>
+
+  <ion-list class="app-list">
 
     <ion-list-header>
       <ion-title>Dress Description</ion-title>
@@ -12,32 +77,32 @@
 
     <ion-item>
       <ion-label position="floating" color="light">* Name</ion-label>
-      <ion-input [(ngModel)]="dress.name" required></ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-input [(ngModel)]="dress.name" required [readonly]="rented"></ion-input>
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">Informative details</ion-label>
-      <ion-textarea placeholder="Enter here" [(ngModel)]="dress.description"></ion-textarea>
+      <ion-textarea placeholder="Enter here" [(ngModel)]="dress.description" [readonly]="rented"></ion-textarea>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">* Style</ion-label>
-      <ion-input [(ngModel)]="dress.style" required></ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-input [(ngModel)]="dress.style" required [readonly]="rented"></ion-input>
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">* Category</ion-label>
-      <ion-input readonly required [value]="dress.category ? categoryService.getCategoryById(dress.category).title : ''"></ion-input>
+      <ion-input readonly required [value]="dress.category ? categoryService.getCategoryById(dress.category).title : ''" [readonly]="rented"></ion-input>
       <ion-select class="ion-hide" #categorySelect [(ngModel)]="dress.category">
         <ion-select-option *ngFor="let c of categoryService.allCategories" [value]="c.id">{{c.title}}</ion-select-option>
       </ion-select>
-      <ion-button slot="end" fill="clear" shape="round" (click)="categorySelect.open()">
+      <ion-button slot="end" fill="clear" shape="round" (click)="categorySelect.open()" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_chevron-down.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
@@ -48,17 +113,17 @@
       <ion-select class="ion-hide" #sizeSelect [(ngModel)]="dress.size">
         <ion-select-option *ngFor="let s of DressSizes" [value]="s">{{s | dressSize}}</ion-select-option>
       </ion-select>
-      <ion-button slot="end" fill="clear" shape="round" (click)="sizeSelect.open()">
+      <ion-button slot="end" fill="clear" shape="round" (click)="sizeSelect.open()" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_chevron-down.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">* Rent price</ion-label>
-      <ion-input type="number" min="0" required [(ngModel)]="dress.price">
+      <ion-input type="number" min="0" required [(ngModel)]="dress.price" [readonly]="rented">
         <ion-text *ngIf="dress.price" class="ion-padding-end">{{COIN_SIGN}}</ion-text>
       </ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
@@ -74,7 +139,7 @@
                     [ngModel]="DateUtil.DateToISO(dress.fromDate)"
                     (ngModelChange)="dress.fromDate = DateUtil.DateToDate($event)"
       ></ion-datetime>
-      <ion-button slot="end" fill="clear" shape="round" (click)="fromInput.open()">
+      <ion-button slot="end" fill="clear" shape="round" (click)="fromInput.open()" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_calendar.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
@@ -90,52 +155,52 @@
                     [ngModel]="DateUtil.DateToISO(dress.toDate)"
                     (ngModelChange)="dress.toDate = DateUtil.DateToDate($event)"
       ></ion-datetime>
-      <ion-button slot="end" fill="clear" shape="round" (click)="toInput.open()" [disabled]="!dress.fromDate">
+      <ion-button slot="end" fill="clear" shape="round" (click)="toInput.open()" [disabled]="!dress.fromDate" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_calendar.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">Deposit amount</ion-label>
-      <ion-input type="number" min="0" [(ngModel)]="dress.deposit">
+      <ion-input type="number" min="0" [(ngModel)]="dress.deposit" [readonly]="rented">
         <ion-text *ngIf="dress.deposit" class="ion-padding-end">{{COIN_SIGN}}</ion-text>
       </ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">Delivery time (in days)</ion-label>
-      <ion-input type="number" min="0" [(ngModel)]="dress.supplyDays"></ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-input type="number" min="0" [(ngModel)]="dress.supplyDays" [readonly]="rented"></ion-input>
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating" color="light">* Turn back time (in days)</ion-label>
-      <ion-input type="number" min="0" required [(ngModel)]="dress.returnDays"></ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
+      <ion-input type="number" min="0" required [(ngModel)]="dress.returnDays" [readonly]="rented"></ion-input>
+      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item>
       <ion-label position="stacked" color="light">* Color</ion-label>
-      <ion-input [(ngModel)]="dress.color" required placeholder="ex: '#ffa500' or 'orange'"></ion-input>
+      <ion-input [(ngModel)]="dress.color" required placeholder="ex: '#ffa500' or 'orange'" [readonly]="rented"></ion-input>
       <ion-input type="color" class="ion-hide" #colorPicker [(ngModel)]="dress.color"></ion-input>
-      <ion-note slot="end">
+      <ion-note slot="end" *ngIf="!rented">
         Click to pick
         <ion-icon name="arrow-forward" style="vertical-align: bottom"></ion-icon>
       </ion-note>
       <ion-avatar slot="end" class="color-avatar"
                   [ngStyle]="{backgroundColor: dress.color}"
-                  (click)="openColorPicker(colorPicker)"
+                  (click)="rented || openColorPicker(colorPicker)"
       ></ion-avatar>
     </ion-item>
 
-    <ion-row>
+    <ion-row *ngIf="!rented">
       <ion-button shape="round" color="secondary" class="normal-btn" id="photos-btn" (click)="inputImage.click()">Upload Photos</ion-button>
       <input type="file" accept="image/*" multiple class="ion-hide" #inputImage (change)="onPhotosSelected($event)">
     </ion-row>
@@ -159,6 +224,13 @@
 </ion-content>
 
 <ion-footer *ngIf="dress">
-  <ion-button expand="full" color="secondary" [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save(true)">Publish</ion-button>
-  <ion-button expand="full" color="medium" [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save()" *ngIf="!dress.status">Save as draft</ion-button>
+  <ion-button expand="full" color="secondary"
+              [disabled]="!hasChanges() || hasUploadsInProgress()"
+              (click)="save(true)"
+              *ngIf="!rented"
+  >Publish</ion-button>
+  <ion-button expand="full" color="medium"
+              [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save()"
+              *ngIf="!rented && !dress.status"
+  >Save as draft</ion-button>
 </ion-footer>
