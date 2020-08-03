@@ -14,31 +14,14 @@ export class MyProductsPage implements OnInit {
 
   DressStatus = DressStatus;
 
-  myDresses: Dress[] = [];
-  myDrafts: Dress[] = [];
-
-  segment: string;
-
   constructor(
-    private dressesService: DressesService,
+    public dressesService: DressesService,
     private dressEditor: DressEditorService,
     private alertsService: AlertsService,
     private navService: NavigationService,
   ) { }
 
-  async ngOnInit() {
-    try {
-
-      // Get all user's dresses and separate them into drafts and published
-      const dresses = await this.dressesService.getMyDresses();
-      dresses.forEach((d)=>{
-        (d.status == DressStatus.DRAFT ? this.myDrafts : this.myDresses).push(d);
-      });
-
-    }
-    catch (e) {
-      this.alertsService.notice('Could not get your data...', 'Error', e)
-    }
+  ngOnInit() {
   }
 
   goToGalleryMode() {
@@ -51,9 +34,6 @@ export class MyProductsPage implements OnInit {
 
   async publish(dress: Dress) {
     await this.dressEditor.saveDress(dress.exportProperties(), true);
-    this.myDresses = [];
-    this.myDrafts = [];
-    this.ngOnInit();
   }
 
 }

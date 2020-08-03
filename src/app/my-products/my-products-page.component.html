@@ -18,11 +18,11 @@
 
   <section>
 
-    <div *ngIf="!myDresses.length" class="ion-margin ion-text-center">
+    <div *ngIf="!dressesService.nonDrafts.length" class="ion-margin ion-text-center">
       <ion-text color="light"><i>No dresses on air yet...</i></ion-text>
     </div>
 
-    <div *ngFor="let dress of myDresses; let i = index" class="grid row">
+    <div *ngFor="let dress of dressesService.nonDrafts; let i = index" class="grid row">
       <div class="center">{{i+1}}</div>
       <div>{{dress.name}}</div>
       <div class="center">
@@ -33,7 +33,7 @@
 
   </section>
 
-  <ion-row *ngIf="myDresses.length" (click)="goToGalleryMode()">
+  <ion-row *ngIf="dressesService.nonDrafts.length" (click)="goToGalleryMode()">
     <ion-button id="gallery-btn" class="wider-btn" shape="round" fill="outline" color="dark">Gallery Mode</ion-button>
   </ion-row>
 
@@ -51,11 +51,11 @@
 
   <section>
 
-    <div *ngIf="!myDrafts.length" class="ion-margin ion-text-center">
+    <div *ngIf="!dressesService.drafts.length" class="ion-margin ion-text-center">
       <ion-text color="light"><i>Nothing in drafts</i></ion-text>
     </div>
 
-    <div *ngFor="let dress of myDrafts; let i = index" class="grid row">
+    <div *ngFor="let dress of dressesService.drafts; let i = index" class="grid row">
       <div class="center">{{i+1}}</div>
       <div>{{dress.name}}</div>
       <ion-button color="secondary" shape="round" class="normal-btn list-btn" (click)="publish(dress)">PUBLISH</ion-button>

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
 import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
 import {NavigationService} from '../services/navigation.service';
+import {Subscription} from 'rxjs';
 
 enum PageStatus {
 
@@ -23,10 +24,12 @@ enum PageStatus {
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
 })
-export class LandingPage {
+export class LandingPage implements OnDestroy {
 
   PageStatus = PageStatus;
   pageStatus: PageStatus = PageStatus.LANDING;
+
+  userSub: Subscription;
 
   inputs = {
     name: '',
@@ -47,7 +50,7 @@ export class LandingPage {
   ) {
 
     // When user changed
-    this.authService.onUserReady.subscribe(async (user)=>{
+    this.userSub = this.authService.user$.subscribe(async (user)=>{
 
       // Check user status
       if(user) {
@@ -198,6 +201,10 @@ export class LandingPage {
 
     return true;
 
+  }
+
+  ngOnDestroy(): void {
+    this.userSub.unsubscribe();
   }
 
 }

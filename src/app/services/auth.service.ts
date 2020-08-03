@@ -7,6 +7,7 @@ import {FirebaseError, User, UserInfo} from 'firebase';
 import {Platform} from '@ionic/angular';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
 
 
 /** User's app data. It extends the basic firebase user info */
@@ -66,7 +67,12 @@ export class AuthService {
   private _emailFromURL: string;
 
   /** An event that is emitted when there is a ready signed in user */
-  public onUserReady = new EventEmitter();
+  private onUserReady = new EventEmitter<User>();
+  public user$ = new Observable<User>((subscriber)=>{
+    if(this.isActive)
+      subscriber.next(this._user);
+    subscriber.add(this.onUserReady.subscribe((user)=>subscriber.next(user)));
+  });
 
   /** A function to invoke when there is an error (for UI) */
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);

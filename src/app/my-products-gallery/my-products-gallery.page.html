@@ -11,7 +11,7 @@
     </ion-list-header>
 
     <div id="grid">
-      <div class="dress-view" *ngFor="let dress of myDresses; let idx = index">
+      <div class="dress-view" *ngFor="let dress of dressesService.nonDrafts; let idx = index">
         <img [src]="dress.photo" (click)="showPhotos(dress.photos)">
         <p>
           <ion-text color="primary"><b>{{dress.name}}</b></ion-text>

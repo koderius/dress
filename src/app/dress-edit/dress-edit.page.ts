@@ -181,6 +181,15 @@ export class DressEditPage implements OnInit, OnDestroy {
 
   /** It is possible to save dress changes only if it is a draft or in open status (cannot be edited while rented //TODO: ask: Why not?) */
   async save(publish?: boolean) {
+    if(this.dress.status && !publish) {
+      if(!await this.alertsService.areYouSure(
+        'Save dress to drafts?',
+        'The dress will be moved to your drafts list, and will not be available to other users while there.',
+        'Move to drafts',
+        'Cancel'
+      ))
+        return;
+    }
     if(!publish || this.checkFields()) {
       try {
         // Save the dress and update it, with the returned data

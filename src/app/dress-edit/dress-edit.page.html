@@ -228,12 +228,13 @@
 
 <ion-footer *ngIf="dress">
   <ion-button expand="full" color="secondary"
-              [disabled]="!hasChanges() || hasUploadsInProgress()"
+              [disabled]="(!hasChanges() && dress.status != DressStatus.DRAFT) || hasUploadsInProgress()"
               (click)="save(true)"
               *ngIf="!rented"
   >Publish</ion-button>
   <ion-button expand="full" color="medium"
-              [disabled]="!hasChanges() || hasUploadsInProgress()" (click)="save()"
-              *ngIf="!rented && !dress.status"
+              [disabled]="(!hasChanges() && dress.status == DressStatus.DRAFT) || hasUploadsInProgress()"
+              (click)="save()"
+              *ngIf="!rented"
   >Save as draft</ion-button>
 </ion-footer>

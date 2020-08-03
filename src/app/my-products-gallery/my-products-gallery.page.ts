@@ -14,18 +14,16 @@ import {AlertsService} from '../services/Alerts.service';
 export class MyProductsGalleryPage implements OnInit {
 
   DressStatus = DressStatus;
-  myDresses: Dress[] = [];
 
   constructor(
-    private dressesService: DressesService,
+    public dressesService: DressesService,
     private dressEdit: DressEditorService,
     private photoPopover: PhotoPopoverCtrlService,
     private navService: NavigationService,
     private alertsService: AlertsService,
   ) { }
 
-  async ngOnInit() {
-    this.myDresses = await this.dressesService.getMyDresses(true);
+  ngOnInit() {
   }
 
   showPhotos(photoUrls: string[]) {
@@ -37,9 +35,13 @@ export class MyProductsGalleryPage implements OnInit {
   }
 
   async deleteDress(dress: Dress, idx: number) {
-    if(await this.alertsService.areYouSure(`Delete "${dress.name}" permanently?`, 'You will NOT be able to recover the dress.', 'Delete', 'Cancel'))
-      if(await this.dressEdit.deleteDress(dress.id))
-        this.myDresses.splice(idx, 1);
+    if(await this.alertsService.areYouSure(
+      `Delete "${dress.name}" permanently?`,
+      'You will NOT be able to recover the dress.',
+      'Delete',
+      'Cancel'
+    ))
+      await this.dressEdit.deleteDress(dress.id);
   }
 
 }
