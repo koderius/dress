@@ -15,8 +15,8 @@ export class NavigationService {
     return this.navCtrl.navigateRoot('landing');
   }
 
-  app(tabName?: string) {
-    return this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : ''));
+  app(tabName: string = '') {
+    return this.navCtrl.navigateRoot('tabs/' + tabName);
   }
 
   home() {
@@ -31,12 +31,14 @@ export class NavigationService {
     return this.navCtrl.navigateForward('tabs/profile')
   }
 
-  myProducts() {
-    return this.navCtrl.navigateForward('tabs/profile/my-products');
+  myProducts(gallery?: boolean) {
+    return this.navCtrl.navigateForward('tabs/profile/my-products' + (gallery ? '/gallery' : ''));
   }
 
   editDress(id: string = '') {
-    return this.navCtrl.navigateForward('tabs/profile/my-products/dress-edit' + (id ? '/' + id : ''));
+    if(id)
+      id = '/' + id;
+    return this.navCtrl.navigateForward('tabs/profile/my-products/dress-edit' + id);
   }
 
   categories() {

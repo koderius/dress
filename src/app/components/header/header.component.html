@@ -7,10 +7,13 @@
     </div>
   </ion-buttons>
 
+  <ion-title>{{title}}</ion-title>
 
   <ion-buttons slot="end" *ngIf="type == 'buttons'">
-    <ion-button shape="round" color="medium" fill="solid" (click)="goToMyProducts()">My<br>Products</ion-button>
-    <ion-button shape="round" color="secondary" fill="solid" (click)="goToUpload()">
+    <ion-button shape="round" color="medium" fill="solid" (click)="goToMyProducts()" *ngIf="!noMyProdBtn">
+      My<br>Products
+    </ion-button>
+    <ion-button shape="round" color="secondary" fill="solid" (click)="goToUpload()" *ngIf="!noUploadBtn">
       <ion-icon slot="start" src="../../assets/svg/icon_upload.svg"></ion-icon>
       Upload
     </ion-button>

@@ -198,7 +198,7 @@ export class DressEditPage implements OnInit, OnDestroy {
   checkFields() {
     const inputs = document.getElementsByTagName('input');
     for (let i = 0; i < inputs.length; i++)
-      if(!inputs[i].validity.valueMissing || !this.dress.fromDate || !this.dress.toDate) {
+      if(inputs[i].validity.valueMissing || !this.dress.fromDate || !this.dress.toDate) {
         this.alertService.notice(
           'Before publishing, all required fields must be filled',
           'Missed something...',

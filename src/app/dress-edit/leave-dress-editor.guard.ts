@@ -21,10 +21,11 @@ export class LeaveDressEditorGuard implements CanDeactivate<DressEditPage> {
     nextState: RouterStateSnapshot
   ): Promise<boolean> {
 
+    let answer = true;
+
     // If there are changes, show alert message
     if(component.hasChanges() || component.hasUploadsInProgress()) {
 
-      let answer;
       if(component.hasChanges()) {
         answer = await this.alertService.areYouSure(
           'Dress changes has not been saved',
@@ -48,13 +49,9 @@ export class LeaveDressEditorGuard implements CanDeactivate<DressEditPage> {
         this.fileUploader.commitChanges(true);
       }
 
-      return answer;
-
     }
 
-    // If there are no changes, enable leaving
-    else
-      return true;
+    return answer;
 
   }
 

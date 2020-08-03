@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Dress, DressProps} from '../models/Dress';
+import {Dress, DressProps, DressStatus} from '../models/Dress';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import {AuthService} from './auth.service';
@@ -42,9 +42,12 @@ export class DressesService {
 
   }
 
-  // Get all the user's dresses
-  async getMyDresses() {
-    const snapshot = await this.dressesRef.where('owner', '==', this.authService.currentUser.uid).get();
+  // Get all user's dresses
+  async getMyDresses(noDrafts?: boolean) {
+    let ref = this.dressesRef.where('owner', '==', this.authService.currentUser.uid);
+    if(noDrafts)
+      ref = ref.where('status', '>', DressStatus.DRAFT);
+    const snapshot = await ref.get();
     return snapshot.docs
       .map((d)=>d.data() as DressProps)
       .map((props)=>new Dress(props));

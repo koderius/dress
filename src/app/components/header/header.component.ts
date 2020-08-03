@@ -9,6 +9,9 @@ import {NavigationService} from '../../services/navigation.service';
 export class HeaderComponent implements OnInit {
 
   @Input() type: 'empty' | 'buttons' | 'search' = 'empty';
+  @Input() noUploadBtn: boolean;
+  @Input() noMyProdBtn: boolean;
+  @Input() title: string;
 
   showSearchbar: boolean;
 

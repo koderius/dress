@@ -1,9 +1,21 @@
 <div id="frame">
-  <img [src]="image" alt="Dress image">
+  <img [src]="imgList[idx]" alt="Dress image">
 </div>
 
 <ion-fab horizontal="center" vertical="bottom">
   <ion-fab-button color="danger" (click)="popoverCtrl.dismiss()">
     <ion-icon name="close"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-fab horizontal="start" vertical="bottom" *ngIf="isArray">
+  <ion-fab-button size="small" (click)="back()" [disabled]="imgList.length == 1">
+    <ion-icon name="chevron-back"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-fab horizontal="end" vertical="bottom" *ngIf="isArray">
+  <ion-fab-button size="small" (click)="forward()" [disabled]="imgList.length == 1">
+    <ion-icon name="chevron-forward"></ion-icon>
   </ion-fab-button>
 </ion-fab>

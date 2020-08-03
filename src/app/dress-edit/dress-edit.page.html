@@ -1,5 +1,8 @@
 <ion-header>
-  <app-header type="buttons"></app-header>
+  <app-header type="buttons"
+              [noUploadBtn]="isNew"
+              [title]="isNew ? 'New Dress' : 'Edit Dress'"
+  ></app-header>
 </ion-header>
 
 <ion-content *ngIf="dress">
@@ -8,7 +11,7 @@
     <b>
       <ion-text color="primary">
         {{dress.name}} |
-        <ion-text [color]="dress.status == DressStatus.OPEN ? 'success' : 'danger'">{{dress.status == DressStatus.OPEN ? 'OPEN' : 'RENTED'}}</ion-text>
+        <ion-text [color]="dress.status | dressStatus : 'theme'">{{dress.status | dressStatus | uppercase}}</ion-text>
       </ion-text>
     </b>
   </p>
@@ -98,7 +101,7 @@
 
     <ion-item>
       <ion-label position="floating" color="light">* Category</ion-label>
-      <ion-input readonly required [value]="dress.category ? categoryService.getCategoryById(dress.category).title : ''" [readonly]="rented"></ion-input>
+      <ion-input readonly required [value]="dress.category ? categoryService.getCategoryById(dress.category).title : ''"></ion-input>
       <ion-select class="ion-hide" #categorySelect [(ngModel)]="dress.category">
         <ion-select-option *ngFor="let c of categoryService.allCategories" [value]="c.id">{{c.title}}</ion-select-option>
       </ion-select>

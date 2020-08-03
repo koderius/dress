@@ -1,5 +1,5 @@
 <ion-header>
-  <app-header type="buttons"></app-header>
+  <app-header type="buttons" [noMyProdBtn]="true" title="My Products"></app-header>
 </ion-header>
 
 <ion-content>
@@ -26,14 +26,14 @@
       <div class="center">{{i+1}}</div>
       <div>{{dress.name}}</div>
       <div class="center">
-        <ion-text [color]="dress.status == DressStatus.OPEN ? 'success' : 'danger'">{{dress.status == DressStatus.OPEN ? 'OPEN' : 'RENTED'}}</ion-text>
+        <ion-text [color]="dress.status | dressStatus : 'theme'">{{dress.status | dressStatus | uppercase}}</ion-text>
       </div>
       <ion-button color="medium" shape="round" class="normal-btn list-btn" (click)="goToDressUpload(dress.id)">More Details</ion-button>
     </div>
 
   </section>
 
-  <ion-row *ngIf="myDresses.length">
+  <ion-row *ngIf="myDresses.length" (click)="goToGalleryMode()">
     <ion-button id="gallery-btn" class="wider-btn" shape="round" fill="outline" color="dark">Gallery Mode</ion-button>
   </ion-row>
 

@@ -1,0 +1,24 @@
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-column-gap: 0.5em;
+  grid-row-gap: 1em;
+}
+
+.dress-view {
+  border: solid var(--ion-color-light) 1px;
+  text-align: center;
+  img {
+    height: 15em;
+    width: 100%;
+    object-fit: cover;
+  }
+  p {
+    margin: 0.5em 0;
+  }
+  .btns {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+}

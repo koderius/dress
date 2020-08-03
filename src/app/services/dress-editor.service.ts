@@ -59,10 +59,11 @@ export class DressEditorService {
 
 
   /** Delete dress from user's collection, and delete its images from storage */
-  async deleteDress(dressId: string) {
+  async deleteDress(dressId: string) : Promise<boolean> {
     try {
       await this.dressesService.dressesRef.doc(dressId).delete();
-      return await this.filesUploader.deleteDressPhotos(dressId);
+      this.filesUploader.deleteDressPhotos(dressId);
+      return true;
     }
     catch (e) {
       console.error(e);

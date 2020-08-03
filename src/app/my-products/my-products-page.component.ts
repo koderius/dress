@@ -41,6 +41,10 @@ export class MyProductsPage implements OnInit {
     }
   }
 
+  goToGalleryMode() {
+    this.navService.myProducts(true);
+  }
+
   goToDressUpload(dressId: string) {
     this.navService.editDress(dressId);
   }

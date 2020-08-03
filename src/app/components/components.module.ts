@@ -10,6 +10,7 @@ import {FilterComponent} from './filter/filter.component';
 import {HideHeaderDirective} from '../directives/hide-header.directive';
 import {DressSizePipe} from '../pipe/dress-size.pipe';
 import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
+import {DressStatusPipe} from '../pipe/dress-status.pipe';
 
 
 
@@ -27,6 +28,7 @@ import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
     FilterComponent,
     HideHeaderDirective,
     DressSizePipe,
+    DressStatusPipe,
     PhotoPopoverComponent,
   ],
   exports: [
@@ -36,6 +38,7 @@ import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
     FilterComponent,
     HideHeaderDirective,
     DressSizePipe,
+    DressStatusPipe,
     PhotoPopoverComponent,
   ],
   entryComponents: [

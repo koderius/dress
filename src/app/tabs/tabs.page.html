@@ -1,5 +1,5 @@
 
-<ion-tabs *ngIf="authService.currentUser" (ionTabsWillChange)="goToTabsRoot($event)">
+<ion-tabs *ngIf="authService.currentUser">
 
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="home">
@@ -12,7 +12,7 @@
       <ion-label>Categories</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="profile">
+    <ion-tab-button tab="profile" (click)="myProfile()">
       <ion-icon src="../../assets/svg/icon_user.svg"></ion-icon>
       <ion-label>Profile</ion-label>
     </ion-tab-button>

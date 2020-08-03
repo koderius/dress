@@ -1,0 +1,38 @@
+<ion-header>
+  <app-header type="buttons" title="Gallery"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <ion-list class="app-list">
+
+    <ion-list-header>
+      <ion-title>My Products</ion-title>
+    </ion-list-header>
+
+    <div id="grid">
+      <div class="dress-view" *ngFor="let dress of myDresses; let idx = index">
+        <img [src]="dress.photo" (click)="showPhotos(dress.photos)">
+        <p>
+          <ion-text color="primary"><b>{{dress.name}}</b></ion-text>
+        </p>
+        <p>
+          <ion-text [color]="dress.status | dressStatus : 'theme'">{{dress.status | dressStatus | uppercase}}</ion-text>
+        </p>
+        <div class="btns">
+          <ion-button shape="round" size="small" (click)="deleteDress(dress, idx)" *ngIf="dress.status < DressStatus.RENTED">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+          <ion-button shape="round" size="small" (click)="goToDress(dress.id)" *ngIf="dress.status < DressStatus.RENTED">
+            <ion-icon name="pencil-sharp"></ion-icon>
+          </ion-button>
+          <ion-button shape="round" size="small" (click)="goToDress(dress.id)">
+            <ion-icon name="information"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+  </ion-list>
+
+</ion-content>

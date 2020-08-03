@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {ActionSheetController, PopoverController} from '@ionic/angular';
 import {PhotoPopoverComponent} from './photo-popover.component';
 import {ComponentsModule} from '../components.module';
-import UploadTask = firebase.storage.UploadTask;
 import {UploadProgress} from '../../services/files-uploader.service';
 
 @Injectable({
@@ -15,26 +14,27 @@ export class PhotoPopoverCtrlService {
     private actionSheetCtrl: ActionSheetController,
   ) { }
 
-  async showPhoto(photoUrl: string) {
+  async showPhoto(photoUrl: string | string[]) {
     const p = await this.popoverCtrl.create({
       component: PhotoPopoverComponent,
-      componentProps: {image: photoUrl},
+      componentProps: {images: photoUrl},
       cssClass: 'photo-popover',
     });
     p.present();
   }
 
-  async openActionSheet(photoUrl: string, edit: boolean) {
+  async openActionSheet(photoUrl: string | string[], edit: boolean) {
+    const plural = Array.isArray(photoUrl) && photoUrl.length > 1;
     const buttons = [
       {
-        text: 'Preview',
-        icon: 'image',
+        text: 'View' + (plural ? ' all' : ''),
+        icon: plural ? 'images' : 'image',
         handler: () => {
           this.showPhoto(photoUrl);
         }
       },
       {
-        text: 'Cancel',
+        text: 'Close',
         icon: 'close',
         role: 'cancel',
       }
@@ -70,7 +70,7 @@ export class PhotoPopoverCtrlService {
           }
         },
         {
-          text: 'Cancel',
+          text: 'Close',
           icon: 'close',
           role: 'cancel',
         }
