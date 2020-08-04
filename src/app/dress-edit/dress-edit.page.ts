@@ -190,7 +190,8 @@ export class DressEditPage implements OnInit, OnDestroy {
       ))
         return;
     }
-    if(!publish || this.checkFields()) {
+    this.dress.publishValid = this.checkFields();
+    if(!publish || this.checkFields(true)) {
       try {
         // Save the dress and update it, with the returned data
         this.dressBeforeEdit = await this.dressEditor.saveDress(this.dress.exportProperties(), publish);
@@ -204,19 +205,21 @@ export class DressEditPage implements OnInit, OnDestroy {
   }
 
 
-  checkFields() {
+  checkFields(verbose?: boolean) {
     const inputs = document.getElementsByTagName('input');
     for (let i = 0; i < inputs.length; i++)
       if(inputs[i].validity.valueMissing || !this.dress.fromDate || !this.dress.toDate) {
-        this.alertService.notice(
-          'Before publishing, all required fields must be filled',
-          'Missed something...',
-          'You can save it as draft in the meanwhile.'
-        );
+        if(verbose)
+          this.alertService.notice(
+            'Before publishing, all required fields must be filled',
+            'Missed something...',
+            'You can save it as draft in the meanwhile.'
+          );
         return false;
       }
     if ((this.dress.toDate as Date).getTime() < Date.now()) {
-      this.alertService.notice('The available dates have already passed', 'Dates error...');
+      if(verbose)
+        this.alertService.notice('The available dates have already passed', 'Dates error...');
       return false;
     }
     return true;

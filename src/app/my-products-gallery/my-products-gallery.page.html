@@ -10,7 +10,7 @@
       <ion-title>My Products</ion-title>
     </ion-list-header>
 
-    <div id="grid">
+    <div class="gallery-grid">
       <div class="dress-view" *ngFor="let dress of dressesService.nonDrafts; let idx = index">
         <img [src]="dress.photo" (click)="showPhotos(dress.photos)">
         <p>

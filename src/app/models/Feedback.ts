@@ -1,6 +1,7 @@
 export type FeedBack = {
-  from?: string;
-  timestamp?: Date;
+  writerId?: string;
+  writerName?: string;
+  timestamp?: number;
   title?: string;
   text?: string;
   rank?: number;

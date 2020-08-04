@@ -1,0 +1,37 @@
+ion-item-divider {
+  border: none;
+}
+
+.serial {
+  margin: 0;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  .title {
+    overflow: auto;
+    text-overflow: ellipsis;
+    padding-inline-end: 1em;
+  }
+}
+
+.feedback-content {
+  white-space: normal;
+  .text-collapsed {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1em;
+}

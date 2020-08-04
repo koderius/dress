@@ -45,4 +45,12 @@ export class NavigationService {
     return this.navCtrl.navigateRoot('tabs/categories');
   }
 
+  dressView(id: string) {
+    return this.navCtrl.navigateForward('tabs/dress-view/' + id);
+  }
+
+  renterView(uid: string) {
+    return this.navCtrl.navigateForward('tabs/renter-profile/' + uid);
+  }
+
 }

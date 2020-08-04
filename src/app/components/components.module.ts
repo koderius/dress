@@ -11,6 +11,7 @@ import {HideHeaderDirective} from '../directives/hide-header.directive';
 import {DressSizePipe} from '../pipe/dress-size.pipe';
 import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
 import {DressStatusPipe} from '../pipe/dress-status.pipe';
+import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.component';
 
 
 
@@ -30,6 +31,7 @@ import {DressStatusPipe} from '../pipe/dress-status.pipe';
     DressSizePipe,
     DressStatusPipe,
     PhotoPopoverComponent,
+    feedBacksListComponent,
   ],
   exports: [
     HeaderComponent,
@@ -40,6 +42,7 @@ import {DressStatusPipe} from '../pipe/dress-status.pipe';
     DressSizePipe,
     DressStatusPipe,
     PhotoPopoverComponent,
+    feedBacksListComponent,
   ],
   entryComponents: [
     TermsComponent,

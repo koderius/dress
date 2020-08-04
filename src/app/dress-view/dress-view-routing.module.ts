@@ -5,7 +5,7 @@ import { DressViewPage } from './dress-view.page';
 
 const routes: Routes = [
   {
-    path: '',
+    path: ':id',
     component: DressViewPage
   }
 ];

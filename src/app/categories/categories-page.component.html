@@ -4,13 +4,19 @@
 
 <ion-content [fullscreen]="true" scrollEvents="true" appHideHeader [header]="header">
 
-  <ion-item class="header" lines="none">
-    <h1>CATEGORIES</h1>
-  </ion-item>
+  <ion-list class="app-list">
 
-  <div *ngFor="let c of categories" class="category" [ngStyle]="{width: (100 / imagesPerRow)+'%'}" (click)="filterByCategory(c.id)">
-    <img [src]="c.image">
-    <h6>{{c.title}}</h6>
-  </div>
+    <ion-list-header>
+      <ion-title>Categories</ion-title>
+    </ion-list-header>
+
+    <div class="gallery-grid">
+      <div *ngFor="let c of categoryService.allCategories" class="category" (click)="filterByCategory(c.id)">
+        <img [src]="c.image" [alt]="c.title">
+        <p>{{c.title}}</p>
+      </div>
+    </div>
+
+  </ion-list>
 
 </ion-content>

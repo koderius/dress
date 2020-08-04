@@ -1,9 +1,108 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>dressView</ion-title>
-  </ion-toolbar>
+  <app-header type="empty"></app-header>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="dress && dressOwner">
+
+  <ion-slides [pager]="true" [options]="sliderOptions">
+    <ion-slide *ngFor="let photo of photos">
+      <div class="image-wrapper"
+           [ngStyle]="{backgroundImage: 'url('+photo+')'}"
+           (click)="photoPopover.openActionSheet(photos, false)"
+      ></div>
+    </ion-slide>
+  </ion-slides>
+
+  <ion-list>
+
+    <ion-item class="name-item" lines="none">
+      <ion-label><b>{{dress.name}}</b></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>
+        <p style="font-size: large">
+          <ion-text color="light">Rent price </ion-text>
+          <ion-text color="primary" style="font-size: larger">{{dress.price}}{{COIN_SIGN}}</ion-text>
+        </p>
+        <p>
+          <i>Additional tax may apply;<br>Charged at checkout</i>
+        </p>
+      </ion-label>
+      <ion-avatar slot="end" class="ion-align-self-start" (click)="goToRenter()">
+        <img [src]="dressOwner.photoURL" alt="Dress owner">
+      </ion-avatar>
+      <ion-button fill="clear" color="dark" class="owner-name"
+                  (click)="goToRenter()">{{dressOwner.displayName}}
+      </ion-button>
+    </ion-item>
+
+    <ion-item-group class="dress-details">
+
+      <ion-item>
+        <ion-label position="stacked">Product details</ion-label>
+        <p>{{dress.description}}</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Size</ion-label>
+        <p>{{dress.size | dressSize}}</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Color</ion-label>
+        <p>{{dress.color}}</p>
+        <ion-avatar slot="end"
+                    class="ion-align-self-center"
+                    [ngStyle]="{backgroundColor: dress.color}"
+        ></ion-avatar>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Category</ion-label>
+        <p>{{getCategory(dress.category).title}}</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Available dates</ion-label>
+        <p>{{dress.fromDate | date}} - {{dress.toDate | date}}</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Delivery time</ion-label>
+        <p>{{dress.supplyDays}} days</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Product return time</ion-label>
+        <p>{{dress.returnDays}} days</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Renter country</ion-label>
+        <p>{{dressOwner.state}}</p>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Deposit amount</ion-label>
+        <p>{{dress.deposit}}{{COIN_SIGN}}</p>
+      </ion-item>
+
+    </ion-item-group>
+
+  </ion-list>
+
+  <app-feed-backs-list *ngIf="feedBacks?.length" [feedBacks]="feedBacks"></app-feed-backs-list>
+
+  <ion-segment mode="md" class="rent-btns">
+    <ion-segment-button (click)="contactClicked()">
+      <ion-icon name="chatbubble-ellipses-outline" size="large"></ion-icon>
+      <ion-label>Contact with renter</ion-label>
+    </ion-segment-button>
+    <ion-segment-button (click)="rentClicked()">
+      <ion-icon name="card-outline" size="large"></ion-icon>
+      <ion-label>Rent it</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
 </ion-content>

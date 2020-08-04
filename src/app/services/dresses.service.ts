@@ -86,4 +86,16 @@ export class DressesService {
 
   }
 
+
+  async loadDress(id: string) : Promise<Dress> {
+    try {
+      const snapshot = await this.dressesRef.doc(id).get();
+      return new Dress(snapshot.data() as DressProps);
+    }
+    catch (e) {
+      this.alertsService.notice('Could not find dress', 'Error');
+      console.error(e);
+    }
+  }
+
 }

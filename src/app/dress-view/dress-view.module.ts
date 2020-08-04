@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { DressViewPageRoutingModule } from './dress-view-routing.module';
 
 import { DressViewPage } from './dress-view.page';
+import {ComponentsModule} from '../components/components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DressViewPageRoutingModule
+    DressViewPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [DressViewPage]
 })

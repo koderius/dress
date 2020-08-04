@@ -1,0 +1,38 @@
+<ion-list>
+
+  <ion-item-divider>Reviews</ion-item-divider>
+
+  <ion-item *ngFor="let feedBack of list; let idx = index">
+
+    <ion-note slot="start" class="serial" color="light">{{idx + 1}}</ion-note>
+
+    <ion-label>
+
+      <p class="feedback-header">
+        <b class="title">
+          <span (click)="goToUser(feedBack.writerId)">{{feedBack.writerName}}</span>
+          <span> | {{feedBack.title}}</span>
+        </b>
+        <i>{{feedBack.timestamp | date : 'd.M.yy'}}</i>
+      </p>
+
+      <p class="feedback-content">
+        <span class="text-collapsed" #text
+              (click)="text.classList.add('text-collapsed')"
+        >{{feedBack.text}}</span>
+        <a *ngIf="text.clientHeight < text.scrollHeight"
+           (click)="text.classList.remove('text-collapsed')"
+        > See more</a>
+      </p>
+
+    </ion-label>
+
+  </ion-item>
+
+</ion-list>
+
+<div class="view-btn">
+  <ion-button class="normal-btn" color="dark" shape="round" fill="outline"
+              (click)="extended = !extended"
+  >View {{extended ? 'Less' : 'All'}}</ion-button>
+</div>

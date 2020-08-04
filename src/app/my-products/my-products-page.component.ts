@@ -33,7 +33,13 @@ export class MyProductsPage implements OnInit {
   }
 
   async publish(dress: Dress) {
-    await this.dressEditor.saveDress(dress.exportProperties(), true);
+    if(dress.publishValid) {
+      await this.dressEditor.saveDress(dress.exportProperties(), true);
+      this.alertsService.notice('Dress was published!')
+    }
+    else
+      if(await this.alertsService.areYouSure('Cannot publish', "Some of the dress's properties are missing or invalid", 'Edit dress', 'Dismiss'))
+        this.goToDressUpload(dress.id)
   }
 
 }

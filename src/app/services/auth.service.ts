@@ -89,19 +89,6 @@ export class AuthService {
     private activatedRoute: ActivatedRoute,
   ) {
 
-    // /** MOCK */
-    // this._currentUserDoc = {
-    //   uid: 'abc123',
-    //   email: 'mestroti@gmail.com',
-    //   displayName: 'Moshe Estroti',
-    //   photoURL: 'https://lh3.googleusercontent.com/a-/AOh14Ggb7o8fqqNLVPi5eK-cLvAvLc4jU8rXk5ianNC1zQ=s96-cc-rg',
-    //   providerId: 'firebase',
-    //   phoneNumber: '0543055965',
-    // };
-    // this._user = this._currentUserDoc as User;
-    // return;
-    // /** MOCK */
-
     // On user ready with his data, or when got no user, the auth module is active and the app can start
     this.onUserReady.subscribe(()=>this._active = true);
 

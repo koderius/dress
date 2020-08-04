@@ -62,7 +62,8 @@ ion-button.wider-btn {
     ion-title {
       padding: 0;
       text-transform: uppercase;
-      font-size: 1em;
+      font-weight: bold;
+      font-size: 1.2em;
     }
   }
 
@@ -77,6 +78,13 @@ ion-button.wider-btn {
     }
   }
 
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-column-gap: 0.5em;
+  grid-row-gap: 1em;
 }
 
 .photo-popover {

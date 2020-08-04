@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import {ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild} from '@angular/router';
 import {AuthService} from '../services/auth.service';
 import {NavigationService} from '../services/navigation.service';
+import {first} from 'rxjs/operators';
 
 /**
  * This guard check the authentication status in order to allow entering the app (under the tabs segment)
@@ -12,35 +13,23 @@ import {NavigationService} from '../services/navigation.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivateChild {
 
   constructor(
     private authService: AuthService,
     private navService: NavigationService,
   ) {}
 
-  async canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean> {
+  async canActivateChild(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
-    // If user's document exist (user is logged in and ready), allow entering
-    if(this.authService.currentUser)
-      return true;
-
-    // Wait for user to be ready within 5 seconds
-    const res = await new Promise<boolean>(resolve => {
-
-      this.authService.onUserReady.subscribe((user)=>resolve(!!user));
-
-      setTimeout(()=>{resolve(false)}, 5000);
-
-    });
-
-    // If no user, redirect to landing page
-    if(!res)
-      this.navService.landing();
-
-    return res;
+    return new Promise<boolean>(resolve => {
+      this.authService.user$.pipe(first()).subscribe((user)=>{
+        if(user)
+          resolve(true);
+        else
+          this.navService.landing();
+      });
+    })
 
   }
   

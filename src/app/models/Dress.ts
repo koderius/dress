@@ -47,9 +47,11 @@ export interface DressProps extends BaseModelProps {
   supplyDays?: number;
   returnDays?: number;
   photos?: string[];
+  mainPhoto?: number;
   status?: DressStatus;       // Property name is important for firestore rules
   created?: number;
   modified?: number;
+  publishValid?: boolean
 }
 
 
@@ -110,9 +112,17 @@ export class Dress extends BaseModel implements DressProps {
     this._props.category = categoryId;
   }
 
+  get mainPhoto() {
+    return this._props.mainPhoto || 0;
+  }
+
+  set mainPhoto(idx: number) {
+    this._props.mainPhoto = idx;
+  }
+
   /** Get the first photo, or some default image if there are no photos */
   get photo() {
-    return this.photos.length ? this.photos[0] : '' // TODO: Default image for no photo
+    return this.photos.length ? this.photos[this.mainPhoto] : '' // TODO: Default image for no photo
   }
 
   /** List of all photos */
@@ -136,6 +146,10 @@ export class Dress extends BaseModel implements DressProps {
   removePhoto(idx: number) {
     if(this._props.photos)
       this._props.photos.splice(idx, 1);
+    if(idx < this.mainPhoto)
+      this._props.mainPhoto--;
+    else if(idx == this.mainPhoto)
+      this._props.mainPhoto = 0;
   }
 
   get ranks() {
@@ -216,6 +230,14 @@ export class Dress extends BaseModel implements DressProps {
 
   set returnDays(returnDays: DressStatus) {
     this._props.returnDays = returnDays;
+  }
+
+  get publishValid() {
+    return this._props.publishValid;
+  }
+
+  set publishValid(valid: boolean) {
+    this._props.publishValid = valid;
   }
 
 }

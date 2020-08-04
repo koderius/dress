@@ -1,0 +1,70 @@
+ion-slides {
+  ion-slide {
+    align-items: flex-start;
+    height: calc(100vw + 50px);
+    max-height: 650px;
+    .image-wrapper {
+      max-width: 600px;
+      max-height: 600px;
+      width: 100vw;
+      height: 100vw;
+      background-size: cover;
+      background-position: center;
+    }
+  }
+  ::ng-deep {
+    .swiper-pagination-bullet {
+      width: 1em;
+      height: 1em;
+      opacity: 1;
+      background-color: transparent;
+      border: solid var(--ion-color-light) 2px;
+      &.swiper-pagination-bullet-active {
+        border: none;
+        background-color: var(--ion-color-primary);
+      }
+    }
+  }
+}
+
+.name-item {
+  height: 1.5em;
+  ion-label {
+    align-self: flex-start;
+    margin: 0;
+  }
+}
+
+.owner-name {
+  position: absolute;
+  right: 16px;
+  bottom: 0;
+  margin: 10px 0;
+  --padding-end: 0.5em;
+}
+
+.dress-details {
+  ion-item {
+    p {
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+.rent-btns {
+  ion-segment-button {
+    width: 50%;
+    font-size: x-small;
+    color: white;
+    --indicator-height: 0;
+    height: 60px;
+    &:first-child {
+      --background: var(--ion-color-secondary);
+      --background-checked: var(--ion-color-secondary);
+    }
+    &:last-child {
+      --background: var(--ion-color-medium);
+      --background-checked: var(--ion-color-medium);
+    }
+  }
+}
