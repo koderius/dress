@@ -1,12 +1,13 @@
 import {Component, Input} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {CategoriesService} from '../services/categories.service';
-import {Dress, DressCategory} from '../models/Dress';
+import {Dress} from '../models/Dress';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
 import {DressesService} from '../services/dresses.service';
 import {ActivatedRoute} from '@angular/router';
 import {SearchFilters, SearchFiltersRaw} from '../models/SearchFilters';
 import {NavigationService} from '../services/navigation.service';
+import {LoadingController} from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -36,6 +37,7 @@ export class HomePage {
     private navService: NavigationService,
     private categoryService: CategoriesService,
     private dressService: DressesService,
+    private loader: LoadingController,
   ) {
 
     // Check search segment in the URL
@@ -49,6 +51,10 @@ export class HomePage {
         this.filter(params);
     });
 
+  }
+
+  ionViewDidEnter() {
+    this.loader.dismiss();
   }
 
 

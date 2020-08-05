@@ -53,4 +53,9 @@ export class NavigationService {
     return this.navCtrl.navigateForward('tabs/renter-profile/' + uid);
   }
 
+  chat(withUid: string) {
+    if(withUid)
+      return this.navCtrl.navigateForward('tabs/chat/' + withUid);
+  }
+
 }

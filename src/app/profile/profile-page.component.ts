@@ -52,7 +52,7 @@ export class ProfilePage implements OnInit{
 
   async saveChanges() {
     this.alertService.showLoader('Saving...');
-    await this.authService.editUserDocument(this.userDoc);
+    await this.authService.editUserDocument({...this.userDoc});
     this.userDoc = this.authService.currentUser;
     this.alertService.dismissLoader();
   }

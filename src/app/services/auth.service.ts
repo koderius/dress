@@ -320,8 +320,10 @@ export class AuthService {
   /** Update user's document (BY MERGE) */
   async editUserDocument(newUserDetails: Partial<UserDoc>) : Promise<void> {
 
-    // Cannot change UID
+    // Cannot change UID, email & ranking
     delete newUserDetails.uid;
+    delete newUserDetails.email;
+    delete newUserDetails.rank;
 
     try {
 

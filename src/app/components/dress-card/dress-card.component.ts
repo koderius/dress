@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Dress} from '../../models/Dress';
 import {CategoriesService} from '../../services/categories.service';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-dress-card',
@@ -13,6 +14,7 @@ export class DressCardComponent implements OnInit {
 
   constructor(
     private dressCategories: CategoriesService,
+    private navService: NavigationService
   ) {}
 
   ngOnInit() {
@@ -21,6 +23,10 @@ export class DressCardComponent implements OnInit {
   getCategoryName() {
     const c = this.dressCategories.allCategories.find((c)=>c.id == this.dress.category);
     return c ? c.title : '';
+  }
+
+  viewDress() {
+    this.navService.dressView(this.dress.id);
   }
 
 

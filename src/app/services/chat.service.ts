@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
-import * as firebase from 'firebase';
+import {EventEmitter, Injectable} from '@angular/core';
+import * as firebase from 'firebase/app';
 import 'firebase/database'
 import Reference = firebase.database.Reference;
 import {AuthService} from './auth.service';
+import {ChatMsg} from '../models/ChatMsg';
+import DataSnapshot = firebase.database.DataSnapshot;
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +14,48 @@ export class ChatService {
   // A reference for chats database
   private readonly CHAT = firebase.database().ref('chat');
 
-  private currentChat: Reference;
-  private partner: string;
-  private incomingMessages: any[];
-  private myMessages: any[];
+  private toMeRef: Reference;
+  private toPartnerRef: Reference;
+  private conMetaRef: Reference;
 
-  constructor(private authService: AuthService) { }
+  private partner: string;
+
+  public isActive: boolean;
+
+  private _messages: ChatMsg[] = [];
+  public meta: {
+    lastRead: number,
+  };
+
+  public onMsg = new EventEmitter<ChatMsg>();
 
   get myUid() : string{
     return this.authService.currentUser.uid;
   }
 
-  enterConversation(userId: string) {
+  get messages() {
+    return [...this._messages];
+  }
+
+  constructor(private authService: AuthService) {}
+
+  leaveConversation() {
+
+    // Stop subscribing messages
+    if(this.toMeRef)
+      this.toMeRef.off();
+    if(this.toPartnerRef)
+      this.toPartnerRef.off();
+
+    // Clear refs
+    this.conMetaRef = this.toPartnerRef = this.toMeRef = null;
+
+    // Clear chat messages
+    this._messages.splice(0);
+
+  }
+
+  async enterConversation(userId: string) {
 
     // Leave previous chat
     this.leaveConversation();
@@ -32,15 +64,22 @@ export class ChatService {
 
     try {
 
-      // Start subscribing incoming messages
-      this.currentChat = this.CHAT.child(this.partner + '/' + this.myUid);
-      this.currentChat.on('child_added',snapshot => {
-        this.incomingMessages.push(snapshot.val());
-      });
+      // Set references for incoming and outgoing messages
+      this.toMeRef = this.CHAT.child(this.myUid + '/' + this.partner);
+      this.toPartnerRef = this.CHAT.child(this.partner + '/' + this.myUid);
+      this.conMetaRef = this.toMeRef.child('meta');
 
-      // Get current user's previous messages (once)
-      this.CHAT.child(this.myUid + '/' + this.partner).once('value',snapshot =>{
-        this.myMessages = snapshot.val();
+      // Read conversation metadata (once), and set chat as active
+      const metaSnapshot = await this.conMetaRef.once('value');
+      this.meta = metaSnapshot.val() || {};
+      this.isActive = true;
+
+      // Subscribe incoming and outgoing messages
+      this.toMeRef.on('child_added', snapshot => {
+        this.handleMsg(snapshot, 'i');
+      });
+      this.toPartnerRef.on('child_added', snapshot => {
+        this.handleMsg(snapshot, 'o');
       });
 
     }
@@ -50,36 +89,41 @@ export class ChatService {
 
   }
 
-  leaveConversation() {
+  handleMsg(snapshot: DataSnapshot, type: 'i' | 'o') {
 
-    // Stop subscribing incoming messages
-    if(this.currentChat)
-      this.currentChat.off();
+    // Only timestamps keys are messages
+    if(!+snapshot.key)
+      return;
 
-    this.currentChat = null;
-    this.partner = null;
+    const msg: ChatMsg = {
+      timestamp: +snapshot.key,
+      text: snapshot.val(),
+      type: type,
+    };
+    this._messages.push(msg);
+    this._messages.sort((a, b) => a.timestamp - b.timestamp);
+    this.onMsg.emit(msg);
 
-    // Clear chat messages
-    this.incomingMessages = [];
-    this.myMessages = [];
-
+    // Update current message as the last one was read
+    this.conMetaRef.update({lastRead: msg.timestamp});
   }
 
 
   async writeMsg(msg: string) {
 
-    if(this.partner) {
-
+    // Add message as value, and timestamp as the key
+    if(this.toPartnerRef) {
       try {
-        await this.CHAT.child(this.myUid + '/' + this.partner).child(Date.now().toString()).set(msg);
-        this.myMessages.push(msg);
+        const key = Date.now().toString();
+        await this.toPartnerRef.child(key).set(msg);
       }
       catch (e) {
         console.error(e);
       }
-
     }
 
   }
 
+
 }
+

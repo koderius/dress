@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import {LoaderGuard} from '../loader.guard';
 
 const routes: Routes = [
   {
@@ -12,7 +13,8 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../home/home.module').then(m => m.HomeModule)
+            loadChildren: () => import('../home/home.module').then(m => m.HomeModule),
+            canActivate: [LoaderGuard],
           }
         ]
       },
@@ -41,6 +43,10 @@ const routes: Routes = [
       {
         path: 'dress-view',
         loadChildren: () => import('../dress-view/dress-view.module').then( m => m.DressViewPageModule)
+      },
+      {
+        path: 'chat',
+        loadChildren: () => import('../chat/chat.module').then( m => m.ChatPageModule)
       },
       {
         path: '',

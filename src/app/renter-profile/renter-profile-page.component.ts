@@ -75,4 +75,8 @@ export class RenterProfilePage implements OnInit, OnDestroy {
     this.feedBackService.writeUserFeedBack(this.userDoc.uid, this.myFeedBack);
   }
 
+  connectRenter() {
+    this.navService.chat(this.userDoc.uid);
+  }
+
 }

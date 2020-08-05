@@ -1,0 +1,33 @@
+<ion-header>
+  <app-header type="empty"></app-header>
+</ion-header>
+
+<ion-content #content>
+
+  <main>
+    <div *ngFor="let msg of messages" class="msg" [ngClass]="msg.type == 'i' ? 'in-msg' : 'out-msg'">
+      <div class="msg-wrapper">
+        <p class="msg-meta">
+          <ion-text class="ion-padding-end">{{msg.type == 'o' ? myName : partner.displayName}}</ion-text>
+          <ion-text>{{msg.timestamp | date : msgTimeFormat(msg.timestamp)}}</ion-text>
+        </p>
+        <div class="inner-msg">
+          <p>{{msg.text}}</p>
+        </div>
+        <div #unreadFromHere *ngIf="msg.timestamp == lastRead"></div>
+      </div>
+    </div>
+  </main>
+
+</ion-content>
+
+<ion-footer>
+
+  <ion-item id="input-item" lines="none">
+    <ion-textarea autoGrow rows="1" [(ngModel)]="myMsg" (keyup.enter)="send()"></ion-textarea>
+    <ion-fab-button slot="end" size="small" [disabled]="!myMsg.trim()" (click)="send()">
+      <ion-icon name="send"></ion-icon>
+    </ion-fab-button>
+  </ion-item>
+
+</ion-footer>

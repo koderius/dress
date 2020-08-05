@@ -1,0 +1,49 @@
+$my-color: #DFDFDF;
+
+.msg {
+  margin: 1em;
+  display: flex;
+  .msg-wrapper {
+    max-width: 80%;
+    width: max-content;
+    p {margin: 0}
+    .msg-meta {
+      font-size: smaller;
+      margin-bottom: 0.5em;
+    }
+    .inner-msg {
+      line-height: 1.5;
+      padding: 0.5em 1em;
+      border-radius: 1em;
+    }
+  }
+  &.in-msg {
+    justify-content: flex-start;
+    .inner-msg {
+      background-color: var(--ion-color-secondary);
+      color: white;
+    }
+  }
+  &.out-msg {
+    justify-content: flex-end;
+    .inner-msg {
+      background-color: $my-color;
+      color: black;
+    }
+  }
+}
+
+
+#input-item {
+  --highlight-height: 0;
+  margin-bottom: 0.5em;
+  ion-textarea {
+    background: $my-color;
+    border-radius: 2em;
+    --padding-start: 1em;
+    --padding-end: 1em;
+  }
+  ion-fab-button {
+    --box-shadow: none;
+  }
+}
