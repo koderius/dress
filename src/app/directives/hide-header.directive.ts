@@ -10,6 +10,8 @@ export class HideHeaderDirective implements OnInit {
 
   private lastY = 0;
 
+  private top: number = 0;
+
   constructor(
     private renderer: Renderer2,
     private domCtrl: DomController
@@ -17,21 +19,21 @@ export class HideHeaderDirective implements OnInit {
 
   ngOnInit(): void {
     this.header = this.header.el;
-    this.domCtrl.write(() => {
-      this.renderer.setStyle(this.header, 'transition', 'margin-top 700ms');
-    });
+    // this.domCtrl.write(() => {
+    //   this.renderer.setStyle(this.header, 'transition', 'top 700ms');
+    // });
   }
 
   @HostListener('ionScroll', ['$event']) onContentScroll($event: any) {
-    if ($event.detail.scrollTop > this.lastY) {
-      this.domCtrl.write(() => {
-        this.renderer.setStyle(this.header, 'margin-top', `-${ this.header.clientHeight }px`);
-      });
-    } else {
-      this.domCtrl.write(() => {
-        this.renderer.setStyle(this.header, 'margin-top', '0');
-      });
-    }
+    const dif = $event.detail.scrollTop - this.lastY;
+    this.top -= dif;
+    if(this.top < -this.header.clientHeight)
+      this.top = -this.header.clientHeight;
+    if(this.top > 0)
+      this.top = 0;
+    this.domCtrl.write(() => {
+      this.renderer.setStyle(this.header, 'top', `${this.top}px`);
+    });
 
     this.lastY = $event.detail.scrollTop;
   }

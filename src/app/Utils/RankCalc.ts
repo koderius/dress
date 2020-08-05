@@ -35,7 +35,7 @@ export class RankCalc {
 
   static StarRate(rank: number[], star: number) : string {
     if(rank)
-      return Math.round(((rank[star-1] || 0) / RankCalc.TotalRanks(rank)) / 100) + '%';
+      return Math.round(((rank[star-1] || 0) / RankCalc.TotalRanks(rank)) * 100) + '%';
     else
       return '0%';
   }

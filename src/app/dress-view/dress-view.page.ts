@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
-import {Platform} from '@ionic/angular';
+import {Platform, ToastController} from '@ionic/angular';
 import {AuthService, UserDoc} from '../services/auth.service';
 import {CategoriesService} from '../services/categories.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
@@ -31,6 +31,9 @@ export class DressViewPage implements OnInit, OnDestroy {
     loop: true,
   };
 
+  // Preview mode
+  isMine: boolean;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private dressService: DressesService,
@@ -40,6 +43,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     public photoPopover: PhotoPopoverCtrlService,
     private navService: NavigationService,
     private feedBacksService: FeedBacksService,
+    private toastCtrl: ToastController,
   ) { }
 
   ngOnInit() {
@@ -49,6 +53,7 @@ export class DressViewPage implements OnInit, OnDestroy {
 
       const id = params['id'];
       this.dress = await this.dressService.loadDress(id);
+      this.isMine = this.dress.owner == this.authService.currentUser.uid;
       this.dressOwner = await this.authService.getUserDoc(this.dress.owner);
       this.feedBacks = await this.feedBacksService.getUserFeedBacks(this.dressOwner.uid);
 
@@ -73,11 +78,36 @@ export class DressViewPage implements OnInit, OnDestroy {
     this.navService.renterView(this.dressOwner.uid);
   }
 
-  rentClicked() {
 
-  }
+  async segmentClicked(event: CustomEvent) {
 
-  contactClicked() {
+    // Prevent emit on mouse leave (some segment's stupid problems)
+    const value: 'contact' | 'rent' = event.detail.value;
+    if(!value)
+      return;
+
+    // If on preview mode
+    if(this.isMine && !await this.toastCtrl.getTop()) {
+      const t = await this.toastCtrl.create({
+        header: 'Preview mode!',
+        position: 'middle',
+        duration: 500,
+        color: 'medium',
+        cssClass: 'ion-text-center'
+      });
+      t.present();
+    }
+    else {
+      if(value == 'contact') {
+        // TODO
+      }
+      if(value == 'rent') {
+        // TODO
+      }
+    }
+
+    // Reset segment (to allow clicking on the same button again)
+    event.target['value'] = null;
 
   }
 

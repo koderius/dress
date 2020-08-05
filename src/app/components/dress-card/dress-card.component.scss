@@ -1,7 +1,13 @@
 ion-card {
-  margin: 0.5em;
+  margin: 0;
   box-shadow: none;
   border: solid #c6c6c6 1px;
+  img {
+    height: 250px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 ion-card-content {
@@ -11,6 +17,7 @@ ion-card-content {
 #category-text {
   font-weight: bold;
   text-transform: capitalize;
+  overflow: hidden;
 }
 
 ion-button {

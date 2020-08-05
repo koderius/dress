@@ -34,6 +34,10 @@ export class MyProductsGalleryPage implements OnInit {
     this.navService.editDress(dressId);
   }
 
+  goToDressView(dressId: string) {
+    this.navService.dressView(dressId);
+  }
+
   async deleteDress(dress: Dress, idx: number) {
     if(await this.alertsService.areYouSure(
       `Delete "${dress.name}" permanently?`,

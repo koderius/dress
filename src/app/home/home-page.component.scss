@@ -19,13 +19,19 @@ ion-header:after {
   border: solid #222222;
   border-width: 2px 0;
   padding-bottom: 2em;
+  &:first-child {
+    border-top: none;
+  }
 }
 
+ion-slide {
+  padding: 0 0.5em;
+}
 .swiper-slide {
   display: block;
 }
+
 .category {
-  padding: 0 0.5em;
   h6 {
     font-size: 0.7em;
     margin: 0;

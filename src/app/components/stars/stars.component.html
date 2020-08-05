@@ -1,6 +1,6 @@
 <div id="row">
 
-  <div class="col" *ngFor="let star of stars">
+  <div class="col" *ngFor="let star of stars" (click)="starClicked(star)">
     <ion-img [src]="roundedRank >= star ? starImg : emptyStarImg" [ngStyle]="{height: size, width: size}"></ion-img>
   </div>
 

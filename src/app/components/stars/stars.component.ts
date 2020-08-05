@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RankCalc} from '../../Utils/RankCalc';
 
 @Component({
@@ -11,8 +11,10 @@ export class StarsComponent implements OnInit {
   readonly starImg = '../../assets/images/star.png';
   readonly emptyStarImg = '../../assets/images/star_empty.png';
 
-  @Input() rank: number[];
+  @Input() rank: number | number[];
   @Input() size: string = '1.5em';
+  @Input() selectable: boolean;
+  @Output() selected = new EventEmitter<number>();
 
   roundedRank: number;
 
@@ -21,7 +23,17 @@ export class StarsComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.roundedRank = RankCalc.AverageRank(this.rank);
+    if(Array.isArray(this.rank))
+      this.roundedRank = RankCalc.AverageRank(this.rank);
+    else
+      this.roundedRank = Math.round(this.rank);
+  }
+
+  starClicked(rank: number) {
+    if(this.selectable) {
+      this.roundedRank = rank;
+      this.selected.emit(rank);
+    }
   }
 
 }

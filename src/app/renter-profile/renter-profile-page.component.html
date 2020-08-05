@@ -14,7 +14,7 @@
 
       <div id="photo-item">
         <ion-thumbnail slot="start">
-          <img [src]="userDoc.photoURL" *ngIf="userDoc.photoURL">
+          <img [src]="userDoc.photoURL" *ngIf="userDoc.photoURL" alt="User photo" (click)="photoPopover.showPhoto(userDoc.photoURL)">
         </ion-thumbnail>
         <div class="ion-padding-start">
           <ion-item lines="none">
@@ -39,55 +39,43 @@
 
     </ion-item-group>
 
-    <ion-item-group>
+    <ion-item-group style="border-bottom: none">
 
       <div id="reviews-summery">
 
         <ion-label>All Reviews</ion-label>
 
-        <div *ngFor="let rank of RankCalc.GetList(userDoc.rank).reverse(); let i = index">
-          <ion-text>{{(-i + 5) + ' stars '}}</ion-text>
-          <ion-text color="light">____________ </ion-text>
+        <div *ngFor="let rank of RankCalc.GetList(userDoc.rank).reverse(); let i = index" class="rank-table">
+          <ion-text>{{(-i + 5) + ' Stars '}}</ion-text>
+          <div [ngStyle]="{borderLeftWidth: RankCalc.StarRate(userDoc.rank, (-i + 5)).slice(0, -1) + 'px'}"></div>
           <ion-text>{{RankCalc.StarRate(userDoc.rank, (-i + 5))}}</ion-text>
         </div>
 
       </div>
 
-      <ion-card class="review-card">
-        <div>
-          <ion-note>1</ion-note>
-        </div>
-        <div>
-          <ion-row>
-            <ion-col>
-              <ion-card-subtitle>Username | Review Title</ion-card-subtitle>
-            </ion-col>
-            <ion-col size="5">
-              <app-stars [rank]="[4,5,19,23,15]" class="ion-float-end" size="1.3em"></app-stars>
-            </ion-col>
-          </ion-row>
-          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took</p>
-        </div>
-      </ion-card>
-
-      <ion-row class="ion-margin-bottom">
-        <ion-button color="dark" shape="round" fill="outline" style="margin: auto; text-transform: capitalize">View All</ion-button>
-      </ion-row>
-
     </ion-item-group>
 
+  </ion-list>
+
+  <app-feed-backs-list [uid]="userDoc.uid"
+                       *ngIf="feedBacks?.length"
+  ></app-feed-backs-list>
+
+  <ion-list class="app-list" *ngIf="!isMe()">
 
     <ion-item-group>
 
-      <ion-label>Leave Feedback</ion-label>
-      <ion-text>(For leaving a feedback you must sign in)</ion-text>
+      <ion-label>
+        <h2>Leave Feedback</h2>
+        <p *ngIf="!isSignedIn()">(For leaving a feedback you must be <a><b>signed in</b></a>)</p>
+      </ion-label>
 
       <div id="my-review">
         <ion-label>Your rating</ion-label>
-        <app-stars></app-stars>
-        <ion-input placeholder="Title"></ion-input>
-        <ion-textarea placeholder="Your Feedback"></ion-textarea>
-        <ion-button color="dark" shape="round" size="small" class="ion-float-end">Confirm</ion-button>
+        <app-stars [selectable]="true" (selected)="myFeedBack.rank = $event"></app-stars>
+        <ion-input placeholder="Title" [(ngModel)]="myFeedBack.title"></ion-input>
+        <ion-textarea placeholder="Your Feedback" [(ngModel)]="myFeedBack.text"></ion-textarea>
+        <ion-button color="dark" shape="round" size="small" class="ion-float-end" (click)="sendFeedBack()">Confirm</ion-button>
       </div>
 
     </ion-item-group>
@@ -97,5 +85,22 @@
     </ion-row>
 
   </ion-list>
+
+  <ion-list class="app-list">
+
+    <ion-list-header>
+      <ion-title>More dresses from {{userDoc.displayName}}</ion-title>
+    </ion-list-header>
+
+    <div class="gallery-grid">
+      <app-dress-card *ngFor="let dress of userDresses" [dress]="dress"></app-dress-card>
+    </div>
+
+  </ion-list>
+
+  <div class="view-btn" *ngIf="userDresses.length >= 4">
+    <ion-button class="normal-btn" color="dark" shape="round" fill="outline"
+    >View All</ion-button>
+  </div>
 
 </ion-content>

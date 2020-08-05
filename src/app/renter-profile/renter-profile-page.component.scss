@@ -33,61 +33,50 @@ ion-item {
   }
 }
 
+.rank-table {
+  display: flex;
+  min-width: 200px;
+  width: 50%;
+  line-height: 1.4;
+  div {
+    width: 100px;
+    border-inline-start: solid var(--ion-color-secondary) 0;
+    //border-bottom: solid var(--ion-color-light-tint) 1px;
+    height: 0.5em;
+    margin: 0.35em 0.25em;
+  }
+}
+
 #reviews-summery {
   ion-label {
     line-height: 3;
   }
 }
 
-.review-card {
-  margin: 1em 0;
-  box-shadow: none;
-  div {
-    display: inline-block;
-  }
-  div:first-child {
-    vertical-align: top;
-    padding: 0.5em 0;
-  }
-  div:last-child {
-    width: calc(100% - 2em);
-    float: right;
-  }
-  ion-row {
-    padding: 0.5em 0;
-  }
-  ion-card-subtitle {
-    font-size: 1em;
-    line-height: 1.5;
-    color: black;
-  }
-  p {
-    color: black;
-    margin: 0;
-    text-align: justify;
-    text-justify: inter-word;
-  }
-  ion-col {
-    padding: 0;
-  }
-}
-
 #my-review {
   margin: 1em 0 3em 0;
-  font-size: 0.75em;
+  //font-size: 0.75em;
   color: var(--ion-color-light);
   ion-input, ion-textarea {
     color: black;
-    --padding-top: 0.2em;
-    --padding-bottom: 0.2em;
+    --padding-top: 0.5em;
+    --padding-bottom: 0.5em;
     border: solid var(--ion-color-light) 1px;
     border-radius: 1em;
   }
   ion-input {
+    margin-top: 0.5em;
     width: 40%;
   }
   ion-button {
     font-weight: normal;
     width: 35%;
   }
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1em;
 }

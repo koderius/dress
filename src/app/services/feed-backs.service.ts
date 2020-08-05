@@ -45,14 +45,13 @@ export class FeedBacksService {
   async writeUserFeedBack(to: string, feedBack: FeedBack) : Promise<void> {
 
     // From current user UID
-    feedBack.from = this.authService.currentUser.uid;
+    feedBack.writerId = this.authService.currentUser.uid;
+    feedBack.writerName = this.authService.currentUser.displayName;
+    feedBack.timestamp = Date.now();
 
     // Write or edit feed back
     try {
-      await this.userFeedBacks(to).doc(feedBack.from).set({
-        ...feedBack,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      }, {merge: true});
+      await this.userFeedBacks(to).doc(feedBack.writerId).set(feedBack);
     }
     catch (e) {
       console.error(e);

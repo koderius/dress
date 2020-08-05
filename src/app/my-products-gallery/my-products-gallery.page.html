@@ -20,14 +20,14 @@
           <ion-text [color]="dress.status | dressStatus : 'theme'">{{dress.status | dressStatus | uppercase}}</ion-text>
         </p>
         <div class="btns">
-          <ion-button shape="round" size="small" (click)="deleteDress(dress, idx)" *ngIf="dress.status < DressStatus.RENTED">
+          <ion-button shape="round" size="small" (click)="deleteDress(dress, idx)" [disabled]="dress.status == DressStatus.RENTED">
             <ion-icon name="close"></ion-icon>
           </ion-button>
-          <ion-button shape="round" size="small" (click)="goToDress(dress.id)" *ngIf="dress.status < DressStatus.RENTED">
-            <ion-icon name="pencil-sharp"></ion-icon>
-          </ion-button>
           <ion-button shape="round" size="small" (click)="goToDress(dress.id)">
-            <ion-icon name="information"></ion-icon>
+            <ion-icon [name]="dress.status < DressStatus.RENTED ? 'pencil-sharp' : 'information'"></ion-icon>
+          </ion-button>
+          <ion-button shape="round" size="small" (click)="goToDressView(dress.id)">
+            <ion-icon name="eye-outline"></ion-icon>
           </ion-button>
         </div>
       </div>

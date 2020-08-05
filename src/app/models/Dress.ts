@@ -62,6 +62,7 @@ export class Dress extends BaseModel implements DressProps {
 
   constructor(protected _props : DressProps = {}) {
     super(_props);
+    this.owner = this._props.owner;
   }
 
   get name() {

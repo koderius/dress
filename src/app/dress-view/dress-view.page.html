@@ -92,14 +92,18 @@
 
   </ion-list>
 
-  <app-feed-backs-list *ngIf="feedBacks?.length" [feedBacks]="feedBacks"></app-feed-backs-list>
+  <app-feed-backs-list *ngIf="feedBacks?.length"
+                       [uid]="dressOwner.uid"
+                       listTitle="Reviews"
+  ></app-feed-backs-list>
 
-  <ion-segment mode="md" class="rent-btns">
-    <ion-segment-button (click)="contactClicked()">
+  <ion-segment mode="md" class="rent-btns"
+               (ionChange)="segmentClicked($event)">
+    <ion-segment-button value="contact">
       <ion-icon name="chatbubble-ellipses-outline" size="large"></ion-icon>
       <ion-label>Contact with renter</ion-label>
     </ion-segment-button>
-    <ion-segment-button (click)="rentClicked()">
+    <ion-segment-button value="rent">
       <ion-icon name="card-outline" size="large"></ion-icon>
       <ion-label>Rent it</ion-label>
     </ion-segment-button>

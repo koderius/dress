@@ -1,8 +1,8 @@
 <ion-list>
 
-  <ion-item-divider>Reviews</ion-item-divider>
+  <ion-item-divider *ngIf="listTitle">{{listTitle}}</ion-item-divider>
 
-  <ion-item *ngFor="let feedBack of list; let idx = index">
+  <ion-item *ngFor="let feedBack of feedBacks; let idx = index; let last = last" [lines]="last ? 'none' : ''">
 
     <ion-note slot="start" class="serial" color="light">{{idx + 1}}</ion-note>
 
@@ -13,7 +13,7 @@
           <span (click)="goToUser(feedBack.writerId)">{{feedBack.writerName}}</span>
           <span> | {{feedBack.title}}</span>
         </b>
-        <i>{{feedBack.timestamp | date : 'd.M.yy'}}</i>
+        <app-stars [rank]="feedBack.rank" size="1.2em"></app-stars>
       </p>
 
       <p class="feedback-content">
@@ -23,6 +23,7 @@
         <a *ngIf="text.clientHeight < text.scrollHeight"
            (click)="text.classList.remove('text-collapsed')"
         > See more</a>
+        <i class="ion-float-end">{{feedBack.timestamp | date : 'd.M.yy'}}</i>
       </p>
 
     </ion-label>
@@ -31,8 +32,8 @@
 
 </ion-list>
 
-<div class="view-btn">
+<div class="view-btn" *ngIf="canExtend">
   <ion-button class="normal-btn" color="dark" shape="round" fill="outline"
-              (click)="extended = !extended"
-  >View {{extended ? 'Less' : 'All'}}</ion-button>
+              (click)="extend()"
+  >View All</ion-button>
 </div>

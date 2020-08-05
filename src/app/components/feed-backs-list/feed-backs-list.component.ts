@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FeedBack} from '../../models/Feedback';
 import {NavigationService} from '../../services/navigation.service';
+import {FeedBacksService} from '../../services/feed-backs.service';
 
 @Component({
   selector: 'app-feed-backs-list',
@@ -9,7 +10,11 @@ import {NavigationService} from '../../services/navigation.service';
 })
 export class feedBacksListComponent implements OnInit {
 
-  @Input() feedBacks: FeedBack[] = [{
+  @Input() listTitle: string;
+
+  @Input() uid: string;
+
+  feedBacks: FeedBack[] = [{
     writerId: 'ahsdjkf',
     writerName: 'Somebody I know',
     timestamp: 12334123412,
@@ -41,24 +46,24 @@ export class feedBacksListComponent implements OnInit {
 
   @Input() minShow: number = 2;
 
-  private _extended: boolean;
-  get extended() {
-    return this._extended;
-  }
-  set extended(toggle: boolean) {
-    this.list = toggle ? this.feedBacks : this.feedBacks.slice(0, this.minShow);
-    this._extended = toggle;
-  }
-
-  list: FeedBack[];
+  canExtend: boolean;
 
   constructor(
     private navService: NavigationService,
-  ) {
-    this.extended = false;
+    private feedBackService: FeedBacksService,
+  ) {}
+
+  async ngOnInit() {
+    // Load the requested amount with 1 extra, in order to know whether there are more
+    this.feedBacks = await this.feedBackService.getUserFeedBacks(this.uid, this.minShow + 1);
+    // If there are more, it's possible to extend
+    this.canExtend = !!this.feedBacks.splice(this.minShow).length;
   }
 
-  ngOnInit() {
+  // Load all
+  async extend() {
+    this.feedBacks = await this.feedBackService.getUserFeedBacks(this.uid);
+    this.canExtend = false;
   }
 
   goToUser(uid: string) {

@@ -15,7 +15,8 @@ export class DressCardComponent implements OnInit {
     private dressCategories: CategoriesService,
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   getCategoryName() {
     const c = this.dressCategories.allCategories.find((c)=>c.id == this.dress.category);

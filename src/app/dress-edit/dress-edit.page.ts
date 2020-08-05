@@ -225,4 +225,9 @@ export class DressEditPage implements OnInit, OnDestroy {
     return true;
   }
 
+  dressPreview() {
+    if(this.checkFields(true))
+      this.navService.dressView(this.dress.id);
+  }
+
 }

@@ -98,4 +98,13 @@ export class DressesService {
     }
   }
 
+
+  async loadDressesOfUser(uid: string, limit?: number) : Promise<Dress[]> {
+    let ref = this.publicDressesRef.where('owner', '==', uid);
+    if(limit)
+      ref = ref.limit(limit);
+    const snapshot = await ref.get();
+    return snapshot.docs.map((d)=>new Dress(d.data() as DressProps));
+  }
+
 }

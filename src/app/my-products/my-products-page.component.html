@@ -57,7 +57,9 @@
 
     <div *ngFor="let dress of dressesService.drafts; let i = index" class="grid row">
       <div class="center">{{i+1}}</div>
-      <div>{{dress.name}}</div>
+      <div>{{dress.name}}
+        <ion-text *ngIf="!dress.name" color="danger">Unnamed</ion-text>
+      </div>
       <ion-button color="secondary" shape="round" class="normal-btn list-btn" (click)="publish(dress)">PUBLISH</ion-button>
       <ion-button color="medium" shape="round" class="normal-btn list-btn" (click)="goToDressUpload(dress.id)">More Details</ion-button>
     </div>
