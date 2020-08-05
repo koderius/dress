@@ -11,12 +11,20 @@ export class NavigationService {
     private navCtrl: NavController,
   ) {}
 
+  async back() {
+    const url = window.location.pathname;
+    await this.navCtrl.pop();
+    if(window.location.pathname == url)
+      this.app();
+
+  }
+
   landing() {
     return this.navCtrl.navigateRoot('landing');
   }
 
   app(tabName: string = '') {
-    return this.navCtrl.navigateRoot('tabs/' + tabName);
+    return this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : ''));
   }
 
   home() {
@@ -28,7 +36,7 @@ export class NavigationService {
   }
 
   profile() {
-    return this.navCtrl.navigateForward('tabs/profile')
+    return this.navCtrl.navigateRoot('tabs/profile');
   }
 
   myProducts(gallery?: boolean) {
@@ -51,11 +59,6 @@ export class NavigationService {
 
   renterView(uid: string) {
     return this.navCtrl.navigateForward('tabs/renter-profile/' + uid);
-  }
-
-  chat(withUid: string) {
-    if(withUid)
-      return this.navCtrl.navigateForward('tabs/chat/' + withUid);
   }
 
 }

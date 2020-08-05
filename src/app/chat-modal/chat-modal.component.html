@@ -1,10 +1,18 @@
 <ion-header>
-  <app-header type="empty"></app-header>
+  <app-header type="empty"
+              [dontBack]="true"
+              (onBack)="close()"
+              [title]="'Chat with ' + partner?.displayName"
+  ></app-header>
 </ion-header>
 
 <ion-content #content>
 
-  <main>
+  <div *ngIf="!chatService.isActive" class="spinner">
+    <ion-spinner color="primary" name="dots"></ion-spinner>
+  </div>
+
+  <main *ngIf="chatService.isActive">
     <div *ngFor="let msg of messages" class="msg" [ngClass]="msg.type == 'i' ? 'in-msg' : 'out-msg'">
       <div class="msg-wrapper">
         <p class="msg-meta">
@@ -24,7 +32,7 @@
 <ion-footer>
 
   <ion-item id="input-item" lines="none">
-    <ion-textarea autoGrow rows="1" [(ngModel)]="myMsg" (keyup.enter)="send()"></ion-textarea>
+    <ion-textarea [autoGrow]="!!myMsg" rows="1" placeholder="Your message" [(ngModel)]="myMsg" (keyup.enter)="send()"></ion-textarea>
     <ion-fab-button slot="end" size="small" [disabled]="!myMsg.trim()" (click)="send()">
       <ion-icon name="send"></ion-icon>
     </ion-fab-button>

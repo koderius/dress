@@ -12,6 +12,7 @@ import {DressSizePipe} from '../pipe/dress-size.pipe';
 import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
 import {DressStatusPipe} from '../pipe/dress-status.pipe';
 import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.component';
+import {ChatModal} from '../chat-modal/chat-modal.component';
 
 
 
@@ -32,6 +33,7 @@ import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.componen
     DressStatusPipe,
     PhotoPopoverComponent,
     feedBacksListComponent,
+    ChatModal,
   ],
   exports: [
     HeaderComponent,
@@ -43,10 +45,12 @@ import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.componen
     DressStatusPipe,
     PhotoPopoverComponent,
     feedBacksListComponent,
+    ChatModal,
   ],
   entryComponents: [
     TermsComponent,
     PhotoPopoverComponent,
+    ChatModal,
   ]
 })
 export class ComponentsModule { }

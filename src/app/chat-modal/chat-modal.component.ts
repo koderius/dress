@@ -1,22 +1,23 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {ChatService} from '../services/chat.service';
 import {Subscription} from 'rxjs';
 import {AuthService, UserDoc} from '../services/auth.service';
-import {IonContent} from '@ionic/angular';
+import {IonContent, ModalController} from '@ionic/angular';
 import {ChatMsg} from '../models/ChatMsg';
 
 @Component({
-  selector: 'app-chat',
-  templateUrl: './chat.page.html',
-  styleUrls: ['./chat.page.scss'],
+  selector: 'app-chat-modal',
+  templateUrl: './chat-modal.component.html',
+  styleUrls: ['./chat-modal.component.scss'],
 })
-export class ChatPage implements OnInit, OnDestroy {
+export class ChatModal implements OnInit, OnDestroy {
 
   @ViewChild('content', {static: false}) content: IonContent;
   @ViewChild('unreadFromHere', {static: false}) unreadMsg: ElementRef;
 
-  sub: Subscription;
+  @Input() uid: string;
+
   msgSub: Subscription;
 
   partner: UserDoc;
@@ -34,41 +35,36 @@ export class ChatPage implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private chatService: ChatService,
+    public chatService: ChatService,
     private authService: AuthService,
+    private modalCtrl: ModalController,
   ) { }
 
-  ngOnInit() {
-    this.sub = this.activatedRoute.params.subscribe(async (params)=>{
-      const uid = params['uid'];
-      if(uid != this.authService.currentUser.uid) {
-        this.myName = this.authService.currentUser.displayName;
+  async ngOnInit() {
 
-        this.partner = await this.authService.getUserDoc(uid);
-        if(this.partner) {
-
-          await this.chatService.enterConversation(uid);
-
-          // Scroll to the last read message
-          this.lastRead = this.chatService.meta.lastRead;
-          setTimeout(()=>{
-            if(this.unreadMsg && this.unreadMsg.nativeElement)
-              this.content.scrollToPoint(0, this.unreadMsg.nativeElement.offsetTop);
-          }, 500);
-
-        }
-
+    if(this.uid != this.authService.currentUser.uid) {
+      this.myName = this.authService.currentUser.displayName;
+      this.partner = await this.authService.getUserDoc(this.uid);
+      if(this.partner) {
+        await this.chatService.enterConversation(this.uid);
+        // Scroll to the last read message
+        this.lastRead = this.chatService.meta.lastRead;
+        setTimeout(()=>{
+          if(this.unreadMsg && this.unreadMsg.nativeElement)
+            this.content.scrollToPoint(0, this.unreadMsg.nativeElement.offsetTop);
+        }, 500);
       }
-    });
+    }
+
     this.msgSub = this.chatService.onMsg.subscribe((msg: ChatMsg)=>{
       if(this.canScrollToBottom)
         this.content.scrollToBottom();
     });
+
   }
 
   ngOnDestroy(): void {
     this.chatService.leaveConversation();
-    this.sub.unsubscribe();
     this.msgSub.unsubscribe();
   }
 
@@ -86,6 +82,10 @@ export class ChatPage implements OnInit, OnDestroy {
       this.myMsg = '';
       this.canScrollToBottom = true;
     }
+  }
+
+  close() {
+    this.modalCtrl.dismiss();
   }
 
 }

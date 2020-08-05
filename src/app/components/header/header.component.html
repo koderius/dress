@@ -1,7 +1,9 @@
 <ion-toolbar>
 
   <ion-buttons slot="start">
-    <ion-back-button defaultHref="/"></ion-back-button>
+    <ion-button (click)="back()">
+      <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+    </ion-button>
     <div id="logo" (click)="goHome()">
       <ion-img src="../../assets/logo/logo_small.png"></ion-img>
     </div>

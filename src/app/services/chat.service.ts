@@ -53,6 +53,9 @@ export class ChatService {
     // Clear chat messages
     this._messages.splice(0);
 
+    this.isActive = false;
+    this.meta = null;
+
   }
 
   async enterConversation(userId: string) {

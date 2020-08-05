@@ -14,7 +14,7 @@ const routes: Routes = [
   },
   {
     path: 'dress-edit',
-    loadChildren: () => import('../dress-edit/dress-edit.module').then( m => m.DressEditPageModule)
+    loadChildren: () => import('../dress-edit/dress-edit.module').then( m => m.DressEditPageModule),
   },
 ];
 

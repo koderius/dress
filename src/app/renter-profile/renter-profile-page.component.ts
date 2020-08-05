@@ -10,6 +10,7 @@ import {Subscription} from 'rxjs';
 import {AlertsService} from '../services/Alerts.service';
 import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
+import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -38,6 +39,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
     private feedBackService: FeedBacksService,
     private alertService: AlertsService,
     private dressService: DressesService,
+    private chatOpener: ChatOpenerService,
   ) {}
 
   ngOnInit() {
@@ -76,7 +78,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
   }
 
   connectRenter() {
-    this.navService.chat(this.userDoc.uid);
+    this.chatOpener.openChat(this.userDoc.uid);
   }
 
 }

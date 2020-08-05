@@ -32,7 +32,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../profile/profile.module').then(m => m.ProfileModule)
+            loadChildren: () => import('../profile/profile.module').then(m => m.ProfileModule),
           }
         ]
       },
@@ -43,10 +43,6 @@ const routes: Routes = [
       {
         path: 'dress-view',
         loadChildren: () => import('../dress-view/dress-view.module').then( m => m.DressViewPageModule)
-      },
-      {
-        path: 'chat',
-        loadChildren: () => import('../chat/chat.module').then( m => m.ChatPageModule)
       },
       {
         path: '',

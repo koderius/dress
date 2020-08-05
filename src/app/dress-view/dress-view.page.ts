@@ -10,6 +10,7 @@ import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover
 import {NavigationService} from '../services/navigation.service';
 import {FeedBack} from '../models/Feedback';
 import {FeedBacksService} from '../services/feed-backs.service';
+import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 
 @Component({
   selector: 'app-dress-view',
@@ -44,6 +45,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     private navService: NavigationService,
     private feedBacksService: FeedBacksService,
     private toastCtrl: ToastController,
+    private chatOpener: ChatOpenerService,
   ) { }
 
   ngOnInit() {
@@ -99,7 +101,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     }
     else {
       if(value == 'contact') {
-        this.navService.chat(this.dressOwner.uid);
+        this.chatOpener.openChat(this.dressOwner.uid);
       }
       if(value == 'rent') {
         // TODO

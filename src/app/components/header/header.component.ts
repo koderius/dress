@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NavigationService} from '../../services/navigation.service';
 
 @Component({
@@ -12,6 +12,9 @@ export class HeaderComponent implements OnInit {
   @Input() noUploadBtn: boolean;
   @Input() noMyProdBtn: boolean;
   @Input() title: string;
+  @Input() dontBack: boolean;
+
+  @Output() onBack = new EventEmitter<void>();
 
   showSearchbar: boolean;
 
@@ -38,6 +41,12 @@ export class HeaderComponent implements OnInit {
 
   goToUpload() {
     this.navService.editDress();
+  }
+
+  back() {
+    this.onBack.emit();
+    if(!this.dontBack)
+      this.navService.back();
   }
 
 }
