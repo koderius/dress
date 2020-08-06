@@ -102,7 +102,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     }
     else {
       if(value == 'contact') {
-        this.chatOpener.openChat(this.dressOwner.uid);
+        this.chatOpener.openChat(this.dressOwner.uid, this.dress);
       }
       if(value == 'rent') {
         // TODO

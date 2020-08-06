@@ -36,8 +36,8 @@ $my-color: #DFDFDF;
 
 #input-item {
   --highlight-height: 0;
-  margin-bottom: 0.5em;
   ion-textarea {
+    margin-bottom: 0.5em;
     background: $my-color;
     border-radius: 2em;
     --padding-start: 1em;

@@ -3,9 +3,10 @@ import {ActivatedRoute} from '@angular/router';
 import {ChatService} from '../services/chat.service';
 import {Subscription} from 'rxjs';
 import {UserDoc} from '../services/auth.service';
-import {IonContent, ModalController} from '@ionic/angular';
+import {IonContent, ModalController, Platform} from '@ionic/angular';
 import {ChatMsg} from '../models/ChatMsg';
 import {UserDataService} from '../services/user-data.service';
+import {Dress} from '../models/Dress';
 
 @Component({
   selector: 'app-chat-modal',
@@ -15,9 +16,11 @@ import {UserDataService} from '../services/user-data.service';
 export class ChatModal implements OnInit, OnDestroy {
 
   @ViewChild('content', {static: false}) content: IonContent;
-  @ViewChild('unreadFromHere', {static: false}) unreadMsg: ElementRef;
+  @ViewChild('unreadFromHere', {static: false}) unreadMsg: ElementRef<HTMLDivElement>;
+  @ViewChild('lastMsg', {static: false}) lastMsg: ElementRef<HTMLDivElement>;
 
   @Input() uid: string;
+  @Input() dressInterested: Dress;
 
   msgSub: Subscription;
 
@@ -28,17 +31,17 @@ export class ChatModal implements OnInit, OnDestroy {
   myName: string;
 
   lastRead: number;
-  canScrollToBottom: boolean;
 
-  get messages() {
-    return this.chatService.messages;
-  }
+  messages = [];
+
+  isLastMsgSeen: boolean;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     public chatService: ChatService,
     private modalCtrl: ModalController,
     private userService: UserDataService,
+    private platform: Platform,
   ) { }
 
   async ngOnInit() {
@@ -57,9 +60,17 @@ export class ChatModal implements OnInit, OnDestroy {
       }
     }
 
-    this.msgSub = this.chatService.onMsg.subscribe((msg: ChatMsg)=>{
-      if(this.canScrollToBottom)
-        this.content.scrollToBottom();
+    const startTime = Date.now();
+
+    // Subscribe messages
+    this.msgSub = this.chatService.onMessage.subscribe((msg: ChatMsg)=>{
+      this.messages.push(msg);
+      // Sort old messages by time
+      if(msg.timestamp < startTime)
+        this.messages.sort((a, b) => a.timestamp - b.timestamp);
+      // If scroll is on the bottom, keep scroll bottom with every new message
+      if(this.isLastMsgSeen)
+        this.content.scrollToBottom(500);
     });
 
   }
@@ -67,6 +78,11 @@ export class ChatModal implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.chatService.leaveConversation();
     this.msgSub.unsubscribe();
+  }
+
+  onScroll() {
+    const lastMsgTop = this.lastMsg.nativeElement.getBoundingClientRect().top;
+    this.isLastMsgSeen = lastMsgTop < this.platform.height() - 100;
   }
 
   msgTimeFormat(time: number) {
@@ -77,11 +93,16 @@ export class ChatModal implements OnInit, OnDestroy {
       return 'dd/MM/yy HH:mm';
   }
 
-  send() {
+  async send() {
+    if(this.dressInterested) {
+      await this.chatService.writeMsg(this.dressInterested.exportProperties());
+      this.dressInterested = null;
+    }
     if(this.myMsg.trim()) {
       this.chatService.writeMsg(this.myMsg);
       this.myMsg = '';
-      this.canScrollToBottom = true;
+      if(!this.isLastMsgSeen)
+        this.content.scrollToBottom(500);
     }
   }
 

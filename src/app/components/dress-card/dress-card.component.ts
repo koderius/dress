@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Dress} from '../../models/Dress';
 import {CategoriesService} from '../../services/categories.service';
 import {NavigationService} from '../../services/navigation.service';
@@ -11,6 +11,7 @@ import {NavigationService} from '../../services/navigation.service';
 export class DressCardComponent implements OnInit {
 
   @Input() dress: Dress;
+  @Output() checkClicked = new EventEmitter<void>();
 
   constructor(
     private dressCategories: CategoriesService,
@@ -26,6 +27,7 @@ export class DressCardComponent implements OnInit {
   }
 
   viewDress() {
+    this.checkClicked.emit();
     this.navService.dressView(this.dress.id);
   }
 

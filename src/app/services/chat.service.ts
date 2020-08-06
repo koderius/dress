@@ -5,6 +5,7 @@ import Reference = firebase.database.Reference;
 import {AuthService} from './auth.service';
 import {ChatMsg} from '../models/ChatMsg';
 import DataSnapshot = firebase.database.DataSnapshot;
+import {Dress, DressProps} from '../models/Dress';
 
 @Injectable({
   providedIn: 'root'
@@ -22,20 +23,15 @@ export class ChatService {
 
   public isActive: boolean;
 
-  private _messages: ChatMsg[] = [];
   public meta: {
     lastRead: number,
     dressId: string,
   };
 
-  public onMsg = new EventEmitter<ChatMsg>();
+  public onMessage = new EventEmitter<ChatMsg>();
 
   get myUid() : string{
     return this.authService.currentUser.uid;
-  }
-
-  get messages() {
-    return [...this._messages];
   }
 
   constructor(private authService: AuthService) {}
@@ -50,9 +46,6 @@ export class ChatService {
 
     // Clear refs
     this.conMetaRef = this.toPartnerRef = this.toMeRef = null;
-
-    // Clear chat messages
-    this._messages.splice(0);
 
     this.isActive = false;
     this.meta = null;
@@ -80,10 +73,10 @@ export class ChatService {
 
       // Subscribe incoming and outgoing messages
       this.toMeRef.on('child_added', snapshot => {
-        this.handleMsg(snapshot, 'i');
+        this.handleMsg(snapshot.key, snapshot.val(), 'i');
       });
       this.toPartnerRef.on('child_added', snapshot => {
-        this.handleMsg(snapshot, 'o');
+        this.handleMsg(snapshot.key, snapshot.val(), 'o');
       });
 
     }
@@ -93,27 +86,28 @@ export class ChatService {
 
   }
 
-  handleMsg(snapshot: DataSnapshot, type: 'i' | 'o') {
+  handleMsg(key: string, value: string | DressProps, type: 'i' | 'o') {
 
     // Only timestamps keys are messages
-    if(!+snapshot.key)
+    if(!+key)
       return;
 
+    const msgVal = value;
     const msg: ChatMsg = {
-      timestamp: +snapshot.key,
-      text: snapshot.val(),
+      timestamp: +key,
       type: type,
+      text: typeof msgVal == 'string' ? msgVal : null,
+      dress: typeof msgVal == 'object' ? new Dress(msgVal) : null,
     };
-    this._messages.push(msg);
-    this._messages.sort((a, b) => a.timestamp - b.timestamp);
-    this.onMsg.emit(msg);
+
+    this.onMessage.emit(msg);
 
     // Update current message as the last one was read
     this.conMetaRef.update({lastRead: msg.timestamp});
   }
 
 
-  async writeMsg(msg: string) {
+  async writeMsg(msg: string | DressProps) {
 
     // Add message as value, and timestamp as the key
     if(this.toPartnerRef) {

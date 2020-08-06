@@ -1,5 +1,8 @@
+import {Dress} from './Dress';
+
 export type ChatMsg = {
   timestamp: number;
-  text: string;
   type: 'i' | 'o';
+  text?: string;
+  dress?: Dress,
 }
