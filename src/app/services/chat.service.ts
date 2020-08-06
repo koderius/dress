@@ -25,6 +25,7 @@ export class ChatService {
   private _messages: ChatMsg[] = [];
   public meta: {
     lastRead: number,
+    dressId: string,
   };
 
   public onMsg = new EventEmitter<ChatMsg>();
