@@ -2,9 +2,10 @@ import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angul
 import {ActivatedRoute} from '@angular/router';
 import {ChatService} from '../services/chat.service';
 import {Subscription} from 'rxjs';
-import {AuthService, UserDoc} from '../services/auth.service';
+import {UserDoc} from '../services/auth.service';
 import {IonContent, ModalController} from '@ionic/angular';
 import {ChatMsg} from '../models/ChatMsg';
+import {UserDataService} from '../services/user-data.service';
 
 @Component({
   selector: 'app-chat-modal',
@@ -36,15 +37,15 @@ export class ChatModal implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     public chatService: ChatService,
-    private authService: AuthService,
     private modalCtrl: ModalController,
+    private userService: UserDataService,
   ) { }
 
   async ngOnInit() {
 
-    if(this.uid != this.authService.currentUser.uid) {
-      this.myName = this.authService.currentUser.displayName;
-      this.partner = await this.authService.getUserDoc(this.uid);
+    if(this.uid != this.userService.currentUser.uid) {
+      this.myName = this.userService.currentUser.displayName;
+      this.partner = await this.userService.getUserDoc(this.uid);
       if(this.partner) {
         await this.chatService.enterConversation(this.uid);
         // Scroll to the last read message

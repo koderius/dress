@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AuthService, UserDoc} from '../services/auth.service';
+import {UserDoc} from '../services/auth.service';
 import {ActivatedRoute} from '@angular/router';
 import {RankCalc} from '../Utils/RankCalc';
 import {NavigationService} from '../services/navigation.service';
@@ -11,6 +11,7 @@ import {AlertsService} from '../services/Alerts.service';
 import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
+import {UserDataService} from '../services/user-data.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -32,7 +33,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
   myFeedBack: FeedBack = {};
 
   constructor(
-    private authService: AuthService,
+    private userService: UserDataService,
     private activatedRoute: ActivatedRoute,
     private navService: NavigationService,
     public photoPopover: PhotoPopoverCtrlService,
@@ -46,7 +47,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
 
     // Get user document according to url, and then get his feed backs & some dresses
     this.userSub = this.activatedRoute.params.subscribe(async (params)=>{
-      this.userDoc = await this.authService.getUserDoc(params['uid']);
+      this.userDoc = await this.userService.getUserDoc(params['uid']);
       this.feedBacks = await this.feedBackService.getUserFeedBacks(this.userDoc.uid);
       this.userDresses = await this.dressService.loadDressesOfUser(this.userDoc.uid, 4);
     });
@@ -58,11 +59,11 @@ export class RenterProfilePage implements OnInit, OnDestroy {
   }
 
   isSignedIn() : boolean {
-    return !!this.authService.currentUser;
+    return !!this.userService.currentUser;
   }
 
   isMe() : boolean {
-    return this.userDoc.uid == this.authService.currentUser.uid;
+    return this.userDoc.uid == this.userService.currentUser.uid;
   }
 
   goToEdit() {

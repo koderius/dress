@@ -3,7 +3,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 import {FeedBack} from '../models/Feedback';
-import {AuthService} from './auth.service';
+import {UserDataService} from './user-data.service';
 
 /**
  * This service response on reading and writing feed backs
@@ -15,10 +15,10 @@ import {AuthService} from './auth.service';
 export class FeedBacksService {
 
   /** Get user's feed backs collection reference */
-  private userFeedBacks = (uid: string) => this.authService.userProfileDoc(uid).collection('feedbacks');
+  private userFeedBacks = (uid: string) => this.userService.userDocRef(uid).collection('feedbacks');
 
 
-  constructor(private authService: AuthService) {}
+  constructor(private userService: UserDataService) {}
 
 
   /** Get some user's (including current user) feed backs */
@@ -45,8 +45,8 @@ export class FeedBacksService {
   async writeUserFeedBack(to: string, feedBack: FeedBack) : Promise<void> {
 
     // From current user UID
-    feedBack.writerId = this.authService.currentUser.uid;
-    feedBack.writerName = this.authService.currentUser.displayName;
+    feedBack.writerId = this.userService.currentUser.uid;
+    feedBack.writerName = this.userService.currentUser.displayName;
     feedBack.timestamp = Date.now();
 
     // Write or edit feed back

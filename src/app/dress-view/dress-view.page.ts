@@ -4,13 +4,14 @@ import {Subscription} from 'rxjs';
 import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
 import {Platform, ToastController} from '@ionic/angular';
-import {AuthService, UserDoc} from '../services/auth.service';
+import {UserDoc} from '../services/auth.service';
 import {CategoriesService} from '../services/categories.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
 import {NavigationService} from '../services/navigation.service';
 import {FeedBack} from '../models/Feedback';
 import {FeedBacksService} from '../services/feed-backs.service';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
+import {UserDataService} from '../services/user-data.service';
 
 @Component({
   selector: 'app-dress-view',
@@ -39,7 +40,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private dressService: DressesService,
     private platform: Platform,
-    private authService: AuthService,
+    private userData: UserDataService,
     private categoriesService: CategoriesService,
     public photoPopover: PhotoPopoverCtrlService,
     private navService: NavigationService,
@@ -55,8 +56,8 @@ export class DressViewPage implements OnInit, OnDestroy {
 
       const id = params['id'];
       this.dress = await this.dressService.loadDress(id);
-      this.isMine = this.dress.owner == this.authService.currentUser.uid;
-      this.dressOwner = await this.authService.getUserDoc(this.dress.owner);
+      this.isMine = this.dress.owner == this.userData.currentUser.uid;
+      this.dressOwner = await this.userData.getUserDoc(this.dress.owner);
       this.feedBacks = await this.feedBacksService.getUserFeedBacks(this.dressOwner.uid);
 
       // Move main photo the the beginning

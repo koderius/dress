@@ -1,4 +1,4 @@
-<ion-content class="background" *ngIf="authService.isActive">
+<ion-content class="background" *ngIf="canShow">
 
   <div class="logo" [ngClass]="pageStatus == PageStatus.LANDING ? 'large' : 'small'">
     <ion-img src="../../assets/logo/logo_large.png"></ion-img>
@@ -49,19 +49,19 @@
 
       <ion-item *ngIf="inputToShow('email')">
         <ion-icon src="../../assets/svg/icon_email.svg" slot="start"></ion-icon>
-        <ion-input placeholder="Email" [(ngModel)]="inputs.email" type="email" autocomplete="on" [pattern]="authService.EMAIL_REGEX"></ion-input>
+        <ion-input placeholder="Email" [(ngModel)]="inputs.email" type="email" autocomplete="on" [pattern]="AuthService.EMAIL_REGEX"></ion-input>
       </ion-item>
 
       <ion-item *ngIf="inputToShow('password')">
         <ion-icon src="../../assets/svg/icon_password.svg" slot="start"></ion-icon>
-        <ion-input [placeholder]="passwordPlaceholder()" [(ngModel)]="inputs.password" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="authService.PASSWORD_REGEX"></ion-input>
+        <ion-input [placeholder]="passwordPlaceholder()" [(ngModel)]="inputs.password" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="AuthService.PASSWORD_REGEX"></ion-input>
         <ion-button *ngIf="pageStatus != PageStatus.SIGN_IN" fill="clear" shape="round" slot="end" tabindex="-1" (click)="isPasswordShow = !isPasswordShow">{{isPasswordShow ? 'Hide' : 'Show'}}</ion-button>
         <ion-button *ngIf="pageStatus == PageStatus.SIGN_IN" fill="clear" slot="end" (click)="pageStatus = PageStatus.FORGOT_PASSWORD">Forgot?</ion-button>
       </ion-item>
 
       <ion-item *ngIf="inputToShow('passwordV')">
         <ion-icon src="../../assets/svg/icon_password.svg" slot="start"></ion-icon>
-        <ion-input placeholder="Confirm Password" [(ngModel)]="inputs.passwordV" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="authService.PASSWORD_REGEX"></ion-input>
+        <ion-input placeholder="Confirm Password" [(ngModel)]="inputs.passwordV" [type]="isPasswordShow ? 'text' : 'password'" [pattern]="AuthService.PASSWORD_REGEX"></ion-input>
         <ion-button fill="clear" shape="round" slot="end" tabindex="-1" (click)="isPasswordShow = !isPasswordShow">{{isPasswordShow ? 'Hide' : 'Show'}}</ion-button>
       </ion-item>
 

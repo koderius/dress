@@ -1,3 +1,7 @@
+ion-input + ion-button {
+  user-select: none;
+}
+
 ion-textarea {
   border: solid var(--ion-color-light) 1px;
   --padding-start: 0.5em !important;

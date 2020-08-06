@@ -11,10 +11,11 @@ import {AlertsService} from '../services/Alerts.service';
 import {DateUtil} from '../Utils/DateUtil';
 import {NavigationService} from '../services/navigation.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
-import {AuthService, UserDoc} from '../services/auth.service';
+import {UserDoc} from '../services/auth.service';
 import {DefaultUserImage} from '../Utils/Images';
 import {Rent} from '../models/Rent';
 import {RentService} from '../services/rent.service';
+import {UserDataService} from '../services/user-data.service';
 
 @Component({
   selector: 'app-dress-edit',
@@ -69,7 +70,7 @@ export class DressEditPage implements OnInit, OnDestroy {
     private photoPopoverCtrl: PhotoPopoverCtrlService,
     private fileService: FilesUploaderService,
     private alertsService: AlertsService,
-    private authService: AuthService,
+    private userData: UserDataService,
     private rentService: RentService,
   ) { }
 
@@ -99,7 +100,7 @@ export class DressEditPage implements OnInit, OnDestroy {
         // Load dress renting details (if currently rented)
         if(this.dress.status == DressStatus.RENTED) {
           this.rentData = await this.rentService.getMyDressActiveRentDoc(this.dress.id);
-          this.rentingUser = await this.authService.getUserDoc(this.rentData.renterId);
+          this.rentingUser = await this.userData.getUserDoc(this.rentData.renterId);
         }
 
       }

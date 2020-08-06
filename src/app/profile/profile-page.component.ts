@@ -7,6 +7,7 @@ import {DefaultUserImage} from '../Utils/Images';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
 import {FilesUploaderService} from '../services/files-uploader.service';
 import {Rent} from '../models/Rent';
+import {UserDataService} from '../services/user-data.service';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class ProfilePage implements OnInit{
 
   constructor(
     private authService: AuthService,
+    private userData: UserDataService,
     private alertService: AlertsService,
     private photoPopover: PhotoPopoverCtrlService,
     private fileUploader: FilesUploaderService,
@@ -34,12 +36,12 @@ export class ProfilePage implements OnInit{
   ngOnInit() {
 
     // Get copy of user document
-    this.userDoc = this.authService.currentUser;
+    this.userDoc = this.userData.currentUser;
 
   }
 
   hasChanges() {
-    return !ObjectsUtil.SameValues(this.userDoc, this.authService.currentUser);
+    return !ObjectsUtil.SameValues(this.userDoc, this.userData.currentUser);
   }
 
   editClicked(ev) {
@@ -52,8 +54,8 @@ export class ProfilePage implements OnInit{
 
   async saveChanges() {
     this.alertService.showLoader('Saving...');
-    await this.authService.editUserDocument({...this.userDoc});
-    this.userDoc = this.authService.currentUser;
+    await this.userData.editUserDocument({...this.userDoc});
+    this.userDoc = this.userData.currentUser;
     this.alertService.dismissLoader();
   }
 
@@ -71,8 +73,8 @@ export class ProfilePage implements OnInit{
           text: 'Save',
           handler: async (data)=>{
             const username = data['username'] as string;
-            if(username && username.match(this.authService.PASSWORD_REGEX)) {
-              await this.authService.editUserDocument({displayName: username});
+            if(username && username.match(AuthService.PASSWORD_REGEX)) {
+              await this.userData.editUserDocument({displayName: username});
               this.userDoc.displayName = username;
               this.alertService.notice('Your username has been changed');
             }

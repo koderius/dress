@@ -55,7 +55,7 @@ export class DressesService {
     //   this._dresses = snapshot.docs.map((d)=>d.data() as DressProps);
     // });
 
-    this.authService.user$.subscribe((user)=>{
+    this.authService.onAuthChange.subscribe((user)=>{
 
       // Unsubscribe previous user dresses
       if(this.myDressesUnsubscribeFn)

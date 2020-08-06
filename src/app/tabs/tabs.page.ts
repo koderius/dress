@@ -1,32 +1,23 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
 import {NavigationService} from '../services/navigation.service';
-import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss']
 })
-export class TabsPage implements OnDestroy {
+export class TabsPage {
 
-  userSub: Subscription;
   openOptions: boolean;
 
   constructor(
     public authService: AuthService,
     private modalCtrl: ModalController,
     private navService: NavigationService,
-  ) {
-
-    this.userSub = this.authService.user$.subscribe((user)=>{
-      if(!user)
-        this.navService.landing();
-    })
-
-  }
+  ) {}
 
   async showOptions() {
 
@@ -68,10 +59,6 @@ export class TabsPage implements OnDestroy {
     // Sign out if navigation is allowed by guards
     if(await this.navService.landing())
       this.authService.signOut();
-  }
-
-  ngOnDestroy(): void {
-    this.userSub.unsubscribe();
   }
 
 }

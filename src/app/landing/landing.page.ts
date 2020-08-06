@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
@@ -24,12 +24,16 @@ enum PageStatus {
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
 })
-export class LandingPage implements OnDestroy {
+export class LandingPage implements OnInit, OnDestroy {
+
+  canShow: boolean;
+
+  AuthService = AuthService;
 
   PageStatus = PageStatus;
   pageStatus: PageStatus = PageStatus.LANDING;
 
-  userSub: Subscription;
+  authSub: Subscription;
 
   inputs = {
     name: '',
@@ -47,16 +51,23 @@ export class LandingPage implements OnDestroy {
     private alertService: AlertsService,
     private modalCtrl: ModalController,
     private navService: NavigationService,
-  ) {
+  ) {}
+
+  async ngOnInit() {
+
+    // First check for URL auth actions
+    await this.authService.checkURL();
 
     // When user changed
-    this.userSub = this.authService.user$.subscribe(async (user)=>{
+    this.authSub = this.authService.onAuthChange.subscribe(async (user)=>{
 
       // Check user status
       if(user) {
         // If user is verified, go into the app
-        if(user.emailVerified)
+        if(user.emailVerified) {
           this.navService.app();
+          return;
+        }
 
         // Else stay in unverified user status
         else
@@ -67,15 +78,11 @@ export class LandingPage implements OnDestroy {
       if(this.authService.mode == 'resetPassword')
         this.pageStatus = PageStatus.NEW_PASSWORD;
 
+      this.canShow = true;
+
     });
 
-    // Show error message when there is some auth error
-    this.authService.onAuthError = (e: FirebaseError) => {
-      this.alertService.notice(e.message, 'Authentication Error', e.code);
-    };
-
   }
-
 
   // The placeholder to show in the password inputs
   passwordPlaceholder() : string {
@@ -182,13 +189,13 @@ export class LandingPage implements OnDestroy {
     }
 
     // Check email is well formatted
-    if(this.inputToShow('email') && !this.inputs.email.match(this.authService.EMAIL_REGEX)) {
+    if(this.inputToShow('email') && !this.inputs.email.match(AuthService.EMAIL_REGEX)) {
       alert('Email is bad formatted');
       return false;
     }
 
     // Check password is valid
-    if(this.inputToShow('password') && !this.inputs.password.match(this.authService.PASSWORD_REGEX)) {
+    if(this.inputToShow('password') && !this.inputs.password.match(AuthService.PASSWORD_REGEX)) {
       alert('Password must contain at least 6 characters of letters and numbers');
       return false;
     }
@@ -204,7 +211,7 @@ export class LandingPage implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.userSub.unsubscribe();
+    this.authSub.unsubscribe();
   }
 
 }

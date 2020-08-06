@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { DressEditPage } from './dress-edit.page';
 import {LeaveDressEditorGuard} from './leave-dress-editor.guard';
-import {NoStackGuard} from '../no-stack.guard';
 
 const routes: Routes = [
   {
