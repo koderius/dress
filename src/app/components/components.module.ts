@@ -13,6 +13,8 @@ import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
 import {DressStatusPipe} from '../pipe/dress-status.pipe';
 import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.component';
 import {ChatModal} from '../chat-modal/chat-modal.component';
+import {MainHeaderComponent} from './main-header/main-header.component';
+import {NotificationsComponent} from './notifications/notifications.component';
 
 
 
@@ -34,6 +36,8 @@ import {ChatModal} from '../chat-modal/chat-modal.component';
     PhotoPopoverComponent,
     feedBacksListComponent,
     ChatModal,
+    MainHeaderComponent,
+    NotificationsComponent,
   ],
   exports: [
     HeaderComponent,
@@ -46,11 +50,13 @@ import {ChatModal} from '../chat-modal/chat-modal.component';
     PhotoPopoverComponent,
     feedBacksListComponent,
     ChatModal,
+    MainHeaderComponent,
   ],
   entryComponents: [
     TermsComponent,
     PhotoPopoverComponent,
     ChatModal,
+    NotificationsComponent,
   ]
 })
 export class ComponentsModule { }

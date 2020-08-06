@@ -25,7 +25,7 @@ export class ChatService {
 
   public meta: {
     lastRead: number,
-    dressId: string,
+    lastMsgTime: number,
   };
 
   public onMessage = new EventEmitter<ChatMsg>();
@@ -107,13 +107,16 @@ export class ChatService {
   }
 
 
-  async writeMsg(msg: string | DressProps) {
+  writeMsg(msg: string | DressProps) {
 
     // Add message as value, and timestamp as the key
     if(this.toPartnerRef) {
       try {
         const key = Date.now().toString();
-        await this.toPartnerRef.child(key).set(msg);
+        this.toPartnerRef.child(key).set(msg);
+        // Set the timestamp as the last message time
+        this.toMeRef.child('meta/lastMsgTime').set(key);
+        this.toPartnerRef.child('meta/lastMsgTime').set(key);
       }
       catch (e) {
         console.error(e);
@@ -122,6 +125,14 @@ export class ChatService {
 
   }
 
+
+  async getCons() {
+    const snapshot = await this.CHAT.child(this.authService.currentUser.uid)
+      .orderByChild('meta/lastMsgTime')
+      .limitToLast(5)
+      .once('value');
+    return snapshot.val();
+  }
 
 }
 
