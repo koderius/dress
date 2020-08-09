@@ -33,20 +33,24 @@ export class ChatService {
   private lastChatsUnsub: ()=>void;
 
   get myUid() : string{
-    return this.authService.currentUser.uid;
+    return this.authService.currentUser ? this.authService.currentUser.uid : null;
   }
 
   constructor(
     private authService: AuthService,
     private userData: UserDataService,
   ) {
-    this.authService.onAuthChange.subscribe(()=>{
+
+    // Subscribe user's last chats
+    this.userData.onUserDoc.subscribe((user)=>{
       if(this.lastChatsUnsub) {
         this.lastChatsUnsub();
         this.lastChats = null;
       }
-      this.subscribeLastCons(5);
+      if(user)
+        this.subscribeLastCons(5);
     });
+
   }
 
   leaveConversation() {

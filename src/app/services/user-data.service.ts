@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AuthService} from './auth.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -6,11 +6,16 @@ import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
+import {Observable} from 'rxjs';
+import {TermsComponent} from '../components/terms/terms.component';
+import {ModalController} from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserDataService {
+
+  private isTermsRead: boolean;
 
   public userDocRef(uid: string = this._currentUser && this._currentUser.uid) {
     if(uid)
@@ -25,34 +30,32 @@ export class UserDataService {
     return this._currentUser;
   }
 
-  onUserDoc = new EventEmitter<User>();
-
-  constructor(
-    private alertService: AlertsService,
-    private authService: AuthService,
-  ) {
-
-    this.authService.onAuthChange.subscribe((user: User)=>{
-
+  /** Observe the (verified) user document */
+  onUserDoc = new Observable<UserDoc | null>(subscriber => {
+    subscriber.add(this.authService.user$.subscribe((user: User)=>{
       if(this.unsubFn)
         this.unsubFn();
 
-      if(user) {
+      if(user && user.emailVerified) {
         this.unsubFn = this.userDocRef(user.uid).onSnapshot(async (snapshot: DocumentSnapshot<UserDoc>) => {
           if(snapshot.exists)
             this._currentUser = snapshot.data();
           else {
             this._currentUser = await this.createUserDocument();
           }
-          this.onUserDoc.emit(user);
+          subscriber.next(this._currentUser);
         }, (e: FirebaseError) => this.errorMsg(e));
       }
       else
-        this.onUserDoc.emit(null);
+        subscriber.next(null);
+    }));
+  });
 
-    });
-
-  }
+  constructor(
+    private alertService: AlertsService,
+    private authService: AuthService,
+    public modalCtrl: ModalController,
+  ) {}
 
   /*
   Get user document according to provided UID.
@@ -91,29 +94,34 @@ export class UserDataService {
 
   private async createUserDocument() {
 
-    const user = this.authService.currentUser;
+    if(this.isTermsRead || await this.readTerms()) {
+      this.isTermsRead = false;
 
-    const doc: UserDoc = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      phoneNumber: user.phoneNumber,
-      fullName: user.displayName,
-    };
+      const user = this.authService.currentUser;
 
-    // Delete all undefined
-    for(let p in user)
-      if(!user[p])
-        delete user[p];
+      const doc: UserDoc = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        phoneNumber: user.phoneNumber,
+        fullName: user.displayName,
+      };
 
-    try {
-      await this.userDocRef(user.uid).set(doc);
-      return doc;
-    }
-    catch (e) {
-      this.errorMsg(e);
-      return null;
+      // Delete all undefined
+      for(let p in user)
+        if(!user[p])
+          delete user[p];
+
+      try {
+        await this.userDocRef(user.uid).set(doc);
+        return doc;
+      }
+      catch (e) {
+        this.errorMsg(e);
+        return null;
+      }
+
     }
 
   }
@@ -121,6 +129,20 @@ export class UserDataService {
   private errorMsg(e: FirebaseError) {
     console.error(e);
     this.alertService.notice('Could not load user data', 'Error', `${e.code}\n${e.message}`);
+  }
+
+
+  // Open terms in a modal
+  async readTerms() {
+    const m = await this.modalCtrl.create({
+      component: TermsComponent,
+      backdropDismiss: false,
+      keyboardClose: false,
+    });
+    m.present();
+    if((await m.onDidDismiss()).role == 'AGREE')
+      this.isTermsRead = true;
+    return this.isTermsRead;
   }
 
 }

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/functions';
@@ -6,8 +6,8 @@ import {FirebaseError, User} from 'firebase';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 import {AlertsService} from './Alerts.service';
-import {Observable} from 'rxjs';
 import {UserDoc} from '../models/User';
+import {Observable} from 'rxjs';
 
 /**
  * This service is used for authentication actions.
@@ -35,8 +35,12 @@ export class AuthService {
   private _oobCode: string;
   private _emailFromURL: string;
 
-  public onAuthChange = new Observable<User | null>(subscriber => {
-    subscriber.add(this.auth.onAuthStateChanged((user)=>subscriber.next(user)));
+  /** On auth state changed, check user verification (and try verify, and then emit the user) */
+  public user$ = new Observable<User | null>(subscriber => {
+    subscriber.add(this.auth.onAuthStateChanged(async (user)=>{
+      await this.checkProviderVerification(user);
+      subscriber.next(user);
+    }));
   });
 
   /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
@@ -52,37 +56,10 @@ export class AuthService {
   ) {}
 
 
-  public tryVerify(user: User, retry?: boolean) {
-
-    if(!user)
-      return false;
-
-    // Already verified
-    if(user.emailVerified)
-      return true;
-
-    // Try verify user that has some provider other than email+password
-    if(user.providerData.length > 1 || user.providerData[0].providerId != 'password') {
-      const verifyEmail = firebase.functions().httpsCallable('tryVerifyUserEmail');
-      verifyEmail().then((r)=>{
-        if(r)
-          user.reload();
-      }).catch(()=>{
-        if(!retry)
-          this.tryVerify(user, true);
-      });
-      return true;
-    }
-    // Cannot try verify - the only provider is email+password. should be verify only by email verification
-    else
-      return false;
-
-  }
-
-  /** A function to invoke when there is an error (for UI) */
-  private onAuthError(e: FirebaseError) {
+  /** Auth error notification */
+  private async onAuthError(e: FirebaseError) {
     console.error(e);
-    this.alertsService.notice(e.message, 'Authentication Error', `${e.name}: ${e.code}`);
+    await this.alertsService.notice(e.message, 'Authentication Error', `${e.name}: ${e.code}`);
   }
 
   /** Mode that redirected from URL (reset password / email verification) */
@@ -90,7 +67,7 @@ export class AuthService {
     return this._mode;
   }
 
-  /** The email which the URL was redirect from */
+  /** The email which the URL was redirected from */
   get emailFromURL() : string {
     return this._emailFromURL;
   }
@@ -124,7 +101,7 @@ export class AuthService {
           if(info) {
             this._emailFromURL = info.data.email;
             await this.auth.applyActionCode(this._oobCode);
-            this.alertsService.notice(`Email ${this._emailFromURL} verified`);
+            await this.alertsService.notice(`Email ${this._emailFromURL} verified`);
             await this.currentUser.reload();
           }
           break;
@@ -214,6 +191,19 @@ export class AuthService {
       this.onAuthError(e);
     }
 
+  }
+
+  /** Call cloud function for verifying external providers (i.e facebook) that do not auto verify */
+  private async checkProviderVerification(user: User, retry?: boolean) : Promise<void> {
+    if(user && !user.emailVerified && user.providerId != 'password') {
+      const verifyEmail = firebase.functions().httpsCallable('tryVerifyUserEmail');
+      console.log('Try verifying external auth provider...', retry ? 'retry...' : '');
+      const r = await verifyEmail();
+      if(r)
+        await user.reload();
+      else if(!retry)
+        await this.checkProviderVerification(user, true);
+    }
   }
 
   /** Update the user authentication data */

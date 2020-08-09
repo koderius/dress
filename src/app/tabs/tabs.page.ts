@@ -56,9 +56,7 @@ export class TabsPage {
 
   async signOut() {
     this.openOptions = false;
-    // Sign out if navigation is allowed by guards
-    if(await this.navService.landing())
-      this.authService.signOut();
+    this.authService.signOut();
   }
 
 }

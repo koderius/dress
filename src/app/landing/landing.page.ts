@@ -6,6 +6,7 @@ import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
 import {NavigationService} from '../services/navigation.service';
 import {Subscription} from 'rxjs';
+import {UserDataService} from '../services/user-data.service';
 
 enum PageStatus {
 
@@ -26,12 +27,10 @@ enum PageStatus {
 })
 export class LandingPage implements OnInit, OnDestroy {
 
-  canShow: boolean;
-
   AuthService = AuthService;
 
   PageStatus = PageStatus;
-  pageStatus: PageStatus = PageStatus.LANDING;
+  pageStatus: PageStatus;
 
   authSub: Subscription;
 
@@ -44,13 +43,12 @@ export class LandingPage implements OnInit, OnDestroy {
 
   isPasswordShow: boolean;
 
-  isTermsRead: boolean;
-
   constructor(
     public authService: AuthService,
     private alertService: AlertsService,
     private modalCtrl: ModalController,
     private navService: NavigationService,
+    public userService: UserDataService,
   ) {}
 
   async ngOnInit() {
@@ -59,26 +57,25 @@ export class LandingPage implements OnInit, OnDestroy {
     await this.authService.checkURL();
 
     // When user changed
-    this.authSub = this.authService.onAuthChange.subscribe(async (user)=>{
-
+    this.authSub = this.authService.user$.subscribe(async (user)=>{
       // Check user status
       if(user) {
         // If user is verified, go into the app
-        if(user.emailVerified) {
+        if(user.emailVerified)
           this.navService.app();
-          return;
-        }
-
-        // Else stay in unverified user status
         else
           this.pageStatus = PageStatus.VERIFICATION_SENT;
       }
 
-      // Check whether it's a reset password mode, and change the status accordingly
-      if(this.authService.mode == 'resetPassword')
-        this.pageStatus = PageStatus.NEW_PASSWORD;
+      else {
+        // Check whether it's a reset password mode, and change the status accordingly
+        if(this.authService.mode == 'resetPassword')
+          this.pageStatus = PageStatus.NEW_PASSWORD;
+        else
+          this.pageStatus = PageStatus.LANDING;
 
-      this.canShow = true;
+      }
+
 
     });
 
@@ -107,23 +104,8 @@ export class LandingPage implements OnInit, OnDestroy {
   }
 
 
-  // Open terms in a modal
-  async goToTerms() {
-    const m = await this.modalCtrl.create({
-      component: TermsComponent,
-      backdropDismiss: false,
-      keyboardClose: false,
-    });
-    m.present();
-    if((await m.onDidDismiss()).role == 'AGREE')
-      this.isTermsRead = true;
-  }
-
-
   // Register with email & password. (1) Open terms, (2) Create user and (3) wait for verification (email was sent)
   async registerClicked() {
-    if(!this.isTermsRead)
-      await this.goToTerms();
     this.alertService.showLoader('Registering...');
     if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name))
       this.pageStatus = PageStatus.VERIFICATION_SENT;
@@ -144,10 +126,8 @@ export class LandingPage implements OnInit, OnDestroy {
   // Login with facebook or google. On the first time, open the terms
   async loginWithClicked(provider: 'facebook' | 'google') {
     this.alertService.showLoader('Logging in...');
-    const cred = await this.authService.signInWithProvider(provider);
+    await this.authService.signInWithProvider(provider);
     this.alertService.dismissLoader();
-    if(cred.additionalUserInfo.isNewUser)
-      await this.goToTerms();
   }
 
 

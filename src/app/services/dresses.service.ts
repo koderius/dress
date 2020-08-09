@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {Dress, DressProps, DressStatus} from '../models/Dress';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
-import {AuthService} from './auth.service';
 import {AlertsService} from './Alerts.service';
+import {UserDataService} from './user-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +34,7 @@ export class DressesService {
 
 
   constructor(
-    private authService: AuthService,
+    private userService: UserDataService,
     private alertsService: AlertsService,
   ) {
 
@@ -55,7 +55,7 @@ export class DressesService {
     //   this._dresses = snapshot.docs.map((d)=>d.data() as DressProps);
     // });
 
-    this.authService.onAuthChange.subscribe((user)=>{
+    this.userService.onUserDoc.subscribe((user)=>{
 
       // Unsubscribe previous user dresses
       if(this.myDressesUnsubscribeFn)
