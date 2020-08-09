@@ -1,11 +1,11 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
-import 'firebase/database'
-import Reference = firebase.database.Reference;
+import 'firebase/firestore'
 import {AuthService} from './auth.service';
-import {ChatMsg} from '../models/ChatMsg';
-import DataSnapshot = firebase.database.DataSnapshot;
+import {ChatDoc, ChatMsg, ChatPreview, DBMsg} from '../models/ChatMsg';
 import {Dress, DressProps} from '../models/Dress';
+import DocumentReference = firebase.firestore.DocumentReference;
+import {UserDataService} from './user-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,42 +13,53 @@ import {Dress, DressProps} from '../models/Dress';
 export class ChatService {
 
   // A reference for chats database
-  private readonly CHAT = firebase.database().ref('chat');
+  private readonly CHAT = firebase.firestore().collection('chats');
 
-  private toMeRef: Reference;
-  private toPartnerRef: Reference;
-  private conMetaRef: Reference;
+  private chatRef: DocumentReference;
+  private chatSub: ()=>void;
 
   private partner: string;
+  private ids: string[];
 
   public isActive: boolean;
 
-  public meta: {
-    lastRead: number,
-    lastMsgTime: number,
-  };
+  // Last read message time
+  public lastRead: number;
+  public lastMsgTime: number;
 
   public onMessage = new EventEmitter<ChatMsg>();
+
+  public lastChats: ChatPreview[];
+  private lastChatsUnsub: ()=>void;
 
   get myUid() : string{
     return this.authService.currentUser.uid;
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userData: UserDataService,
+  ) {
+    this.authService.onAuthChange.subscribe(()=>{
+      if(this.lastChatsUnsub) {
+        this.lastChatsUnsub();
+        this.lastChats = null;
+      }
+      this.subscribeLastCons(5);
+    });
+  }
 
   leaveConversation() {
 
     // Stop subscribing messages
-    if(this.toMeRef)
-      this.toMeRef.off();
-    if(this.toPartnerRef)
-      this.toPartnerRef.off();
+    if(this.chatSub)
+      this.chatSub();
 
     // Clear refs
-    this.conMetaRef = this.toPartnerRef = this.toMeRef = null;
+    this.chatRef = null;
 
     this.isActive = false;
-    this.meta = null;
+    this.lastRead = null;
 
   }
 
@@ -61,22 +72,25 @@ export class ChatService {
 
     try {
 
-      // Set references for incoming and outgoing messages
-      this.toMeRef = this.CHAT.child(this.myUid + '/' + this.partner);
-      this.toPartnerRef = this.CHAT.child(this.partner + '/' + this.myUid);
-      this.conMetaRef = this.toMeRef.child('meta');
+      this.ids = [this.myUid, this.partner].sort((a, b) => a.localeCompare(b));
+
+      // Set references for the chat by the users IDs
+      this.chatRef = this.CHAT.doc(this.ids.join('_'));
+      this.chatRef.set({users: this.ids}, {merge: true});
 
       // Read conversation metadata (once), and set chat as active
-      const metaSnapshot = await this.conMetaRef.once('value');
-      this.meta = metaSnapshot.val() || {};
+      const meta = (await this.chatRef.get()).data();
+      this.lastRead = meta['lastRead' + this.ids.indexOf(this.myUid)] || 0;
+      this.lastMsgTime = meta.lastMsgTime;
+      console.log(this.lastRead);
       this.isActive = true;
 
       // Subscribe incoming and outgoing messages
-      this.toMeRef.on('child_added', snapshot => {
-        this.handleMsg(snapshot.key, snapshot.val(), 'i');
-      });
-      this.toPartnerRef.on('child_added', snapshot => {
-        this.handleMsg(snapshot.key, snapshot.val(), 'o');
+      this.chatSub = this.chatRef.collection('chat').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach((d)=>{
+          if(d.type == 'added')
+            this.handleMsg(d.doc.id, d.doc.data() as DBMsg);
+        })
       });
 
     }
@@ -86,37 +100,46 @@ export class ChatService {
 
   }
 
-  handleMsg(key: string, value: string | DressProps, type: 'i' | 'o') {
 
-    // Only timestamps keys are messages
-    if(!+key)
-      return;
-
-    const msgVal = value;
-    const msg: ChatMsg = {
+  // Convert the message data as in the database to app's front message data
+  private fromDBToFront(key: string, value: DBMsg, ids: string[]) : ChatMsg {
+    const sentBy = ids[+value.u];
+    const msgVal = value.t;
+    return {
       timestamp: +key,
-      type: type,
+      type: sentBy == this.myUid ? 'o' : 'i',
       text: typeof msgVal == 'string' ? msgVal : null,
       dress: typeof msgVal == 'object' ? new Dress(msgVal) : null,
     };
-
-    this.onMessage.emit(msg);
-
-    // Update current message as the last one was read
-    this.conMetaRef.update({lastRead: msg.timestamp});
   }
 
 
-  writeMsg(msg: string | DressProps) {
+  handleMsg(key: string, value: DBMsg) {
+
+    // Translate message and emit it in event
+    const msg = this.fromDBToFront(key, value, this.ids);
+    this.onMessage.emit(msg);
+
+    // Update new messages last read
+    if(msg.timestamp >= (this.lastMsgTime || 0)) {
+      const lastReadProp = 'lastRead' + this.ids.indexOf(this.myUid);
+      this.chatRef.update({[lastReadProp]: msg.timestamp});
+    }
+  }
+
+
+  async writeMsg(msg: string | DressProps) {
 
     // Add message as value, and timestamp as the key
-    if(this.toPartnerRef) {
+    if(this.chatRef) {
       try {
         const key = Date.now().toString();
-        this.toPartnerRef.child(key).set(msg);
+        await this.chatRef.collection('chat').doc(key).set({
+          t: msg,
+          u: !!this.ids.indexOf(this.myUid),
+        });
         // Set the timestamp as the last message time
-        this.toMeRef.child('meta/lastMsgTime').set(key);
-        this.toPartnerRef.child('meta/lastMsgTime').set(key);
+        this.chatRef.update({lastMsgTime: +key});
       }
       catch (e) {
         console.error(e);
@@ -126,13 +149,66 @@ export class ChatService {
   }
 
 
-  async getCons() {
-    const snapshot = await this.CHAT.child(this.authService.currentUser.uid)
-      .orderByChild('meta/lastMsgTime')
-      .limitToLast(5)
-      .once('value');
-    return snapshot.val();
+  // Get last X chats
+  private async subscribeLastCons(limit: number) {
+
+    // Start subscribing the last X chats
+    this.lastChatsUnsub = await this.CHAT.where('users', 'array-contains', this.myUid)
+      .orderBy('lastMsgTime', 'desc')
+      .limit(limit).onSnapshot((snapshot)=>{
+
+        if(!this.lastChats)
+          this.lastChats = [];
+
+        // Clear the old array (and keep the values)
+        const tmp = [...this.lastChats];
+        this.lastChats.splice(0);
+
+        console.log(snapshot.docChanges());
+
+        // Reorder the array
+        snapshot.docChanges().filter((d)=>d.type != 'removed').forEach(async (d)=>{
+
+          const ids = d.doc.id.split('_');
+          const chatData = (d.doc.data() || {lastMsgTime : 0}) as ChatDoc;
+
+          // If it was modified, move it to the new index
+          if(d.type == 'modified')
+            this.lastChats[d.newIndex] = tmp[d.oldIndex];
+
+          // If it was added, add its data in the new index
+          if(d.type == 'added') {
+            this.lastChats[d.newIndex] = {};
+            this.userData.getUserDoc(ids.find((id)=>id != this.myUid)).then((user)=>{
+              this.lastChats[d.newIndex].user = user;
+            })
+          }
+
+          // Load the new message
+          if(d.type == 'added' || (this.lastChats[d.newIndex].lastMsg && this.lastChats[d.newIndex].lastMsg.timestamp != chatData.lastMsgTime)) {
+            const msgSnap = await this.CHAT.doc(d.doc.id).collection('chat').doc(chatData.lastMsgTime.toString()).get();
+            this.lastChats[d.newIndex].lastMsg = this.fromDBToFront(msgSnap.id, msgSnap.data() as DBMsg, ids);
+          }
+
+          // Update read/unread
+          this.lastChats[d.newIndex].unread = chatData.lastMsgTime != chatData['lastRead' + +ids.indexOf(this.myUid)];
+
+        });
+
+      });
+
   }
+
+  // // Get last X messages of a chat
+  // async getConMessages(conId: string, numOfMessages) : Promise<ChatMsg[]> {
+  //
+  //   const snapshot = await this.CHAT.doc(conId).collection('chat')
+  //     .orderBy(firebase.firestore.FieldPath.documentId())
+  //     .limit(numOfMessages).get();
+  //
+  //   return snapshot.docs.map((d)=>this.fromDBToFront(d.id, d.data() as DBMsg, conId.split('_')));
+  //
+  // }
 
 }
 

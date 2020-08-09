@@ -15,6 +15,7 @@ import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.componen
 import {ChatModal} from '../chat-modal/chat-modal.component';
 import {MainHeaderComponent} from './main-header/main-header.component';
 import {NotificationsComponent} from './notifications/notifications.component';
+import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 
 
 
@@ -57,6 +58,7 @@ import {NotificationsComponent} from './notifications/notifications.component';
     PhotoPopoverComponent,
     ChatModal,
     NotificationsComponent,
-  ]
+  ],
+  providers: [ChatOpenerService]
 })
 export class ComponentsModule { }

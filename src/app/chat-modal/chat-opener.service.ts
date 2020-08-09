@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import {ChatModal} from './chat-modal.component';
 import {ModalController} from '@ionic/angular';
-import {ComponentsModule} from '../components/components.module';
 import {Dress} from '../models/Dress';
 
 @Injectable({
-  providedIn: ComponentsModule
+  providedIn: 'root'
 })
 export class ChatOpenerService {
 

@@ -34,7 +34,7 @@ export class ChatModal implements OnInit, OnDestroy {
 
   messages = [];
 
-  isLastMsgSeen: boolean;
+  isLastMsgSeen: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -51,12 +51,7 @@ export class ChatModal implements OnInit, OnDestroy {
       this.partner = await this.userService.getUserDoc(this.uid);
       if(this.partner) {
         await this.chatService.enterConversation(this.uid);
-        // Scroll to the last read message
-        this.lastRead = this.chatService.meta.lastRead;
-        setTimeout(()=>{
-          if(this.unreadMsg && this.unreadMsg.nativeElement)
-            this.content.scrollToPoint(0, this.unreadMsg.nativeElement.offsetTop);
-        }, 500);
+        this.lastRead = this.chatService.lastRead;
       }
     }
 
@@ -68,10 +63,19 @@ export class ChatModal implements OnInit, OnDestroy {
       // Sort old messages by time
       if(msg.timestamp < startTime)
         this.messages.sort((a, b) => a.timestamp - b.timestamp);
-      // If scroll is on the bottom, keep scroll bottom with every new message
-      if(this.isLastMsgSeen)
-        this.content.scrollToBottom(500);
+
+      if(msg.timestamp == this.lastRead)
+        setTimeout(()=>{
+          if(this.unreadMsg && this.unreadMsg.nativeElement)
+            this.content.scrollToPoint(0, this.unreadMsg.nativeElement.offsetTop);
+        }, 500);
+      // If scroll is on the bottom, keep scroll bottom with every new input message
+      if(this.isLastMsgSeen && msg.type == 'i' && msg.timestamp > this.chatService.lastMsgTime)
+        setTimeout(()=>{
+          this.content.scrollToBottom();
+        }, 500);
     });
+
 
   }
 
@@ -99,10 +103,10 @@ export class ChatModal implements OnInit, OnDestroy {
       this.dressInterested = null;
     }
     if(this.myMsg.trim()) {
-      this.chatService.writeMsg(this.myMsg);
+      const tmp = this.myMsg;
       this.myMsg = '';
-      if(!this.isLastMsgSeen)
-        this.content.scrollToBottom(500);
+      await this.chatService.writeMsg(tmp);
+      this.content.scrollToBottom();
     }
   }
 

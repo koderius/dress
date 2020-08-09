@@ -12,7 +12,7 @@ export class HeaderComponent implements OnInit {
   @Input() noUploadBtn: boolean;
   @Input() noMyProdBtn: boolean;
   @Input() title: string;
-  @Input() dontBack: boolean;
+  @Input() modal: boolean;
 
   @Output() onBack = new EventEmitter<void>();
 
@@ -45,7 +45,7 @@ export class HeaderComponent implements OnInit {
 
   back() {
     this.onBack.emit();
-    if(!this.dontBack)
+    if(!this.modal)
       this.navService.back();
   }
 
