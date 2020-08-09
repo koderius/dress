@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {UserDoc} from '../services/auth.service';
 import {ActivatedRoute} from '@angular/router';
 import {RankCalc} from '../Utils/RankCalc';
 import {NavigationService} from '../services/navigation.service';
@@ -12,6 +11,7 @@ import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
+import {UserDoc} from '../models/User';
 
 @Component({
   selector: 'app-edit-profile',

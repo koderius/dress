@@ -2,24 +2,12 @@ import {Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/functions';
-import {FirebaseError, User, UserInfo} from 'firebase';
+import {FirebaseError, User} from 'firebase';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 import {AlertsService} from './Alerts.service';
 import {Observable} from 'rxjs';
-
-
-/** User's app data. It extends the basic firebase user info */
-export interface UserDoc extends Partial<UserInfo> {
-  // DisplayName would be the username, apart from the fullName, which is the name for the contact info
-  fullName?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  size?: string;
-  rank?: number[];
-}
+import {UserDoc} from '../models/User';
 
 /**
  * This service is used for authentication actions.

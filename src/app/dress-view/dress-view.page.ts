@@ -4,7 +4,6 @@ import {Subscription} from 'rxjs';
 import {DressesService} from '../services/dresses.service';
 import {Dress} from '../models/Dress';
 import {Platform, ToastController} from '@ionic/angular';
-import {UserDoc} from '../services/auth.service';
 import {CategoriesService} from '../services/categories.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
 import {NavigationService} from '../services/navigation.service';
@@ -12,6 +11,7 @@ import {FeedBack} from '../models/Feedback';
 import {FeedBacksService} from '../services/feed-backs.service';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
+import {UserDoc} from '../models/User';
 
 @Component({
   selector: 'app-dress-view',

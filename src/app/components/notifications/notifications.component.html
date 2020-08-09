@@ -1,6 +1,10 @@
 <ion-list>
 
-  <ion-item *ngFor="let con of cons" (click)="goToChat(con.user.uid)" [lines]="cons.length > 1 ? 'full' : 'none'">
+  <ion-item *ngFor="let con of cons"
+            (click)="goToChat(con.user.uid)"
+            [lines]="cons.length > 1 ? 'full' : 'none'"
+            [ngStyle]="{fontWeight: con.unread ? 'bold' : 'normal'}"
+  >
     <ion-avatar slot="start">
       <img [src]="con.user.photoURL" *ngIf="con.user.photoURL">
     </ion-avatar>
@@ -10,7 +14,7 @@
         <ion-text *ngIf="con.lastMsg.type == 'o'">(Me): </ion-text>
         <ion-text>{{con.lastMsg.text || ('Interested in dress: ' + con.lastMsg.dress.name)}}</ion-text>
       </p>
-      <p [ngStyle]="{fontWeight: con.unread ? 'bold' : 'normal'}">{{con.lastMsg.timestamp | date : 'dd/MM/yy HH:mm'}}</p>
+      <p>{{con.lastMsg.timestamp | date : 'dd/MM/yy HH:mm'}}</p>
     </ion-label>
   </ion-item>
 

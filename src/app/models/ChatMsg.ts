@@ -1,5 +1,5 @@
 import {Dress, DressProps} from './Dress';
-import {UserDoc} from '../services/auth.service';
+import {UserDoc} from './User';
 
 export type DBMsg = {
   // Whether the message was sent by the first user (false) or the second (true)

@@ -1,10 +1,11 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {AuthService, UserDoc} from './auth.service';
+import {AuthService} from './auth.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
+import {UserDoc} from '../models/User';
 
 @Injectable({
   providedIn: 'root'

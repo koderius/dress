@@ -11,11 +11,11 @@ import {AlertsService} from '../services/Alerts.service';
 import {DateUtil} from '../Utils/DateUtil';
 import {NavigationService} from '../services/navigation.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
-import {UserDoc} from '../services/auth.service';
 import {DefaultUserImage} from '../Utils/Images';
 import {Rent} from '../models/Rent';
 import {RentService} from '../services/rent.service';
 import {UserDataService} from '../services/user-data.service';
+import {UserDoc} from '../models/User';
 
 @Component({
   selector: 'app-dress-edit',

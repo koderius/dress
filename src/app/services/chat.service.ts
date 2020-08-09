@@ -164,8 +164,6 @@ export class ChatService {
         const tmp = [...this.lastChats];
         this.lastChats.splice(0);
 
-        console.log(snapshot.docChanges());
-
         // Reorder the array
         snapshot.docChanges().filter((d)=>d.type != 'removed').forEach(async (d)=>{
 

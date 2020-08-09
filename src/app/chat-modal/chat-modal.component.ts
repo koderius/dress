@@ -2,11 +2,11 @@ import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angul
 import {ActivatedRoute} from '@angular/router';
 import {ChatService} from '../services/chat.service';
 import {Subscription} from 'rxjs';
-import {UserDoc} from '../services/auth.service';
 import {IonContent, ModalController, Platform} from '@ionic/angular';
 import {ChatMsg} from '../models/ChatMsg';
 import {UserDataService} from '../services/user-data.service';
 import {Dress} from '../models/Dress';
+import {UserDoc} from '../models/User';
 
 @Component({
   selector: 'app-chat-modal',

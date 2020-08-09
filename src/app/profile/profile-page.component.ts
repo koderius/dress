@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService, UserDoc} from '../services/auth.service';
+import {AuthService} from '../services/auth.service';
 import {AlertsService} from '../services/Alerts.service';
 import {DressSize} from '../models/Dress';
 import {ObjectsUtil} from '../Utils/ObjectsUtil';
@@ -8,6 +8,7 @@ import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover
 import {FilesUploaderService} from '../services/files-uploader.service';
 import {Rent} from '../models/Rent';
 import {UserDataService} from '../services/user-data.service';
+import {UserDoc} from '../models/User';
 
 
 @Component({
