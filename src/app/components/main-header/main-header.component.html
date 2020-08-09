@@ -1,5 +1,5 @@
 <ion-item lines="full">
-  <p>Hello, {{userService.currentUser.displayName}}</p>
+  <p>Hello, {{userService.currentUser?.displayName}}</p>
   <ion-button slot="end" fill="clear" shape="round" class="msg-btn" color="dark"
               (click)="openNotes($event)"
               [disabled]="!chatsLoaded"

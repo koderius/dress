@@ -8,14 +8,11 @@ import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
 import {Observable} from 'rxjs';
 import {TermsComponent} from '../components/terms/terms.component';
-import {ModalController} from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserDataService {
-
-  private isTermsRead: boolean;
 
   public userDocRef(uid: string = this._currentUser && this._currentUser.uid) {
     if(uid)
@@ -54,7 +51,6 @@ export class UserDataService {
   constructor(
     private alertService: AlertsService,
     private authService: AuthService,
-    public modalCtrl: ModalController,
   ) {}
 
   /*
@@ -94,34 +90,29 @@ export class UserDataService {
 
   private async createUserDocument() {
 
-    if(this.isTermsRead || await this.readTerms()) {
-      this.isTermsRead = false;
+    const user = this.authService.currentUser;
 
-      const user = this.authService.currentUser;
+    const doc: UserDoc = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber,
+      fullName: user.displayName,
+    };
 
-      const doc: UserDoc = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        phoneNumber: user.phoneNumber,
-        fullName: user.displayName,
-      };
+    // Delete all undefined
+    for(let p in user)
+      if(!user[p])
+        delete user[p];
 
-      // Delete all undefined
-      for(let p in user)
-        if(!user[p])
-          delete user[p];
-
-      try {
-        await this.userDocRef(user.uid).set(doc);
-        return doc;
-      }
-      catch (e) {
-        this.errorMsg(e);
-        return null;
-      }
-
+    try {
+      await this.userDocRef(user.uid).set(doc);
+      return doc;
+    }
+    catch (e) {
+      this.errorMsg(e);
+      return null;
     }
 
   }
@@ -129,20 +120,6 @@ export class UserDataService {
   private errorMsg(e: FirebaseError) {
     console.error(e);
     this.alertService.notice('Could not load user data', 'Error', `${e.code}\n${e.message}`);
-  }
-
-
-  // Open terms in a modal
-  async readTerms() {
-    const m = await this.modalCtrl.create({
-      component: TermsComponent,
-      backdropDismiss: false,
-      keyboardClose: false,
-    });
-    m.present();
-    if((await m.onDidDismiss()).role == 'AGREE')
-      this.isTermsRead = true;
-    return this.isTermsRead;
   }
 
 }

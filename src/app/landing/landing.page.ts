@@ -6,7 +6,6 @@ import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
 import {NavigationService} from '../services/navigation.service';
 import {Subscription} from 'rxjs';
-import {UserDataService} from '../services/user-data.service';
 
 enum PageStatus {
 
@@ -43,12 +42,13 @@ export class LandingPage implements OnInit, OnDestroy {
 
   isPasswordShow: boolean;
 
+  isTermsRead: boolean;
+
   constructor(
     public authService: AuthService,
     private alertService: AlertsService,
     private modalCtrl: ModalController,
     private navService: NavigationService,
-    public userService: UserDataService,
   ) {}
 
   async ngOnInit() {
@@ -75,7 +75,6 @@ export class LandingPage implements OnInit, OnDestroy {
           this.pageStatus = PageStatus.LANDING;
 
       }
-
 
     });
 
@@ -104,11 +103,28 @@ export class LandingPage implements OnInit, OnDestroy {
   }
 
 
+  // Open terms in a modal
+  async goToTerms() {
+    const m = await this.modalCtrl.create({
+      component: TermsComponent,
+      backdropDismiss: false,
+      keyboardClose: false,
+    });
+    m.present();
+    this.alertService.dismissLoader();
+    if((await m.onDidDismiss()).role == 'AGREE')
+      this.isTermsRead = true;
+    return this.isTermsRead;
+  }
+
+
   // Register with email & password. (1) Open terms, (2) Create user and (3) wait for verification (email was sent)
   async registerClicked() {
     this.alertService.showLoader('Registering...');
-    if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name))
+    if(await this.authService.signUpWithEmail(this.inputs.email, this.inputs.password, this.inputs.name)) {
       this.pageStatus = PageStatus.VERIFICATION_SENT;
+      this.goToTerms();
+    }
     this.alertService.dismissLoader();
   }
 
@@ -126,8 +142,10 @@ export class LandingPage implements OnInit, OnDestroy {
   // Login with facebook or google. On the first time, open the terms
   async loginWithClicked(provider: 'facebook' | 'google') {
     this.alertService.showLoader('Logging in...');
-    await this.authService.signInWithProvider(provider);
+    const cred = await this.authService.signInWithProvider(provider);
     this.alertService.dismissLoader();
+    if(cred.additionalUserInfo.isNewUser && !this.isTermsRead)
+      this.goToTerms();
   }
 
 

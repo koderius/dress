@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-
     return new Promise(resolve => {
       this.userData.onUserDoc.pipe(takeWhile(user => !!user, true)).subscribe((user)=>{
         if(user) {
