@@ -22,12 +22,8 @@ export class LeavePurchaseGuard implements CanDeactivate<PurchasePage> {
   ): Promise<boolean> {
 
     const answer = await this.alertService.areYouSure('Leave purchase process?','','Leave', 'Stay');
-    // Handling double trigger
-    setTimeout(async ()=>{
-      const previous = await this.alertService.alertCtrl.getTop();
-      if(previous)
-        previous.dismiss();
-    });
+    await this.alertService.alertCtrl.dismiss();
+    this.alertService.alertCtrl.dismiss().catch(()=>{});
     if(answer) {
       this.purchaseService.stopPurchase();
       return true;
