@@ -1,0 +1,108 @@
+<ion-header>
+  <app-header type="empty"></app-header>
+</ion-header>
+
+<ion-content class="background ion-padding-vertical" [ngSwitch]="step$ | async">
+
+  <ion-list class="app-list" lines="none" *ngSwitchCase="1">
+
+    <p>
+      <b>Shipping Information</b>
+    </p>
+
+    <ion-item class="short">
+      <ion-input placeholder="Name" name="fullName" [(ngModel)]="shipping.fullName"></ion-input>
+    </ion-item>
+
+    <ion-item class="short">
+      <ion-input placeholder="Mobile" type="tel" name="phoneNumber" [(ngModel)]="shipping.phoneNumber"></ion-input>
+    </ion-item>
+
+    <ion-item class="textarea">
+      <ion-textarea placeholder="Address" name="Address" [(ngModel)]="shipping.address"
+                    rows="3"
+      ></ion-textarea>
+    </ion-item>
+
+    <div class="double-input">
+      <ion-item>
+        <ion-input placeholder="City" name="city" [(ngModel)]="shipping.city"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input placeholder="Zip Code" type="tel" name="zipCode" [(ngModel)]="shipping.zipCode"></ion-input>
+      </ion-item>
+    </div>
+
+    <div class="double-input">
+      <ion-item>
+        <ion-input placeholder="State" name="state" [(ngModel)]="shipping.state"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input placeholder="Country" name="country" [(ngModel)]="shipping.country"></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-button shape="round" class="main-btn" (click)="confirmStep1()">Confirm</ion-button>
+
+  </ion-list>
+
+
+  <ion-list class="app-list" *ngSwitchCase="2">
+
+    <p>
+      <b>Payments methods</b>
+    </p>
+
+    <ion-button shape="round" class="main-btn" (click)="confirmStep2()">Confirm</ion-button>
+
+  </ion-list>
+
+
+  <ion-list class="app-list" lines="none" *ngSwitchCase="3">
+
+    <p>
+      <b>Order Review</b>
+    </p>
+
+    <ion-item-divider class="ion-margin-bottom">
+      <ion-label>Seller:</ion-label>
+      <ion-chip (click)="goToRenter()">
+        <ion-avatar>
+          <img [src]="owner.photoURL" *ngIf="owner.photoURL">
+        </ion-avatar>
+        <ion-label>{{owner.fullName}}</ion-label>
+      </ion-chip>
+    </ion-item-divider>
+
+    <div (click)="openPhotos()" class="image">
+      <img [src]="dress.photo">
+    </div>
+
+    <p>
+      <b>{{dress.name}}</b>
+    </p>
+    <p>{{dress.description}}</p>
+
+    <div class="summery">
+      <p>
+        <b>Subtotal</b>
+        <b><ion-text color="primary">{{dress.price}}{{COIN_SIGN}}</ion-text></b>
+      </p>
+      <p>
+        <b>Shipping</b>
+        <b><ion-text color="primary">{{shippingPrice}}{{COIN_SIGN}}</ion-text></b>
+      </p>
+      <div class="line"></div>
+      <p>
+        <b>Total</b>
+        <b><ion-text color="primary">{{dress.price + shippingPrice}}{{COIN_SIGN}}</ion-text></b>
+      </p>
+    </div>
+
+    <ion-button shape="round" class="main-btn">Place Order</ion-button>
+
+  </ion-list>
+
+</ion-content>

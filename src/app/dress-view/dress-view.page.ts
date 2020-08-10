@@ -12,6 +12,7 @@ import {FeedBacksService} from '../services/feed-backs.service';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
+import {PurchaseService} from '../purchase/purchase.service';
 
 @Component({
   selector: 'app-dress-view',
@@ -47,6 +48,7 @@ export class DressViewPage implements OnInit, OnDestroy {
     private feedBacksService: FeedBacksService,
     private toastCtrl: ToastController,
     private chatOpener: ChatOpenerService,
+    private purchaseService: PurchaseService,
   ) { }
 
   ngOnInit() {
@@ -105,7 +107,7 @@ export class DressViewPage implements OnInit, OnDestroy {
         this.chatOpener.openChat(this.dressOwner.uid, this.dress);
       }
       if(value == 'rent') {
-        // TODO
+        this.purchaseService.startPurchaseProcess(this.dress.id);
       }
     }
 

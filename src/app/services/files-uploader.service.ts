@@ -74,7 +74,7 @@ export class FilesUploaderService {
         progress.progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
 
         // Update the state as 'running' or 'paused'
-        switch (snapshot.state) {
+        switch (snapshot.country) {
           case firebase.storage.TaskState.PAUSED:
             progress.state = 'paused';
             break;

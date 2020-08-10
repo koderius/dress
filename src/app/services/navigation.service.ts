@@ -16,7 +16,6 @@ export class NavigationService {
     await this.navCtrl.pop();
     if(window.location.pathname == url)
       this.app();
-
   }
 
   landing() {

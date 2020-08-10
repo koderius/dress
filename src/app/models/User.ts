@@ -5,6 +5,7 @@ export interface UserDoc extends Partial<UserInfo> {
   fullName?: string;
   address?: string;
   city?: string;
+  country?: string;
   state?: string;
   zipCode?: string;
   size?: string;

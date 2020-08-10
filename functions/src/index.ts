@@ -1,5 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as axios from 'axios';
+import {PaypalClient, PaypalSecret} from './keys';
 
 
 // // Start writing Firebase Functions
@@ -56,5 +58,26 @@ export const tryVerifyUserEmail = functions.https.onCall(async (data, context) =
 
   else
     return false;
+
+});
+
+
+export const getPaypalToken = functions.https.onCall(async (data, context) => {
+
+  const resp = await axios.default.post(
+    'https://api.sandbox.paypal.com/v1/oauth2/token',
+    'grant_type=client_credentials',
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      auth: {
+        username: PaypalClient,
+        password: PaypalSecret,
+      },
+    }
+  );
+
+  return resp.data['access_token'];
 
 });

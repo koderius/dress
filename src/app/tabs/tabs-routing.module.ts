@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
 import {LoaderGuard} from '../loader.guard';
+import {LeavePurchaseGuard} from '../purchase/leave-purchase.guard';
 
 const routes: Routes = [
   {
@@ -43,6 +44,11 @@ const routes: Routes = [
       {
         path: 'dress-view',
         loadChildren: () => import('../dress-view/dress-view.module').then( m => m.DressViewPageModule)
+      },
+      {
+        path: 'purchase',
+        loadChildren: () => import('../purchase/purchase.module').then( m => m.PurchasePageModule),
+        canDeactivate: [LeavePurchaseGuard]
       },
       {
         path: '',

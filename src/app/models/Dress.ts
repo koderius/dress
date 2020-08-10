@@ -182,7 +182,7 @@ export class Dress extends BaseModel implements DressProps {
   }
 
   set state(state: string) {
-    this._props.state = state;
+    this._props.country = state;
   }
 
   get status() {

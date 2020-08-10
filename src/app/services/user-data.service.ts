@@ -7,7 +7,6 @@ import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
 import {Observable} from 'rxjs';
-import {TermsComponent} from '../components/terms/terms.component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +23,7 @@ export class UserDataService {
   private _currentUser: UserDoc | null;
 
   get currentUser() : UserDoc | null {
-    return this._currentUser;
+    return {...this._currentUser};
   }
 
   /** Observe the (verified) user document */
