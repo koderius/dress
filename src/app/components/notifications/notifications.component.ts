@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {ChatService} from '../../services/chat.service';
-import {ChatDoc, ChatPreview} from '../../models/ChatMsg';
+import {ChatPreview} from '../../models/ChatMsg';
 import {UserDataService} from '../../services/user-data.service';
 import {ChatOpenerService} from '../../chat-modal/chat-opener.service';
 import {PopoverController} from '@ionic/angular';
+import {DefaultUserImage} from '../../Utils/Images';
 
 @Component({
   selector: 'app-notifications',
@@ -11,6 +12,8 @@ import {PopoverController} from '@ionic/angular';
   styleUrls: ['./notifications.component.scss'],
 })
 export class NotificationsComponent implements OnInit {
+
+  DefaultUserImage = DefaultUserImage;
 
   cons: ChatPreview[] = [];
 

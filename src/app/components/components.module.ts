@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, CurrencyPipe} from '@angular/common';
 import {HeaderComponent} from './header/header.component';
 import {IonicModule} from '@ionic/angular';
 import {FormsModule} from '@angular/forms';
@@ -8,15 +8,15 @@ import {TermsComponent} from './terms/terms.component';
 import {DressCardComponent} from './dress-card/dress-card.component';
 import {FilterComponent} from './filter/filter.component';
 import {HideHeaderDirective} from '../directives/hide-header.directive';
-import {DressSizePipe} from '../pipe/dress-size.pipe';
+import {DressSizePipe} from '../pipes/dress-size.pipe';
 import {PhotoPopoverComponent} from './photo-popover/photo-popover.component';
-import {DressStatusPipe} from '../pipe/dress-status.pipe';
+import {DressStatusPipe} from '../pipes/dress-status.pipe';
 import {feedBacksListComponent} from './feed-backs-list/feed-backs-list.component';
 import {ChatModal} from '../chat-modal/chat-modal.component';
 import {MainHeaderComponent} from './main-header/main-header.component';
 import {NotificationsComponent} from './notifications/notifications.component';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
-import {UserDataService} from '../services/user-data.service';
+import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
 
 
 
@@ -40,6 +40,7 @@ import {UserDataService} from '../services/user-data.service';
     ChatModal,
     MainHeaderComponent,
     NotificationsComponent,
+    AppCurrencyPipe,
   ],
   exports: [
     HeaderComponent,
@@ -53,6 +54,7 @@ import {UserDataService} from '../services/user-data.service';
     feedBacksListComponent,
     ChatModal,
     MainHeaderComponent,
+    AppCurrencyPipe,
   ],
   entryComponents: [
     TermsComponent,
@@ -60,6 +62,6 @@ import {UserDataService} from '../services/user-data.service';
     ChatModal,
     NotificationsComponent,
   ],
-  providers: [ChatOpenerService]
+  providers: [ChatOpenerService, CurrencyPipe]
 })
 export class ComponentsModule { }

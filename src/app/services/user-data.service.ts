@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {AuthService} from './auth.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -21,14 +21,27 @@ export class UserDataService {
   private unsubFn: ()=>void;
 
   private _currentUser: UserDoc | null;
+  private onCurrentUser = new EventEmitter<UserDoc | null>();
 
   get currentUser() : UserDoc | null {
-    return {...this._currentUser};
+    return this._currentUser ? {...this._currentUser} : null;
   }
 
   /** Observe the (verified) user document */
-  onUserDoc = new Observable<UserDoc | null>(subscriber => {
-    subscriber.add(this.authService.user$.subscribe((user: User)=>{
+  userDoc$ = new Observable<UserDoc | null>(subscriber => {
+    if(this._currentUser !== undefined)
+      subscriber.next(this.currentUser);
+    subscriber.add(this.onCurrentUser.subscribe(()=>{
+      subscriber.next(this.currentUser);
+    }));
+  });
+
+  constructor(
+    private alertService: AlertsService,
+    private authService: AuthService,
+  ) {
+
+    this.authService.user$.subscribe((user: User)=>{
       if(this.unsubFn)
         this.unsubFn();
 
@@ -39,18 +52,16 @@ export class UserDataService {
           else {
             this._currentUser = await this.createUserDocument();
           }
-          subscriber.next(this._currentUser);
+          this.onCurrentUser.emit(this._currentUser);
         }, (e: FirebaseError) => this.errorMsg(e));
       }
-      else
-        subscriber.next(null);
-    }));
-  });
+      else {
+        this._currentUser = null;
+        this.onCurrentUser.emit(null);
+      }
+    });
 
-  constructor(
-    private alertService: AlertsService,
-    private authService: AuthService,
-  ) {}
+  }
 
   /*
   Get user document according to provided UID.

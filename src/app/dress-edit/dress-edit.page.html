@@ -125,7 +125,7 @@
     <ion-item>
       <ion-label position="floating" color="light">* Rent price</ion-label>
       <ion-input type="number" min="0" required [(ngModel)]="dress.price" [readonly]="rented">
-        <ion-text *ngIf="dress.price" class="ion-padding-end">{{COIN_SIGN}}</ion-text>
+        <ion-text *ngIf="dress.price">{{(null | appCurrency)}}</ion-text>
       </ion-input>
       <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -167,7 +167,7 @@
     <ion-item>
       <ion-label position="floating" color="light">Deposit amount</ion-label>
       <ion-input type="number" min="0" [(ngModel)]="dress.deposit" [readonly]="rented">
-        <ion-text *ngIf="dress.deposit" class="ion-padding-end">{{COIN_SIGN}}</ion-text>
+        <ion-text *ngIf="dress.deposit">{{null | appCurrency}}</ion-text>
       </ion-input>
       <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)" *ngIf="!rented">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>

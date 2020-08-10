@@ -6,7 +6,7 @@
             [ngStyle]="{fontWeight: con.unread ? 'bold' : 'normal'}"
   >
     <ion-avatar slot="start">
-      <img [src]="con.user.photoURL" *ngIf="con.user.photoURL">
+      <img [src]="con.user.photoURL || DefaultUserImage">
     </ion-avatar>
     <ion-label>
       <h6>{{con.user.displayName}}</h6>

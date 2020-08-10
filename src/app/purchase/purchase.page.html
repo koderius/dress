@@ -70,7 +70,7 @@
       <ion-label>Seller:</ion-label>
       <ion-chip (click)="goToRenter()">
         <ion-avatar>
-          <img [src]="owner.photoURL" *ngIf="owner.photoURL">
+          <img [src]="owner.photoURL || DefaultUserImage">
         </ion-avatar>
         <ion-label>{{owner.fullName}}</ion-label>
       </ion-chip>
@@ -88,16 +88,16 @@
     <div class="summery">
       <p>
         <b>Subtotal</b>
-        <b><ion-text color="primary">{{dress.price}}{{COIN_SIGN}}</ion-text></b>
+        <b><ion-text color="primary">{{dress.price | appCurrency}}</ion-text></b>
       </p>
       <p>
         <b>Shipping</b>
-        <b><ion-text color="primary">{{shippingPrice}}{{COIN_SIGN}}</ion-text></b>
+        <b><ion-text color="primary">{{shippingPrice | appCurrency}}</ion-text></b>
       </p>
       <div class="line"></div>
       <p>
         <b>Total</b>
-        <b><ion-text color="primary">{{dress.price + shippingPrice}}{{COIN_SIGN}}</ion-text></b>
+        <b><ion-text color="primary">{{(dress.price + shippingPrice) | currency}}</ion-text></b>
       </p>
     </div>
 

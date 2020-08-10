@@ -28,8 +28,6 @@ export class DressEditPage implements OnInit, OnDestroy {
 
   DefaultUserImage = DefaultUserImage;
 
-  COIN_SIGN = '$';
-
   DateUtil = DateUtil;
 
   routeSubscription;

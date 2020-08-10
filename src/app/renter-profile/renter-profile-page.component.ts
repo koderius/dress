@@ -12,6 +12,7 @@ import {Dress} from '../models/Dress';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
+import {DefaultUserImage} from '../Utils/Images';
 
 @Component({
   selector: 'app-edit-profile',
@@ -19,6 +20,8 @@ import {UserDoc} from '../models/User';
   styleUrls: ['./renter-profile-page.component.scss'],
 })
 export class RenterProfilePage implements OnInit, OnDestroy {
+
+  DefaultUserImage = DefaultUserImage;
 
   userSub: Subscription;
 

@@ -14,7 +14,7 @@
 
       <div id="photo-item">
         <ion-thumbnail slot="start">
-          <img [src]="userDoc.photoURL" *ngIf="userDoc.photoURL" alt="User photo" (click)="photoPopover.showPhoto(userDoc.photoURL)">
+          <img [src]="userDoc.photoURL || DefaultUserImage" alt="User photo" (click)="photoPopover.showPhoto(userDoc.photoURL)">
         </ion-thumbnail>
         <div class="ion-padding-start">
           <ion-item lines="none">

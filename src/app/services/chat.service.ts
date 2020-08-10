@@ -42,7 +42,7 @@ export class ChatService {
   ) {
 
     // Subscribe user's last chats
-    this.userData.onUserDoc.subscribe((user)=>{
+    this.userData.userDoc$.subscribe((user)=>{
       if(this.lastChatsUnsub) {
         this.lastChatsUnsub();
         this.lastChats = null;

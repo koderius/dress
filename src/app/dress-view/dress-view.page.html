@@ -23,14 +23,14 @@
       <ion-label>
         <p style="font-size: large">
           <ion-text color="light">Rent price </ion-text>
-          <ion-text color="primary" style="font-size: larger">{{dress.price}}{{COIN_SIGN}}</ion-text>
+          <ion-text color="primary" style="font-size: larger">{{dress.price | appCurrency}}</ion-text>
         </p>
         <p>
           <i>Additional tax may apply;<br>Charged at checkout</i>
         </p>
       </ion-label>
       <ion-avatar slot="end" class="ion-align-self-start" (click)="goToRenter()">
-        <img [src]="dressOwner.photoURL" alt="Dress owner">
+        <img [src]="dressOwner.photoURL || DefaultUserImage" alt="Dress owner">
       </ion-avatar>
       <ion-button fill="clear" color="dark" class="owner-name"
                   (click)="goToRenter()">{{dressOwner.displayName}}
@@ -85,7 +85,7 @@
 
       <ion-item>
         <ion-label position="stacked">Deposit amount</ion-label>
-        <p>{{dress.deposit}}{{COIN_SIGN}}</p>
+        <p>{{dress.deposit | appCurrency}}</p>
       </ion-item>
 
     </ion-item-group>

@@ -13,6 +13,7 @@ import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
 import {PurchaseService} from '../purchase/purchase.service';
+import {DefaultUserImage} from '../Utils/Images';
 
 @Component({
   selector: 'app-dress-view',
@@ -21,7 +22,7 @@ import {PurchaseService} from '../purchase/purchase.service';
 })
 export class DressViewPage implements OnInit, OnDestroy {
 
-  COIN_SIGN = '$';
+  DefaultUserImage = DefaultUserImage;
 
   paramsSub: Subscription;
   dress: Dress;

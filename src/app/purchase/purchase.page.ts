@@ -9,6 +9,7 @@ import {Dress} from '../models/Dress';
 import {PurchaseService} from './purchase.service';
 import {NavigationService} from '../services/navigation.service';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
+import {DefaultUserImage} from '../Utils/Images';
 
 @Component({
   selector: 'app-purchase',
@@ -17,7 +18,7 @@ import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover
 })
 export class PurchasePage implements OnInit {
 
-  COIN_SIGN = '$';
+  DefaultUserImage = DefaultUserImage;
 
   step$: Observable<number>;
 
