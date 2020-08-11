@@ -1,19 +1,20 @@
+export type CountryData = {
+  name: string;
+}
+
 export class CountriesUtil {
 
-  private static _allCountries: string[];
+  private static _allCountries: CountryData[];
 
   static async GetAll() {
     const resp = await fetch('https://restcountries.eu/rest/v2/all');
-    const list = (await resp.json()) as any[];
-    this._allCountries = list.map((c)=>c['name']);
-    return this._allCountries.slice();
+    this._allCountries = (await resp.json()) as CountryData[];
   }
 
-  static All() {
+  static async All() : Promise<CountryData[]> {
     if(!CountriesUtil._allCountries)
-      CountriesUtil.GetAll();
-    else
-      return this._allCountries.slice();
+      await CountriesUtil.GetAll();
+    return this._allCountries.slice();
   }
 
 }

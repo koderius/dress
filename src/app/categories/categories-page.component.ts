@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {CategoriesService} from '../services/categories.service';
-import {SearchFiltersRaw} from '../models/SearchFilters';
+import {SearchFilters, SearchFiltersRaw} from '../models/SearchFilters';
 import {NavigationService} from '../services/navigation.service';
 
 @Component({
@@ -17,8 +17,9 @@ export class CategoriesPage {
 
   /** Go to home page and filter dresses by the selected category */
   filterByCategory(categoryId: string) {
-    const filter: SearchFiltersRaw = {category: categoryId};
-    this.navService.search(filter);
+    const filter = new SearchFilters();
+    filter.categories = [categoryId];
+    this.navService.home(filter.toRaw());
   }
 
 }

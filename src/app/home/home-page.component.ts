@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {CategoriesService} from '../services/categories.service';
 import {Dress} from '../models/Dress';
@@ -8,17 +8,19 @@ import {ActivatedRoute} from '@angular/router';
 import {SearchFilters, SearchFiltersRaw} from '../models/SearchFilters';
 import {NavigationService} from '../services/navigation.service';
 import {LoadingController} from '@ionic/angular';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home-page.component.html',
   styleUrls: ['home-page.component.scss']
 })
-export class HomePage {
+export class HomePage implements OnInit, OnDestroy {
+
+  urlSub: Subscription;
 
   /** Whether in filter mode (instead of main homepage) */
-  isFiltered: boolean;
+  filterMode: boolean;
 
   /** Number of items per slider, according to screen's size */
   dressSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 2 + 0.25};
@@ -27,6 +29,7 @@ export class HomePage {
   /** Dresses to show as default */
   popular$: Observable<Dress[]> = this.dressService.mostPopular$(5);
   forYou: Dress[] = this.dressService.dresses;
+  filteredDresses: Dress[] = [];
 
   get categories() {
     return this.categoryService.allCategories;
@@ -39,23 +42,27 @@ export class HomePage {
     private categoryService: CategoriesService,
     private dressService: DressesService,
     private loader: LoadingController,
-  ) {
+  ) {}
 
-    // Check search segment in the URL
-    this.activeRoute.url.subscribe((segments)=>{
-      this.isFiltered = segments[0] && segments[0].path == 'search';
-    });
-
-    // Get filter query parameters from the URL (if in search segment)
-    this.activeRoute.queryParams.subscribe((params: SearchFiltersRaw)=>{
-      if(this.isFiltered)
+  ngOnInit(): void {
+    // Check search segment in the URL, and get the query parameters
+    this.urlSub = this.activeRoute.queryParams.subscribe((params: SearchFiltersRaw)=>{
+      this.filterMode = !!Object.keys(params).length;
+      if(this.filterMode) {
         this.filter(params);
+      }
     });
-
   }
 
-  ionViewDidEnter() {
-    this.loader.dismiss();
+  ngOnDestroy(): void {
+    if(this.urlSub)
+      this.urlSub.unsubscribe();
+  }
+
+  async ionViewDidEnter() {
+    const l = await this.loader.getTop();
+    if(l)
+      l.dismiss();
   }
 
 
@@ -69,9 +76,25 @@ export class HomePage {
     this.navService.categories();
   }
 
-  filter(params: SearchFiltersRaw) {
-    const filters = new SearchFilters(params);
-    //TODO: Filter request
+  /** Search selected category */
+  filterCategory(categoryId: string) {
+    this.navService.home(new SearchFilters({category: categoryId}));
+  }
+
+  /** Show all the dresses, sorted by rank (= all dresses without filters) */
+  showAllPopular() {
+    this.navService.home({all: true});
+  }
+
+  showForYou() {
+    const filters = new SearchFilters({
+      // todo:
+    });
+    this.navService.home(filters);
+  }
+
+  async filter(params: SearchFiltersRaw) {
+    this.filteredDresses = await this.dressService.filterDresses(new SearchFilters(params));
   }
 
 }

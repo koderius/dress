@@ -14,9 +14,10 @@ export class DressesService {
 
   readonly dressesRef = firebase.firestore().collection('dresses');
 
-  /** Reference to all non-draft dresses collections */
+  /** Reference to all non-draft dresses collections ordered by rank */
   private readonly publicDressesRef = this.dressesRef
-    .where('status', 'in', [DressStatus.OPEN, DressStatus.RENTED]);
+    .where('status', 'in', [DressStatus.OPEN, DressStatus.RENTED])
+    .orderBy('rank', 'desc');
 
   private _dresses : DressProps[] = [];
 
@@ -65,9 +66,11 @@ export class DressesService {
       // Start subscribing current user dresses
       if(user) {
         try {
-          this.myDressesUnsubscribeFn = this.dressesRef.where('owner', '==', user.uid)
-            .onSnapshot((snapshot)=>{
-              this._myDresses = snapshot.docs.map((d)=>d.data() as DressProps);
+          this.myDressesUnsubscribeFn = this.dressesRef
+            .where('owner', '==', user.uid).onSnapshot((snapshot)=>{
+              this._myDresses = snapshot.docs
+                .map((d)=>d.data() as DressProps)
+                .sort((a, b) => a.name.localeCompare(b.name));
               // Split
               this.drafts.splice(0);
               this.nonDrafts.splice(0);
@@ -113,7 +116,7 @@ export class DressesService {
   // Get an observable of the most popular
   mostPopular$(limit?: number) : Observable<Dress[]> {
 
-    let ref = this.publicDressesRef.orderBy('rank', 'desc');
+    let ref = this.publicDressesRef;
     if(limit)
       ref = ref.limit(limit);
 
@@ -134,11 +137,27 @@ export class DressesService {
 
     let ref = this.publicDressesRef;
 
-    if(searchFilters.categories && searchFilters.categories.length && searchFilters.categories.length <= 10)
-      ref = ref.where('category', 'in', searchFilters.categories);
+    // Filter by the first category
+    if(searchFilters.categories.length)
+      ref = ref.where('category', '==', searchFilters.categories.splice(0,1)[0]);
 
-    if(searchFilters.countries && searchFilters.countries.length && searchFilters.countries.length <= 10)
-      ref = ref.where('country', 'in', searchFilters.countries);
+    // Filter by the first country
+    if(searchFilters.countries.length)
+      ref = ref.where('country', '==', searchFilters.countries.splice(0,1)[0]);
+
+    // Filter by available dates? - todo
+
+    const res = await ref.get();
+    let dresses = res.docs.map((d)=>d.data()) as DressProps[];
+
+    // Filter the rest of the categories & countries in the front end
+    if(searchFilters.categories.length)
+      dresses = dresses.filter((d)=>searchFilters.categories.slice(10).includes(d.category));
+    if(searchFilters.countries.length)
+      dresses = dresses.filter((d)=>searchFilters.countries.slice(10).includes(d.country));
+    // More fields (advanced)? - todo
+
+    return dresses.map((d)=>new Dress(d));
 
   }
 

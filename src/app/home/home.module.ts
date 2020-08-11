@@ -13,7 +13,6 @@ import {ComponentsModule} from '../components/components.module';
     FormsModule,
     RouterModule.forChild([
       {path: '', component: HomePage},
-      {path: 'search', component: HomePage},
     ]),
     ComponentsModule
   ],

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {SearchFiltersRaw} from '../models/SearchFilters';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ export class NavigationService {
 
   constructor(
     private navCtrl: NavController,
+    private router: Router
   ) {}
 
   // Go back to previous page, or go to home page if there are no more pages in the stack
@@ -27,12 +29,11 @@ export class NavigationService {
     return this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : ''));
   }
 
-  home() {
-    return this.navCtrl.navigateRoot('tabs/home', {queryParams: {}, animationDirection: 'back'});
-  }
-
-  search(queryParams: SearchFiltersRaw) {
-    return this.navCtrl.navigateRoot('tabs/home/search', {queryParams: queryParams});
+  home(queryParams: SearchFiltersRaw = null) {
+    return this.navCtrl.navigateRoot('tabs/home', {
+      queryParams: queryParams,
+      animationDirection: 'back',
+    });
   }
 
   profile() {

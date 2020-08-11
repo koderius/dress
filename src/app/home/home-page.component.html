@@ -8,15 +8,16 @@
 
 <ion-content [fullscreen]="true" scrollEvents="true" appHideHeader [header]="header">
 
-  <div *ngIf="!isFiltered">
+  <div *ngIf="!filterMode">
     <div class="section">
       <ion-item class="header" lines="none">
         <h1>CATEGORIES</h1>
-        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn" (click)="goToCategories()">View All</ion-button>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn"
+                    (click)="goToCategories()">View All</ion-button>
       </ion-item>
 
       <ion-slides [options]="categoriesSliderOptions">
-        <ion-slide *ngFor="let c of categories" class="category">
+        <ion-slide *ngFor="let c of categories" class="category" (click)="filterCategory(c.id)">
           <img [src]="c.image">
           <h6>{{c.title}}</h6>
         </ion-slide>
@@ -26,7 +27,9 @@
     <div class="section">
       <ion-item class="header" lines="none">
         <h1>Most Popular</h1>
-        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn">View All</ion-button>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn"
+                    (click)="showAllPopular()"
+        >View All</ion-button>
       </ion-item>
 
       <ion-slides [options]="dressSliderOptions">
@@ -39,8 +42,10 @@
 
     <div class="section">
       <ion-item class="header" lines="none">
-        <h1>Most Popular</h1>
-        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn">View All</ion-button>
+        <h1>Dresses you may like</h1>
+        <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn"
+                    (click)="showForYou()"
+        >View All</ion-button>
       </ion-item>
 
       <ion-slides [options]="dressSliderOptions">
@@ -52,9 +57,30 @@
     </div>
   </div>
 
+  <div *ngIf="filterMode">
+
+    <ion-item class="header" lines="none">
+      <h1>Most Popular</h1>
+      <ion-button slot="end" shape="round" fill="outline" color="dark" class="wider-btn"
+                  (click)="backToHome()"
+      >Back to<br>homepage</ion-button>
+    </ion-item>
+
+    <ion-item *ngIf="!filteredDresses.length">
+      <ion-label color="light">No dresses were found...</ion-label>
+    </ion-item>
+
+    <div class="gallery-grid ion-padding">
+      <app-dress-card *ngFor="let dress of filteredDresses"
+                      [dress]="dress"
+      ></app-dress-card>
+    </div>
+
+  </div>
+
 
 </ion-content>
 
-<ion-footer *ngIf="isFiltered">
+<ion-footer *ngIf="filterMode">
   <ion-button class="main-btn" color="secondary" (click)="backToHome()">Back To Homepage</ion-button>
 </ion-footer>

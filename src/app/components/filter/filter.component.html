@@ -3,22 +3,34 @@
 
     <ion-note slot="start">Quick<br>Search</ion-note>
 
-    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'categories' ? openedFilter = null : openedFilter = 'categories'">
-      Category
+    <ion-button shape="round" class="tiny-btn"
+                (click)="openedFilter == 'categories' ? openedFilter = null : openedFilter = 'categories'"
+                [color]="filters.categories.length ? 'success' : ''"
+                [fill]="filters.categories.length ? 'solid' : 'outline'"
+    >Category
       <ion-icon slot="end" name="chevron-down"></ion-icon>
     </ion-button>
 
-    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'dates' ? openedFilter = null : openedFilter = 'dates'">
-      Dates
+    <ion-button shape="round" class="tiny-btn"
+                (click)="openedFilter == 'dates' ? openedFilter = null : openedFilter = 'dates'"
+                [color]="(filters.fromDate || filters.toDate) ? 'success' : ''"
+                [fill]="(filters.fromDate || filters.toDate) ? 'solid' : 'outline'"
+    >Dates
       <ion-icon slot="end" name="chevron-down"></ion-icon>
     </ion-button>
 
-    <ion-button fill="outline" shape="round" class="tiny-btn" (click)="openedFilter == 'countries' ? openedFilter = null : openedFilter = 'countries'">
-      Country
+    <ion-button shape="round" class="tiny-btn"
+                (click)="openedFilter == 'countries' ? openedFilter = null : openedFilter = 'countries'"
+                [color]="filters.countries.length ? 'success' : ''"
+                [fill]="filters.countries.length ? 'solid' : 'outline'"
+    >Country
       <ion-icon slot="end" name="chevron-down"></ion-icon>
     </ion-button>
 
-    <ion-button fill="outline" shape="round" class="tiny-btn selected" (click)="findDressClicked()">FIND ME<br>DRESSES</ion-button>
+    <ion-button fill="outline" shape="round" class="tiny-btn selected"
+                [disabled]="!filters.hasFilters"
+                (click)="findDressClicked()"
+    >FIND ME<br>DRESSES</ion-button>
 
   </div>
 
@@ -29,17 +41,19 @@
 
 <ion-list class="list" [ngClass]="openedFilter == 'categories' ? 'open' : 'close'">
   <ion-item *ngFor="let c of categories" color="primary">
-    <ion-checkbox slot="start"></ion-checkbox>
+    <ion-checkbox slot="start" [value]="filters.categories.includes(c.id)" (ionChange)="addFilter('category', c.id, $event.detail.checked)"></ion-checkbox>
     <ion-label>{{c.title}}</ion-label>
   </ion-item>
 </ion-list>
 
 <ion-list class="list" [ngClass]="openedFilter == 'countries' ? 'open' : 'close'">
-  <ion-searchbar color="primary" (ionChange)="getCountries($event.detail.value)"></ion-searchbar>
-  <ion-item *ngFor="let c of countries" color="primary">
-    <ion-checkbox slot="start"></ion-checkbox>
-    <ion-label>{{c}}</ion-label>
-  </ion-item>
+  <ion-searchbar color="primary" (ionChange)="refreshCountries($event.detail.value)" debounce="0"></ion-searchbar>
+  <div class="scrollable-area">
+    <ion-item *ngFor="let country of countries" color="primary">
+      <ion-checkbox slot="start" [value]="filters.countries.includes(country.name)" (ionChange)="addFilter('country', country.name, $event.detail.checked)"></ion-checkbox>
+      <ion-label>{{country.name}}</ion-label>
+    </ion-item>
+  </div>
 </ion-list>
 
 <ion-list class="list" [ngClass]="openedFilter == 'dates' ? 'open' : 'close'">
