@@ -4,6 +4,8 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import {AlertsService} from './Alerts.service';
 import {UserDataService} from './user-data.service';
+import {SearchFilters} from '../models/SearchFilters';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,8 @@ export class DressesService {
   readonly dressesRef = firebase.firestore().collection('dresses');
 
   /** Reference to all non-draft dresses collections */
-  private readonly publicDressesRef = this.dressesRef.where('status', '>', 0);
+  private readonly publicDressesRef = this.dressesRef
+    .where('status', 'in', [DressStatus.OPEN, DressStatus.RENTED]);
 
   private _dresses : DressProps[] = [];
 
@@ -32,7 +35,6 @@ export class DressesService {
     return this._myDresses.map((d)=>new Dress(d));
   }
 
-
   constructor(
     private userService: UserDataService,
     private alertsService: AlertsService,
@@ -46,15 +48,12 @@ export class DressesService {
         ranks: [132,43,123,563,123],
         price: 230,
         datesRange: [Date.now(), Date.now() + 12345678],
-        state: 'Israel',
+        country: 'Israel',
         photos: ['../../assets/MOCKs/dress.PNG'],
       };
 
-    // // Subscribe all dresses TODO: Only for develop - should be filtered
-    // this.DRESSES_COLLECTION.onSnapshot(snapshot => {
-    //   this._dresses = snapshot.docs.map((d)=>d.data() as DressProps);
-    // });
 
+    // Start subscribing all my dresses
     this.userService.userDoc$.subscribe((user)=>{
 
       // Unsubscribe previous user dresses
@@ -73,7 +72,8 @@ export class DressesService {
               this.drafts.splice(0);
               this.nonDrafts.splice(0);
               this._myDresses.forEach((d)=>{
-                (d.status == DressStatus.DRAFT ? this.drafts : this.nonDrafts).push(new Dress(d));
+                const list = d.status == DressStatus.DRAFT ? this.drafts : this.nonDrafts;
+                list.push(new Dress(d));
               });
             });
         }
@@ -87,6 +87,7 @@ export class DressesService {
   }
 
 
+  // Load single dress
   async loadDress(id: string) : Promise<Dress> {
     try {
       const snapshot = await this.dressesRef.doc(id).get();
@@ -99,12 +100,46 @@ export class DressesService {
   }
 
 
+  // Load dresses of some user todo: ordered by?
   async loadDressesOfUser(uid: string, limit?: number) : Promise<Dress[]> {
     let ref = this.publicDressesRef.where('owner', '==', uid);
     if(limit)
       ref = ref.limit(limit);
     const snapshot = await ref.get();
     return snapshot.docs.map((d)=>new Dress(d.data() as DressProps));
+  }
+
+
+  // Get an observable of the most popular
+  mostPopular$(limit?: number) : Observable<Dress[]> {
+
+    let ref = this.publicDressesRef.orderBy('rank', 'desc');
+    if(limit)
+      ref = ref.limit(limit);
+
+    return new Observable<Dress[]>(subscriber => {
+      const unSub = ref.onSnapshot(snapshot => {
+          const dresses = snapshot.docs.map((d)=>new Dress(d.data() as DressProps));
+          subscriber.next(dresses);
+        },
+        (e)=>this.alertsService.notice('Cannot load dresses', 'Error', `${e.name}/${e.message}`)
+      );
+      subscriber.add(unSub);
+    });
+
+  }
+
+
+  async filterDresses(searchFilters: SearchFilters) {
+
+    let ref = this.publicDressesRef;
+
+    if(searchFilters.categories && searchFilters.categories.length && searchFilters.categories.length <= 10)
+      ref = ref.where('category', 'in', searchFilters.categories);
+
+    if(searchFilters.countries && searchFilters.countries.length && searchFilters.countries.length <= 10)
+      ref = ref.where('country', 'in', searchFilters.countries);
+
   }
 
 }

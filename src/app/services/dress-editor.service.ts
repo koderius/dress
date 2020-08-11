@@ -58,11 +58,10 @@ export class DressEditorService {
   }
 
 
-  /** Delete dress from user's collection, and delete its images from storage */
+  /** Delete dress from user's collection. Cloud function will delete its images from storage */
   async deleteDress(dressId: string) : Promise<boolean> {
     try {
       await this.dressesService.dressesRef.doc(dressId).delete();
-      this.filesUploader.deleteDressPhotos(dressId);
       return true;
     }
     catch (e) {

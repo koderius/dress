@@ -8,6 +8,7 @@ import {ActivatedRoute} from '@angular/router';
 import {SearchFilters, SearchFiltersRaw} from '../models/SearchFilters';
 import {NavigationService} from '../services/navigation.service';
 import {LoadingController} from '@ionic/angular';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -24,7 +25,7 @@ export class HomePage {
   categoriesSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
 
   /** Dresses to show as default */
-  popular: Dress[] = this.dressService.dresses;
+  popular$: Observable<Dress[]> = this.dressService.mostPopular$(5);
   forYou: Dress[] = this.dressService.dresses;
 
   get categories() {

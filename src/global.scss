@@ -82,7 +82,7 @@ ion-button.wider-btn {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 0.5fr));
   grid-column-gap: 0.5em;
   grid-row-gap: 1em;
 }

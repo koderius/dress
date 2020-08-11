@@ -61,7 +61,7 @@ export class DressViewPage implements OnInit, OnDestroy {
       this.dress = await this.dressService.loadDress(id);
       this.isMine = this.dress.owner == this.userData.currentUser.uid;
       this.dressOwner = await this.userData.getUserDoc(this.dress.owner);
-      this.feedBacks = await this.feedBacksService.getUserFeedBacks(this.dressOwner.uid);
+      this.feedBacks = await this.feedBacksService.getFeedBacks(this.dressOwner.uid);
 
       // Move main photo the the beginning
       this.photos = this.dress.photos;

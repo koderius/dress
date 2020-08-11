@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/auth';
 import {FeedBack} from '../models/Feedback';
 import {UserDataService} from './user-data.service';
+import {DressesService} from './dresses.service';
 
 /**
  * This service response on reading and writing feed backs
@@ -16,16 +14,21 @@ export class FeedBacksService {
 
   /** Get user's feed backs collection reference */
   private userFeedBacks = (uid: string) => this.userService.userDocRef(uid).collection('feedbacks');
+  private dressFeedBacks = (dressId: string) => this.dressService.dressesRef.doc(dressId).collection('feedbacks');
 
 
-  constructor(private userService: UserDataService) {}
+  constructor(
+    private userService: UserDataService,
+    private dressService: DressesService,
+  ) {}
 
 
   /** Get some user's (including current user) feed backs */
-  async getUserFeedBacks(uid: string, limit? : number) : Promise<FeedBack[]> {
+  async getFeedBacks(id: string, limit? : number, userOrDress: 'user' | 'dress' = 'user') : Promise<FeedBack[]> {
 
     // Sort feed backs from latest to earliest
-    let ref = this.userFeedBacks(uid).orderBy('timestamp', 'desc');
+    const col = userOrDress == 'user' ? this.userFeedBacks(id) : this.dressFeedBacks(id);
+    let ref = col.orderBy('timestamp', 'desc');
 
     // Limit number of feed backs to show, if specified
     if(limit)
@@ -42,7 +45,7 @@ export class FeedBacksService {
 
 
   /** Write feed back to other user */
-  async writeUserFeedBack(to: string, feedBack: FeedBack) : Promise<void> {
+  async writeFeedBack(to: string, feedBack: FeedBack, userOrDress: 'user' | 'dress' = 'user') : Promise<void> {
 
     // From current user UID
     feedBack.writerId = this.userService.currentUser.uid;
@@ -51,7 +54,8 @@ export class FeedBacksService {
 
     // Write or edit feed back
     try {
-      await this.userFeedBacks(to).doc(feedBack.writerId).set(feedBack);
+      const col = userOrDress == 'user' ? this.userFeedBacks(to) : this.dressFeedBacks(to);
+      await col.doc(feedBack.writerId).set(feedBack);
     }
     catch (e) {
       console.error(e);

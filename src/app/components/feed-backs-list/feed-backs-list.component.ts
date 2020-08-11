@@ -55,14 +55,14 @@ export class feedBacksListComponent implements OnInit {
 
   async ngOnInit() {
     // Load the requested amount with 1 extra, in order to know whether there are more
-    this.feedBacks = await this.feedBackService.getUserFeedBacks(this.uid, this.minShow + 1);
+    this.feedBacks = await this.feedBackService.getFeedBacks(this.uid, this.minShow + 1);
     // If there are more, it's possible to extend
     this.canExtend = !!this.feedBacks.splice(this.minShow).length;
   }
 
   // Load all
   async extend() {
-    this.feedBacks = await this.feedBackService.getUserFeedBacks(this.uid);
+    this.feedBacks = await this.feedBackService.getFeedBacks(this.uid);
     this.canExtend = false;
   }
 

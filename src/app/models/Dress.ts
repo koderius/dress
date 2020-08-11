@@ -38,11 +38,12 @@ export interface DressProps extends BaseModelProps {
   description?: string;
   style?: string;
   size?: string;
-  state?: string;
+  country?: string;
   datesRange?: number[];
   price?: number;
   deposit?: number;
   ranks?: number[];
+  rank?: number;
   color?: string;
   supplyDays?: number;
   returnDays?: number;
@@ -57,12 +58,14 @@ export interface DressProps extends BaseModelProps {
 
 export class Dress extends BaseModel implements DressProps {
 
-  // Can be read only
-  readonly owner: string;
-
   constructor(protected _props : DressProps = {}) {
     super(_props);
-    this.owner = this._props.owner;
+    if(!this._props.rank)
+      this._props.rank = 0;
+  }
+
+  get owner() {
+    return this._props.owner;
   }
 
   get name() {
@@ -123,7 +126,7 @@ export class Dress extends BaseModel implements DressProps {
 
   /** Get the first photo, or some default image if there are no photos */
   get photo() {
-    return this.photos.length ? this.photos[this.mainPhoto] : '' // TODO: Default image for no photo
+    return this.photos.length ? this.photos[this.mainPhoto] : '../assets/images/default_dress.jpg';
   }
 
   /** List of all photos */
@@ -177,12 +180,12 @@ export class Dress extends BaseModel implements DressProps {
     this._props.deposit = deposit;
   }
 
-  get state() {
-    return this._props.state;
+  get country() {
+    return this._props.country;
   }
 
-  set state(state: string) {
-    this._props.country = state;
+  set country(country: string) {
+    this._props.country = country;
   }
 
   get status() {

@@ -39,7 +39,7 @@ export class FilesUploaderService {
 
   /** The reference of a dress images */
   getDressRef(dressId: string) : Reference {
-    return firebase.storage().ref('dressImages/' + dressId);
+    return firebase.storage().ref('dressImages').child(dressId);
   }
 
 
@@ -74,7 +74,7 @@ export class FilesUploaderService {
         progress.progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
 
         // Update the state as 'running' or 'paused'
-        switch (snapshot.country) {
+        switch (snapshot.state) {
           case firebase.storage.TaskState.PAUSED:
             progress.state = 'paused';
             break;
@@ -111,16 +111,6 @@ export class FilesUploaderService {
 
   deletePhotoRequest(photoUrl: string) {
     this.deleteQueue.push(photoUrl);
-  }
-
-
-  async deleteDressPhotos(dressId: string) {
-    try {
-      this.getDressRef(dressId).delete();
-    }
-    catch (e) {
-      console.error(e);
-    }
   }
 
 

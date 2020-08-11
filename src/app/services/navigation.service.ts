@@ -11,11 +11,12 @@ export class NavigationService {
     private navCtrl: NavController,
   ) {}
 
+  // Go back to previous page, or go to home page if there are no more pages in the stack
   async back() {
-    const url = window.location.pathname;
+    const path = window.location.pathname;
     await this.navCtrl.pop();
-    if(window.location.pathname == url)
-      this.app();
+    if(path == window.location.pathname)
+      return this.app();
   }
 
   landing() {

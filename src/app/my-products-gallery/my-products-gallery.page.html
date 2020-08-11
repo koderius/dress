@@ -11,7 +11,7 @@
     </ion-list-header>
 
     <div class="gallery-grid">
-      <div class="dress-view" *ngFor="let dress of dressesService.nonDrafts; let idx = index">
+      <div class="dress-view" *ngFor="let dress of dresses">
         <img [src]="dress.photo" (click)="showPhotos(dress.photos)">
         <p>
           <ion-text color="primary"><b>{{dress.name}}</b></ion-text>
@@ -20,7 +20,7 @@
           <ion-text [color]="dress.status | dressStatus : 'theme'">{{dress.status | dressStatus | uppercase}}</ion-text>
         </p>
         <div class="btns">
-          <ion-button shape="round" size="small" (click)="deleteDress(dress, idx)" [disabled]="dress.status == DressStatus.RENTED">
+          <ion-button shape="round" size="small" (click)="deleteDress(dress)" [disabled]="dress.status == DressStatus.RENTED">
             <ion-icon name="close"></ion-icon>
           </ion-button>
           <ion-button shape="round" size="small" (click)="goToDress(dress.id)">

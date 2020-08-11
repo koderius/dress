@@ -33,6 +33,11 @@ import {PaypalClient, PaypalSecret} from './keys';
 
 admin.initializeApp();
 
+/**
+ * A function for "manually" set user's email as verified.
+ * Works only if the user has some provider which is not 'password' (then the email should be verified by verification email).
+ * The reason for this function is that facebook (and maybe some other providers) are not considered as email verifiers.
+ */
 export const tryVerifyUserEmail = functions.https.onCall(async (data, context) => {
 
   if(context.auth) {
@@ -58,6 +63,20 @@ export const tryVerifyUserEmail = functions.https.onCall(async (data, context) =
 
   else
     return false;
+
+});
+
+
+/** *
+ * When dress is being deleted:
+ * - Delete all its images from storage
+ */
+export const onDressDelete = functions.firestore.document('dresses/{dressId}').onDelete((snapshot, context) => {
+
+  const dress = snapshot.data();
+  if(dress) {
+    admin.storage().bucket().deleteFiles({directory: `dressImages/${dress.id}`});
+  }
 
 });
 

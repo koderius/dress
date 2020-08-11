@@ -51,7 +51,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
     // Get user document according to url, and then get his feed backs & some dresses
     this.userSub = this.activatedRoute.params.subscribe(async (params)=>{
       this.userDoc = await this.userService.getUserDoc(params['uid']);
-      this.feedBacks = await this.feedBackService.getUserFeedBacks(this.userDoc.uid);
+      this.feedBacks = await this.feedBackService.getFeedBacks(this.userDoc.uid);
       this.userDresses = await this.dressService.loadDressesOfUser(this.userDoc.uid, 4);
     });
 
@@ -78,7 +78,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
       this.alertService.notice('Please rank the dress (1-5) using the stars icons', 'Missed something...');
       return;
     }
-    this.feedBackService.writeUserFeedBack(this.userDoc.uid, this.myFeedBack);
+    this.feedBackService.writeFeedBack(this.userDoc.uid, this.myFeedBack);
   }
 
   connectRenter() {

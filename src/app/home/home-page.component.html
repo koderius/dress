@@ -30,7 +30,7 @@
       </ion-item>
 
       <ion-slides [options]="dressSliderOptions">
-        <ion-slide *ngFor="let dress of popular">
+        <ion-slide *ngFor="let dress of popular$ | async">
           <app-dress-card [dress]="dress"></app-dress-card>
         </ion-slide>
       </ion-slides>

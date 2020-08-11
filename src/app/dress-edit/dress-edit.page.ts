@@ -198,7 +198,7 @@ export class DressEditPage implements OnInit, OnDestroy {
         this.alertService.notice(`Dress was saved ${publish ? 'and published!' : 'as a draft.'}`, 'Details saved');
       }
       catch (e) {
-        this.alertService.notice(e, 'Error...');
+        this.alertService.notice('Cannot save dress...', 'Error...', `${e.name}/${e.message}`);
       }
     }
   }

@@ -15,6 +15,8 @@ export class MyProductsGalleryPage implements OnInit {
 
   DressStatus = DressStatus;
 
+  dresses: Dress[] = [];
+
   constructor(
     public dressesService: DressesService,
     private dressEdit: DressEditorService,
@@ -24,6 +26,7 @@ export class MyProductsGalleryPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.dresses = this.dressesService.nonDrafts;
   }
 
   showPhotos(photoUrls: string[]) {
@@ -38,14 +41,17 @@ export class MyProductsGalleryPage implements OnInit {
     this.navService.dressView(dressId);
   }
 
-  async deleteDress(dress: Dress, idx: number) {
+  async deleteDress(dress: Dress) {
     if(await this.alertsService.areYouSure(
       `Delete "${dress.name}" permanently?`,
       'You will NOT be able to recover the dress.',
       'Delete',
       'Cancel'
-    ))
+    )) {
       await this.dressEdit.deleteDress(dress.id);
+      if(!this.dresses.length)
+        this.navService.back();
+    }
   }
 
 }
