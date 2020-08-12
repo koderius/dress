@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {SearchFiltersRaw} from '../models/SearchFilters';
-import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ export class NavigationService {
 
   constructor(
     private navCtrl: NavController,
-    private router: Router
+    private ngZone: NgZone,
   ) {}
 
   // Go back to previous page, or go to home page if there are no more pages in the stack
@@ -26,7 +25,7 @@ export class NavigationService {
   }
 
   app(tabName: string = '') {
-    return this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : ''));
+    this.ngZone.run(()=>this.navCtrl.navigateRoot('tabs' + (tabName ? '/' + tabName : '')));
   }
 
   home(queryParams: SearchFiltersRaw = null) {
