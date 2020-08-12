@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild, CanActivate} from '@angular/router';
-import {AuthService} from '../services/auth.service';
+import {ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate} from '@angular/router';
 import {NavigationService} from '../services/navigation.service';
 import { takeWhile} from 'rxjs/operators';
 import {UserDataService} from '../services/user-data.service';
@@ -19,7 +18,6 @@ export class AuthGuard implements CanActivate {
   public isTermsRead: boolean;
 
   constructor(
-    private authService: AuthService,
     private navService: NavigationService,
     private userData: UserDataService,
   ) {}
@@ -29,10 +27,11 @@ export class AuthGuard implements CanActivate {
       this.userData.userDoc$.pipe(takeWhile(user => !!user, true)).subscribe((user)=>{
         if(user) {
           resolve(true);
-          console.log('Has permission');
+          console.log('Can enter app');
         }
         else {
           resolve(false);
+          console.log('No logged-in user - leaving app');
           this.navService.landing();
         }
       });

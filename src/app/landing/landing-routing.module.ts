@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { LandingPage } from './landing.page';
+import {LandingGuard} from './landing.guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: LandingPage
+    component: LandingPage,
+    canActivate: [LandingGuard],
   }
 ];
 

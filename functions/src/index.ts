@@ -71,11 +71,23 @@ export const tryVerifyUserEmail = functions.https.onCall(async (data, context) =
  * When dress is being deleted:
  * - Delete all its images from storage
  */
-export const onDressDelete = functions.firestore.document('dresses/{dressId}').onDelete((snapshot, context) => {
+export const onDressDelete = functions.firestore.document('dresses/{dressId}').onWrite((change, context) => {
 
-  const dress = snapshot.data();
-  if(dress) {
-    admin.storage().bucket().deleteFiles({directory: `dressImages/${dress.id}`});
+  // *Not for new dresses
+  if(change && change.before) {
+    const oldDress = change.before.data();
+    // If the dress was deleted, delete all its images
+    if(!change.after)
+      admin.storage().bucket().deleteFiles({directory: `dressImages/${oldDress.id}`});
+    // If it was changes
+    else {
+      const newDress = change.after.data();
+      const oldPhotos = oldDress.photos || [];
+      const newPhotos = newDress ? newDress.photos || [] : [];
+      // Get all the photos that are not in the new dress
+      const photosToDelete = oldPhotos.filter((p)=>!newPhotos.includes(p));
+    }
+
   }
 
 });

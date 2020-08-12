@@ -1,10 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
-import {FirebaseError} from 'firebase';
 import {AlertsService} from '../services/Alerts.service';
 import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
-import {NavigationService} from '../services/navigation.service';
 import {Subscription} from 'rxjs';
 
 enum PageStatus {
@@ -24,14 +22,12 @@ enum PageStatus {
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
 })
-export class LandingPage implements OnInit, OnDestroy {
+export class LandingPage implements OnInit {
 
   AuthService = AuthService;
 
   PageStatus = PageStatus;
   pageStatus: PageStatus;
-
-  authSub: Subscription;
 
   inputs = {
     name: '',
@@ -48,35 +44,29 @@ export class LandingPage implements OnInit, OnDestroy {
     public authService: AuthService,
     private alertService: AlertsService,
     private modalCtrl: ModalController,
-    private navService: NavigationService,
   ) {}
 
   async ngOnInit() {
 
-    // First check for URL auth actions
-    await this.authService.checkURL();
+  // First check for URL auth actions
+  await this.authService.checkURL();
 
-    // When user changed
-    this.authSub = this.authService.user$.subscribe(async (user)=>{
-      // Check user status
-      if(user) {
-        // If user is verified, go into the app
-        if(user.emailVerified)
-          this.navService.app();
-        else
-          this.pageStatus = PageStatus.VERIFICATION_SENT;
-      }
+  const user = this.authService.currentUser;
 
-      else {
-        // Check whether it's a reset password mode, and change the status accordingly
-        if(this.authService.mode == 'resetPassword')
-          this.pageStatus = PageStatus.NEW_PASSWORD;
-        else
-          this.pageStatus = PageStatus.LANDING;
+    // Check user status
+    if(user && !user.emailVerified) {
+      this.pageStatus = PageStatus.VERIFICATION_SENT;
+    }
 
-      }
+    else {
+      // Check whether it's a reset password mode, and change the status accordingly
+      if(this.authService.mode == 'resetPassword')
+        this.pageStatus = PageStatus.NEW_PASSWORD;
+      else
+        this.pageStatus = PageStatus.LANDING;
 
-    });
+    }
+
 
   }
 
@@ -206,10 +196,6 @@ export class LandingPage implements OnInit, OnDestroy {
 
     return true;
 
-  }
-
-  ngOnDestroy(): void {
-    this.authSub.unsubscribe();
   }
 
 }
