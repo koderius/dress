@@ -54,6 +54,11 @@ ion-slides {
   }
 }
 
+#desc {
+  white-space: pre;
+  line-height: 1.2;
+}
+
 .rent-btns {
   ion-segment-button {
     width: 50%;

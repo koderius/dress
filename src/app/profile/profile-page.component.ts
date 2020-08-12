@@ -9,7 +9,8 @@ import {FilesUploaderService} from '../services/files-uploader.service';
 import {Rent} from '../models/Rent';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
-
+import {TelephoneUtil} from '../Utils/TelephoneUtil';
+import {CountriesUtil} from '../Utils/CountriesUtil';
 
 @Component({
   selector: 'app-profile',
@@ -26,6 +27,17 @@ export class ProfilePage implements OnInit{
 
   DressSizes = DressSize;
 
+  phoneNum: TelephoneUtil;
+  country: CountriesUtil;
+
+  get phoneNumPattern() {
+    return this.phoneNum.isValid() ? '.*?' : '^\w{0,0}$';
+  }
+
+  get countryNamePattern() {
+    return this.country.hasCountry() ? '.*?' : '^\w{0,0}$';
+  }
+
   constructor(
     private authService: AuthService,
     private userData: UserDataService,
@@ -39,10 +51,19 @@ export class ProfilePage implements OnInit{
     // Get copy of user document
     this.userDoc = this.userData.currentUser;
 
+    this.phoneNum = new TelephoneUtil(this.userDoc.phoneNumber, this.userDoc.country);
+    this.country = new CountriesUtil(this.userDoc.country);
+
+  }
+
+  ionViewDidEnter() {
+    this.ngOnInit();
   }
 
   hasChanges() {
-    return !ObjectsUtil.SameValues(this.userDoc, this.userData.currentUser);
+    return !ObjectsUtil.SameValues({...this.userDoc}, this.userData.currentUser) ||
+      (this.country.getCountry() && this.country.getCountry().alpha2Code) != this.userDoc.country ||
+      this.phoneNum.toString() != (this.userDoc.phoneNumber || '');
   }
 
   editClicked(ev) {
@@ -54,9 +75,17 @@ export class ProfilePage implements OnInit{
   }
 
   async saveChanges() {
+    if(this.phoneNum.phone && !this.phoneNum.isValid())
+      return this.alertService.notice('Invalid phone number', 'Input Error');
+    else
+      this.userDoc.phoneNumber = this.phoneNum.toString();
+    if(this.country && !this.country.hasCountry())
+      return this.alertService.notice('Unknown country', 'Input Error');
+    else
+      this.userDoc.country = this.country.getCountry().alpha2Code;
     this.alertService.showLoader('Saving...');
     await this.userData.editUserDocument({...this.userDoc});
-    this.userDoc = this.userData.currentUser;
+    this.ngOnInit();
     this.alertService.dismissLoader();
   }
 

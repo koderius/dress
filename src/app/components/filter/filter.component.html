@@ -1,7 +1,13 @@
 <ion-toolbar>
   <div class="row" lines="none">
 
-    <ion-note slot="start">Quick<br>Search</ion-note>
+    <ion-note slot="start" *ngIf="!filters.hasFilters">Quick<br>Search</ion-note>
+
+    <ion-button color="dark" fill="clear" class="tiny-btn" shape="round"
+                *ngIf="filters.hasFilters"
+                (click)="filters.clearFilters(); openedFilter = null">
+      <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+    </ion-button>
 
     <ion-button shape="round" class="tiny-btn"
                 (click)="openedFilter == 'categories' ? openedFilter = null : openedFilter = 'categories'"
@@ -50,7 +56,7 @@
   <ion-searchbar color="primary" (ionChange)="refreshCountries($event.detail.value)" debounce="0"></ion-searchbar>
   <div class="scrollable-area">
     <ion-item *ngFor="let country of countries" color="primary">
-      <ion-checkbox slot="start" [value]="filters.countries.includes(country.name)" (ionChange)="addFilter('country', country.name, $event.detail.checked)"></ion-checkbox>
+      <ion-checkbox slot="start" [value]="filters.countries.includes(country.name)" (ionChange)="addFilter('country', country.alpha2Code, $event.detail.checked)"></ion-checkbox>
       <ion-label>{{country.name}}</ion-label>
     </ion-item>
   </div>

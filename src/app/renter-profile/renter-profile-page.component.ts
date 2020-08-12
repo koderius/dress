@@ -13,6 +13,7 @@ import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
 import {DefaultUserImage} from '../Utils/Images';
+import {CountriesUtil} from '../Utils/CountriesUtil';
 
 @Component({
   selector: 'app-edit-profile',
@@ -35,6 +36,8 @@ export class RenterProfilePage implements OnInit, OnDestroy {
 
   myFeedBack: FeedBack = {};
 
+  userCountry: CountriesUtil;
+
   constructor(
     private userService: UserDataService,
     private activatedRoute: ActivatedRoute,
@@ -53,6 +56,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
       this.userDoc = await this.userService.getUserDoc(params['uid']);
       this.feedBacks = await this.feedBackService.getFeedBacks(this.userDoc.uid);
       this.userDresses = await this.dressService.loadDressesOfUser(this.userDoc.uid, 4);
+      this.userCountry = new CountriesUtil(this.userDoc.country);
     });
 
   }

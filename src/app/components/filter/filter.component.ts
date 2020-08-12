@@ -51,8 +51,8 @@ export class FilterComponent implements OnInit, OnDestroy {
   }
 
   /** Get countries names list (using API) */
-  async refreshCountries(q = '') {
-    this.countries = (await CountriesUtil.All())
+  refreshCountries(q = '') {
+    this.countries = CountriesUtil.All()
       .filter((c)=>c.name.toLowerCase().startsWith(q.toLowerCase()));
   }
 

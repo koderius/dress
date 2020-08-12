@@ -60,8 +60,6 @@ export class Dress extends BaseModel implements DressProps {
 
   constructor(protected _props : DressProps = {}) {
     super(_props);
-    if(!this._props.rank)
-      this._props.rank = 0;
   }
 
   get owner() {

@@ -1,5 +1,5 @@
 <ion-header>
-  <app-header type="empty"></app-header>
+  <app-header type="empty" [title]="isMine ? 'Dress preview' : ''"></app-header>
 </ion-header>
 
 <ion-content *ngIf="dress && dressOwner">
@@ -30,7 +30,7 @@
         </p>
       </ion-label>
       <ion-avatar slot="end" class="ion-align-self-start" (click)="goToRenter()">
-        <img [src]="dressOwner.photoURL || DefaultUserImage" alt="Dress owner">
+        <ion-img [src]="dressOwner.photoURL || DefaultUserImage" alt="Dress owner"></ion-img>
       </ion-avatar>
       <ion-button fill="clear" color="dark" class="owner-name"
                   (click)="goToRenter()">{{dressOwner.displayName}}
@@ -41,7 +41,7 @@
 
       <ion-item>
         <ion-label position="stacked">Product details</ion-label>
-        <p>{{dress.description}}</p>
+        <p id="desc">{{dress.description}}</p>
       </ion-item>
 
       <ion-item>
@@ -80,7 +80,7 @@
 
       <ion-item>
         <ion-label position="stacked">Renter country</ion-label>
-        <p>{{dressOwner.country}}</p>
+        <p>{{ownerCountry?.country}}</p>
       </ion-item>
 
       <ion-item>

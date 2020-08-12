@@ -4,7 +4,7 @@ ion-content ion-toolbar {
   --background: translucent;
 }
 
-ion-item {
+ion-item.ion-valid {
   --highlight-height: 0;
 }
 
@@ -21,4 +21,10 @@ ion-title {
 
 #orders-row {
   overflow-x: scroll;
+}
+
+.flag {
+  align-self: center;
+  height: 2em;
+  width: 2em;
 }

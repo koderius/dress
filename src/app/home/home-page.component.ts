@@ -78,7 +78,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   /** Search selected category */
   filterCategory(categoryId: string) {
-    this.navService.home(new SearchFilters({category: categoryId}));
+    const sf = new SearchFilters();
+    sf.categories = [categoryId];
+    this.navService.home(sf.toRaw());
   }
 
   /** Show all the dresses, sorted by rank (= all dresses without filters) */

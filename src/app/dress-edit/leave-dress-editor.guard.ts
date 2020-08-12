@@ -49,6 +49,9 @@ export class LeaveDressEditorGuard implements CanDeactivate<DressEditPage> {
         this.fileUploader.commitChanges(true);
       }
 
+      await this.alertService.alertCtrl.dismiss();
+      this.alertService.alertCtrl.dismiss().catch(()=>{});
+
     }
 
     return answer;

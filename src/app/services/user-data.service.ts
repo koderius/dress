@@ -7,6 +7,8 @@ import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
 import {Observable} from 'rxjs';
+import {CountriesUtil} from '../Utils/CountriesUtil';
+import {TelephoneUtil} from '../Utils/TelephoneUtil';
 
 @Injectable({
   providedIn: 'root'

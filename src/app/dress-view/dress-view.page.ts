@@ -14,6 +14,7 @@ import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
 import {PurchaseService} from '../purchase/purchase.service';
 import {DefaultUserImage} from '../Utils/Images';
+import {CountriesUtil} from '../Utils/CountriesUtil';
 
 @Component({
   selector: 'app-dress-view',
@@ -30,6 +31,7 @@ export class DressViewPage implements OnInit, OnDestroy {
   feedBacks: FeedBack[];
 
   photos: string[] = [];
+  ownerCountry: CountriesUtil;
 
   sliderOptions = {
     loop: true,
@@ -68,6 +70,8 @@ export class DressViewPage implements OnInit, OnDestroy {
       const mainPhoto = this.photos.splice(this.dress.mainPhoto,1);
       this.photos.unshift(...mainPhoto);
 
+      this.ownerCountry = new CountriesUtil(this.dressOwner.country);
+
     });
 
   }
@@ -93,15 +97,17 @@ export class DressViewPage implements OnInit, OnDestroy {
       return;
 
     // If on preview mode
-    if(this.isMine && !await this.toastCtrl.getTop()) {
-      const t = await this.toastCtrl.create({
-        header: 'Preview mode!',
-        position: 'middle',
-        duration: 500,
-        color: 'medium',
-        cssClass: 'ion-text-center'
-      });
-      t.present();
+    if(this.isMine) {
+      if(!await this.toastCtrl.getTop()) {
+        const t = await this.toastCtrl.create({
+          header: 'Preview mode!',
+          position: 'middle',
+          duration: 500,
+          color: 'medium',
+          cssClass: 'ion-text-center'
+        });
+        t.present();
+      }
     }
     else {
       if(value == 'contact') {
