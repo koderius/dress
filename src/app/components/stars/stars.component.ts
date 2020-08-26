@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RankCalc} from '../../Utils/RankCalc';
-import {Ranks} from '../../models/Feedback';
 
 @Component({
   selector: 'app-stars',
@@ -12,7 +11,7 @@ export class StarsComponent implements OnInit {
   readonly starImg = '../../assets/images/star.png';
   readonly emptyStarImg = '../../assets/images/star_empty.png';
 
-  @Input() rank: number | Ranks;
+  @Input() rank: number | number[];
   @Input() size: string = '1.5em';
   @Input() selectable: boolean;
   @Output() selected = new EventEmitter<number>();

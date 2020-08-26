@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import * as axios from 'axios';
 import {PaypalClient, PaypalSecret} from './keys';
 import {FeedBack} from '../../src/app/models/Feedback';
+import {RankCalc} from '../../src/app/Utils/RankCalc';
 
 
 // // Start writing Firebase Functions
@@ -103,11 +104,20 @@ export const onFeedBack = functions.firestore.document('{collection}/{docId}/fee
   // Get the reference of the feedback's object (user/dress)
   const doc = change.after.ref.parent.parent;
 
-  // Update its stars amount
-  if(feedback && doc)
-    doc.update('ranks.s' + feedback.rank, admin.firestore.FieldValue.increment(1));
-  if(oldFeedback && doc)
-    doc.update('ranks.s' + oldFeedback.rank, admin.firestore.FieldValue.increment(-1));
+  // Read the ranks, add the new rank and remove the old rank, calc the new average, and set them in the document
+  admin.firestore().runTransaction(async transaction => {
+    const ranks: number[] = (await transaction.get(doc)).get('ranks') || [0,0,0,0,0];
+    if(!feedback || !oldFeedback || feedback.rank != oldFeedback.rank) {
+      if(feedback)
+        ranks[feedback.rank - 1]++;
+      if(oldFeedback)
+        ranks[oldFeedback.rank - 1]--;
+      transaction.set(doc, {
+        ranks: ranks,
+        rank: RankCalc.AverageRank(ranks),
+      }, {merge: true});
+    }
+  });
 
 });
 
