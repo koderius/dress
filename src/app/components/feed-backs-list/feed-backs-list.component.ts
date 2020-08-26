@@ -1,50 +1,25 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {FeedBack} from '../../models/Feedback';
 import {NavigationService} from '../../services/navigation.service';
 import {FeedBacksService} from '../../services/feed-backs.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-feed-backs-list',
   templateUrl: './feed-backs-list.component.html',
   styleUrls: ['./feed-backs-list.component.scss'],
 })
-export class feedBacksListComponent implements OnInit {
+export class feedBacksListComponent implements OnInit, OnDestroy {
 
   @Input() listTitle: string;
 
   @Input() uid: string;
 
-  feedBacks: FeedBack[] = [{
-    writerId: 'ahsdjkf',
-    writerName: 'Somebody I know',
-    timestamp: 12334123412,
-    text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took',
-    title: 'The dress is sucks',
-  },
-    {
-      writerId: 'ahsdjkf',
-      writerName: 'Somebody I know',
-      timestamp: 12334123412,
-      text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took',
-      title: 'The dress is sucks',
-    },
-    {
-      writerId: 'ahsdjkf',
-      writerName: 'Somebody I know',
-      timestamp: 12334123412,
-      text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took',
-      title: 'The dress is sucks',
-    },
-    {
-      writerId: 'ahsdjkf',
-      writerName: 'Somebody I know',
-      timestamp: 12334123412,
-      text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took',
-      title: 'The dress is sucks',
-    }
-  ];
+  fbSub: Subscription;
 
-  @Input() minShow: number = 2;
+  feedBacks: FeedBack[] = [];
+
+  @Input() showMax: number = 2;
 
   canExtend: boolean;
 
@@ -53,16 +28,25 @@ export class feedBacksListComponent implements OnInit {
     private feedBackService: FeedBacksService,
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     // Load the requested amount with 1 extra, in order to know whether there are more
-    this.feedBacks = await this.feedBackService.getFeedBacks(this.uid, this.minShow + 1);
-    // If there are more, it's possible to extend
-    this.canExtend = !!this.feedBacks.splice(this.minShow).length;
+    this.fbSub = this.feedBackService.getFeedBacks(this.uid, this.showMax + 1).subscribe((feedbacks)=>{
+      this.feedBacks = feedbacks;
+      // If there are more, it's possible to extend
+      this.canExtend = !!this.feedBacks.splice(this.showMax).length;
+    });
+  }
+
+  ngOnDestroy() {
+    this.fbSub.unsubscribe();
   }
 
   // Load all
-  async extend() {
-    this.feedBacks = await this.feedBackService.getFeedBacks(this.uid);
+  extend() {
+    this.fbSub.unsubscribe();
+    this.fbSub = this.feedBackService.getFeedBacks(this.uid).subscribe((feedbacks)=>{
+      this.feedBacks = feedbacks;
+    });
     this.canExtend = false;
   }
 

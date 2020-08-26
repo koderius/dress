@@ -7,8 +7,6 @@ import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
 import {Observable} from 'rxjs';
-import {CountriesUtil} from '../Utils/CountriesUtil';
-import {TelephoneUtil} from '../Utils/TelephoneUtil';
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +77,17 @@ export class UserDataService {
     }
   }
 
+  observeUser(uid: string) : Observable<UserDoc> {
+    if(uid == this.currentUser.uid)
+      return this.userDoc$;
+    else
+      return new Observable(subscriber => {
+        subscriber.add(this.userDocRef(uid).onSnapshot(snapshot => {
+          subscriber.next(snapshot.data() as UserDoc);
+        }));
+      })
+  }
+
 
   /** Update user's document */
   async editUserDocument(newUserDetails: Partial<UserDoc>) : Promise<void> {
@@ -86,7 +95,7 @@ export class UserDataService {
     // Properties that cannot be changed:
     delete newUserDetails.uid;
     delete newUserDetails.email;
-    delete newUserDetails.rank;
+    delete newUserDetails.ranks;
 
     try {
       // Set the user's document with the new data - in the auth module and in the document

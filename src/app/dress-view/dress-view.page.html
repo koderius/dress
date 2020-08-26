@@ -4,7 +4,7 @@
 
 <ion-content *ngIf="dress && dressOwner">
 
-  <ion-slides [pager]="true" [options]="sliderOptions">
+  <ion-slides [pager]="true" [options]="{loop: photos.length > 1}">
     <ion-slide *ngFor="let photo of photos">
       <div class="image-wrapper"
            [ngStyle]="{backgroundImage: 'url('+photo+')'}"
@@ -60,7 +60,7 @@
 
       <ion-item>
         <ion-label position="stacked">Category</ion-label>
-        <p>{{getCategory(dress.category).title}}</p>
+        <p>{{getCategory(dress.category)?.title}}</p>
       </ion-item>
 
       <ion-item>
@@ -80,7 +80,7 @@
 
       <ion-item>
         <ion-label position="stacked">Renter country</ion-label>
-        <p>{{ownerCountry?.country}}</p>
+        <p>{{dressOwner.country | country}}</p>
       </ion-item>
 
       <ion-item>
@@ -92,8 +92,7 @@
 
   </ion-list>
 
-  <app-feed-backs-list *ngIf="feedBacks?.length"
-                       [uid]="dressOwner.uid"
+  <app-feed-backs-list [uid]="dressOwner.uid"
                        listTitle="Reviews"
   ></app-feed-backs-list>
 

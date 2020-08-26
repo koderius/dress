@@ -30,9 +30,15 @@
 
   </ion-item>
 
+  <ion-item lines="none" *ngIf="!feedBacks.length">
+    <ion-label color="light">
+      <i>No reviews yet</i>
+    </ion-label>
+  </ion-item>
+
 </ion-list>
 
-<div class="view-btn" *ngIf="canExtend">
+<div class="view-btn" *ngIf="canExtend && feedBacks.length">
   <ion-button class="normal-btn" color="dark" shape="round" fill="outline"
               (click)="extend()"
   >View All</ion-button>

@@ -17,6 +17,8 @@ import {MainHeaderComponent} from './main-header/main-header.component';
 import {NotificationsComponent} from './notifications/notifications.component';
 import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
+import {CountryPipe} from '../pipes/country.pipe';
+import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
 
 
 
@@ -41,6 +43,8 @@ import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
     MainHeaderComponent,
     NotificationsComponent,
     AppCurrencyPipe,
+    CountryPipe,
+    PhoneNumberPipe,
   ],
   exports: [
     HeaderComponent,
@@ -55,6 +59,8 @@ import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
     ChatModal,
     MainHeaderComponent,
     AppCurrencyPipe,
+    CountryPipe,
+    PhoneNumberPipe,
   ],
   entryComponents: [
     TermsComponent,

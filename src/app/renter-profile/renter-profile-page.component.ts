@@ -24,6 +24,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
 
   DefaultUserImage = DefaultUserImage;
 
+  urlSub: Subscription;
   userSub: Subscription;
 
   RankCalc = RankCalc;
@@ -32,11 +33,7 @@ export class RenterProfilePage implements OnInit, OnDestroy {
 
   userDresses: Dress[] = [];
 
-  feedBacks: FeedBack[];
-
   myFeedBack: FeedBack = {};
-
-  userCountry: CountriesUtil;
 
   constructor(
     private userService: UserDataService,
@@ -52,16 +49,19 @@ export class RenterProfilePage implements OnInit, OnDestroy {
   ngOnInit() {
 
     // Get user document according to url, and then get his feed backs & some dresses
-    this.userSub = this.activatedRoute.params.subscribe(async (params)=>{
-      this.userDoc = await this.userService.getUserDoc(params['uid']);
-      this.feedBacks = await this.feedBackService.getFeedBacks(this.userDoc.uid);
-      this.userDresses = await this.dressService.loadDressesOfUser(this.userDoc.uid, 4);
-      this.userCountry = new CountriesUtil(this.userDoc.country);
+    this.urlSub = this.activatedRoute.params.subscribe(async (params)=>{
+      if(this.userSub)
+        this.userSub.unsubscribe();
+      this.userSub = this.userService.observeUser(params['uid']).subscribe(user => {
+        this.userDoc = user;
+      });
+      this.userDresses = await this.dressService.loadDressesOfUser(params['uid'], 4);
     });
 
   }
 
   ngOnDestroy(): void {
+    this.urlSub.unsubscribe();
     this.userSub.unsubscribe();
   }
 
@@ -77,12 +77,13 @@ export class RenterProfilePage implements OnInit, OnDestroy {
     this.navService.profile();
   }
 
-  sendFeedBack() {
+  async sendFeedBack() {
     if(!this.myFeedBack.rank) {
       this.alertService.notice('Please rank the dress (1-5) using the stars icons', 'Missed something...');
       return;
     }
-    this.feedBackService.writeFeedBack(this.userDoc.uid, this.myFeedBack);
+    if(await this.feedBackService.writeFeedBack(this.userDoc.uid, this.myFeedBack))
+      this.myFeedBack = {};
   }
 
   connectRenter() {

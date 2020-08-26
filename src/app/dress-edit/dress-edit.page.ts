@@ -43,10 +43,6 @@ export class DressEditPage implements OnInit, OnDestroy {
   photosSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 3 + 0.25};
   photosInProgress: UploadProgress[] = [];
 
-  get rented() {
-    return this.dress.status == DressStatus.RENTED;
-  }
-
   rentData: Rent;
   rentingUser: UserDoc;
   viewFullRenter: boolean;
@@ -158,7 +154,7 @@ export class DressEditPage implements OnInit, OnDestroy {
 
 
   async openPhotoActionSheet(url: string, idx: number) {
-    const res = await this.photoPopoverCtrl.openActionSheet(url, !this.rented);
+    const res = await this.photoPopoverCtrl.openActionSheet(url, true);
     if(res.role == 'destructive')
       this.alertsService.areYouSure('Delete this photo?').then(async (resp)=>{
         if(resp) {
@@ -169,8 +165,6 @@ export class DressEditPage implements OnInit, OnDestroy {
   }
 
   async openProgressActionSheet(p: UploadProgress, idx: number) {
-    if(this.rented)
-      return;
     const res = await this.photoPopoverCtrl.openProgressActionSheet(p);
     if(res.role == 'destructive') {
       this.photosInProgress.splice(idx,1);
@@ -178,7 +172,6 @@ export class DressEditPage implements OnInit, OnDestroy {
   }
 
 
-  /** It is possible to save dress changes only if it is a draft or in open status (cannot be edited while rented //TODO: ask: Why not?) */
   async save(publish?: boolean) {
     if(this.dress.status && !publish) {
       if(!await this.alertsService.areYouSure(

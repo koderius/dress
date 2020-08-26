@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as axios from 'axios';
 import {PaypalClient, PaypalSecret} from './keys';
+import {FeedBack} from '../../src/app/models/Feedback';
 
 
 // // Start writing Firebase Functions
@@ -71,24 +72,42 @@ export const tryVerifyUserEmail = functions.https.onCall(async (data, context) =
  * When dress is being deleted:
  * - Delete all its images from storage
  */
-export const onDressDelete = functions.firestore.document('dresses/{dressId}').onWrite((change, context) => {
+// export const onDressDelete = functions.firestore.document('dresses/{dressId}').onWrite((change, context) => {
+//
+//   // *Not for new dresses
+//   if(change && change.before) {
+//     const oldDress = change.before.data();
+//     // If the dress was deleted, delete all its images
+//     if(!change.after)
+//       admin.storage().bucket().deleteFiles({directory: `dressImages/${oldDress.id}`});
+//     // If it was changes
+//     else {
+//       const newDress = change.after.data();
+//       const oldPhotos = oldDress.photos || [];
+//       const newPhotos = newDress ? newDress.photos || [] : [];
+//       // Get all the photos that are not in the new dress
+//       const photosToDelete = oldPhotos.filter((p)=>!newPhotos.includes(p));
+//     }
+//
+//   }
+//
+// });
 
-  // *Not for new dresses
-  if(change && change.before) {
-    const oldDress = change.before.data();
-    // If the dress was deleted, delete all its images
-    if(!change.after)
-      admin.storage().bucket().deleteFiles({directory: `dressImages/${oldDress.id}`});
-    // If it was changes
-    else {
-      const newDress = change.after.data();
-      const oldPhotos = oldDress.photos || [];
-      const newPhotos = newDress ? newDress.photos || [] : [];
-      // Get all the photos that are not in the new dress
-      const photosToDelete = oldPhotos.filter((p)=>!newPhotos.includes(p));
-    }
 
-  }
+export const onFeedBack = functions.firestore.document('{collection}/{docId}/feedbacks/{writerId}').onWrite((change) => {
+
+  // Get the current feedback and the old feedback
+  const feedback: FeedBack = change.after.data() || null;
+  const oldFeedback: FeedBack = change.before.data() || null;
+
+  // Get the reference of the feedback's object (user/dress)
+  const doc = change.after.ref.parent.parent;
+
+  // Update its stars amount
+  if(feedback && doc)
+    doc.update('ranks.s' + feedback.rank, admin.firestore.FieldValue.increment(1));
+  if(oldFeedback && doc)
+    doc.update('ranks.s' + oldFeedback.rank, admin.firestore.FieldValue.increment(-1));
 
 });
 

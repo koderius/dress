@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {FeedBack} from '../models/Feedback';
 import {UserDataService} from './user-data.service';
 import {DressesService} from './dresses.service';
+import {Observable} from 'rxjs';
 
 /**
  * This service response on reading and writing feed backs
@@ -24,7 +25,7 @@ export class FeedBacksService {
 
 
   /** Get some user's (including current user) feed backs */
-  async getFeedBacks(id: string, limit? : number, userOrDress: 'user' | 'dress' = 'user') : Promise<FeedBack[]> {
+  getFeedBacks(id: string, limit? : number, userOrDress: 'user' | 'dress' = 'user') : Observable<FeedBack[]> {
 
     // Sort feed backs from latest to earliest
     const col = userOrDress == 'user' ? this.userFeedBacks(id) : this.dressFeedBacks(id);
@@ -35,7 +36,11 @@ export class FeedBacksService {
       ref = ref.limit(limit);
 
     try {
-      return (await ref.get()).docs.map((d)=>d.data() as FeedBack);
+      return new Observable(subscriber => {
+        subscriber.add(ref.onSnapshot(snapshot => {
+          subscriber.next(snapshot.docs.map((d)=>d.data() as FeedBack));
+        }));
+      });
     }
     catch (e) {
       console.error(e);
@@ -45,7 +50,8 @@ export class FeedBacksService {
 
 
   /** Write feed back to other user */
-  async writeFeedBack(to: string, feedBack: FeedBack, userOrDress: 'user' | 'dress' = 'user') : Promise<void> {
+  // TODO: Limit the time period of writing/editing the review
+  async writeFeedBack(to: string, feedBack: FeedBack, userOrDress: 'user' | 'dress' = 'user') : Promise<boolean> {
 
     // From current user UID
     feedBack.writerId = this.userService.currentUser.uid;
@@ -56,6 +62,7 @@ export class FeedBacksService {
     try {
       const col = userOrDress == 'user' ? this.userFeedBacks(to) : this.dressFeedBacks(to);
       await col.doc(feedBack.writerId).set(feedBack);
+      return true;
     }
     catch (e) {
       console.error(e);

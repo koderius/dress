@@ -52,8 +52,9 @@ export class FilterComponent implements OnInit, OnDestroy {
 
   /** Get countries names list (using API) */
   refreshCountries(q = '') {
+    q = q.toLowerCase();
     this.countries = CountriesUtil.All()
-      .filter((c)=>c.name.toLowerCase().startsWith(q.toLowerCase()));
+      .filter((c)=>c.name.toLowerCase().startsWith(q) || c.alpha3Code.toLowerCase().startsWith(q) || c.alpha2Code.toLowerCase().startsWith(q));
   }
 
   /** Add/remove category or country to the filters */

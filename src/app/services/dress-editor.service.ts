@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {DressProps, DressStatus} from '../models/Dress';
-import {AuthService} from './auth.service';
 import {FilesUploaderService} from './files-uploader.service';
 import {DressesService} from './dresses.service';
+import {UserDataService} from './user-data.service';
 
 /**
  * This service is response of getting current user's dresses, and create, edit & delete them.
@@ -13,7 +13,7 @@ import {DressesService} from './dresses.service';
 export class DressEditorService {
 
   constructor(
-    private authService: AuthService,
+    private userService: UserDataService,
     private filesUploader: FilesUploaderService,
     private dressesService: DressesService,
   ) {}
@@ -23,7 +23,7 @@ export class DressEditorService {
     try {
       const snapshot = await this.dressesService.dressesRef.doc(id).get();
       const doc = snapshot.data() as DressProps;
-      if(doc.owner == this.authService.currentUser.uid)
+      if(doc.owner == this.userService.currentUser.uid)
         return doc;
       else
         console.error('No permission to edit this dress');
@@ -40,9 +40,12 @@ export class DressEditorService {
     // Get the dress document, or create new document if the dress is new (has no ID)
     const dressDoc = dress.id ? this.dressesService.dressesRef.doc(dress.id) : this.dressesService.dressesRef.doc();
     dress.id = dressDoc.id;
-    dress.owner = this.authService.currentUser.uid;
+    dress.owner = this.userService.currentUser.uid;
+    dress.country = this.userService.currentUser.country;
 
-    dress.status = publish ? DressStatus.OPEN : DressStatus.DRAFT;
+    // Status for rented dress, cannot be changed
+    if(dress.status != DressStatus.RENTED)
+      dress.status = publish ? DressStatus.OPEN : DressStatus.DRAFT;
 
     if(publish) {
       dress.modified = Date.now();

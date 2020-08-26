@@ -29,11 +29,11 @@
 
       <ion-item>
         <ion-label position="stacked" color="light">Country</ion-label>
-        <ion-input readonly [value]="userCountry?.country"></ion-input>
+        <ion-input readonly [value]="userDoc.country | country"></ion-input>
       </ion-item>
 
       <div id="stars-item">
-        <app-stars [rank]="userDoc.rank"></app-stars>
+        <app-stars [rank]="userDoc.ranks"></app-stars>
         <ion-text>Positive Feedback</ion-text>
       </div>
 
@@ -45,10 +45,10 @@
 
         <ion-label>All Reviews</ion-label>
 
-        <div *ngFor="let rank of RankCalc.GetList(userDoc.rank).reverse(); let i = index" class="rank-table">
+        <div *ngFor="let rank of RankCalc.GetList(userDoc.ranks).reverse(); let i = index" class="rank-table">
           <ion-text>{{(-i + 5) + ' Stars '}}</ion-text>
-          <div [ngStyle]="{borderLeftWidth: RankCalc.StarRate(userDoc.rank, (-i + 5)).slice(0, -1) + 'px'}"></div>
-          <ion-text>{{RankCalc.StarRate(userDoc.rank, (-i + 5))}}</ion-text>
+          <div [ngStyle]="{borderLeftWidth: RankCalc.StarRate(userDoc.ranks, (-i + 5)).slice(0, -1) + 'px'}"></div>
+          <ion-text>{{RankCalc.StarRate(userDoc.ranks, (-i + 5))}}</ion-text>
         </div>
 
       </div>
@@ -57,9 +57,7 @@
 
   </ion-list>
 
-  <app-feed-backs-list [uid]="userDoc.uid"
-                       *ngIf="feedBacks?.length"
-  ></app-feed-backs-list>
+  <app-feed-backs-list [uid]="userDoc.uid"></app-feed-backs-list>
 
   <ion-list class="app-list" *ngIf="!isMe()">
 

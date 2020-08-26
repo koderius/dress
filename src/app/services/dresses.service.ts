@@ -16,7 +16,7 @@ export class DressesService {
 
   /** Reference to all non-draft dresses collections ordered by rank */
   private readonly publicDressesRef = this.dressesRef
-    .where('status', 'in', [DressStatus.OPEN, DressStatus.RENTED])
+    .where('status', '==', DressStatus.OPEN)
     .orderBy('rank', 'desc');
 
   private _dresses : DressProps[] = [];

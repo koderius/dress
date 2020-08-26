@@ -35,7 +35,7 @@ export class ProfilePage implements OnInit{
   }
 
   get countryNamePattern() {
-    return this.country.hasCountry() ? '.*?' : '^\w{0,0}$';
+    return this.country.hasValidCountry() ? '.*?' : '^\w{0,0}$';
   }
 
   constructor(
@@ -62,7 +62,7 @@ export class ProfilePage implements OnInit{
 
   hasChanges() {
     return !ObjectsUtil.SameValues({...this.userDoc}, this.userData.currentUser) ||
-      (this.country.getCountry() && this.country.getCountry().alpha2Code) != this.userDoc.country ||
+      (this.country.country && this.country.country.alpha2Code) != this.userDoc.country ||
       this.phoneNum.toString() != (this.userDoc.phoneNumber || '');
   }
 
@@ -79,10 +79,10 @@ export class ProfilePage implements OnInit{
       return this.alertService.notice('Invalid phone number', 'Input Error');
     else
       this.userDoc.phoneNumber = this.phoneNum.toString();
-    if(this.country && !this.country.hasCountry())
+    if(this.country && !this.country.hasValidCountry())
       return this.alertService.notice('Unknown country', 'Input Error');
     else
-      this.userDoc.country = this.country.getCountry().alpha2Code;
+      this.userDoc.country = this.country.country.alpha2Code;
     this.alertService.showLoader('Saving...');
     await this.userData.editUserDocument({...this.userDoc});
     this.ngOnInit();
