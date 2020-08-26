@@ -13,7 +13,8 @@ export class feedBacksListComponent implements OnInit, OnDestroy {
 
   @Input() listTitle: string;
 
-  @Input() uid: string;
+  @Input() id: string;
+  @Input() dressOrUser: 'dress' | 'user';
 
   fbSub: Subscription;
 
@@ -29,8 +30,10 @@ export class feedBacksListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    if(!this.dressOrUser)
+      throw Error('Must mention feedbacks type');
     // Load the requested amount with 1 extra, in order to know whether there are more
-    this.fbSub = this.feedBackService.getFeedBacks(this.uid, this.showMax + 1).subscribe((feedbacks)=>{
+    this.fbSub = this.feedBackService.getFeedBacks(this.dressOrUser, this.id, this.showMax + 1).subscribe((feedbacks)=>{
       this.feedBacks = feedbacks;
       // If there are more, it's possible to extend
       this.canExtend = !!this.feedBacks.splice(this.showMax).length;
@@ -44,7 +47,7 @@ export class feedBacksListComponent implements OnInit, OnDestroy {
   // Load all
   extend() {
     this.fbSub.unsubscribe();
-    this.fbSub = this.feedBackService.getFeedBacks(this.uid).subscribe((feedbacks)=>{
+    this.fbSub = this.feedBackService.getFeedBacks(this.dressOrUser, this.id).subscribe((feedbacks)=>{
       this.feedBacks = feedbacks;
     });
     this.canExtend = false;

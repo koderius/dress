@@ -124,7 +124,7 @@ export class Dress extends BaseModel implements DressProps {
 
   /** Get the first photo, or some default image if there are no photos */
   get photo() {
-    return this.photos.length ? this.photos[this.mainPhoto] : '../assets/images/default_dress.jpg';
+    return this.photos[this.mainPhoto] || '../assets/images/default_dress.jpg';
   }
 
   /** List of all photos */

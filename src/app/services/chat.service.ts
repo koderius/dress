@@ -84,8 +84,8 @@ export class ChatService {
 
       // Read conversation metadata (once), and set chat as active
       const meta = (await this.chatRef.get()).data();
-      this.lastRead = meta['lastRead' + this.ids.indexOf(this.myUid)] || 0;
-      this.lastMsgTime = meta.lastMsgTime;
+      this.lastRead = meta ? (meta['lastRead' + this.ids.indexOf(this.myUid)] || 0) : 0;
+      this.lastMsgTime = meta ? (meta.lastMsgTime || 0) : 0;
       console.log(this.lastRead);
       this.isActive = true;
 

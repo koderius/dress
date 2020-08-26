@@ -57,8 +57,7 @@ export class DressViewPage implements OnInit, OnDestroy {
 
       // Move main photo the the beginning
       this.photos = this.dress.photos;
-      const mainPhoto = this.photos.splice(this.dress.mainPhoto,1);
-      this.photos.unshift(...mainPhoto);
+      this.photos.unshift(this.dress.photo);
 
     });
 

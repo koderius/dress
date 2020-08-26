@@ -25,7 +25,7 @@ export class FeedBacksService {
 
 
   /** Get some user's (including current user) feed backs */
-  getFeedBacks(id: string, limit? : number, userOrDress: 'user' | 'dress' = 'user') : Observable<FeedBack[]> {
+  getFeedBacks(userOrDress: 'user' | 'dress', id: string, limit? : number) : Observable<FeedBack[]> {
 
     // Sort feed backs from latest to earliest
     const col = userOrDress == 'user' ? this.userFeedBacks(id) : this.dressFeedBacks(id);
