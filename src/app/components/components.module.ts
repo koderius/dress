@@ -19,6 +19,7 @@ import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
 import {CountryPipe} from '../pipes/country.pipe';
 import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
+import {ContactFormComponent} from './contact-form/contact-form.component';
 
 
 
@@ -45,6 +46,7 @@ import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
     AppCurrencyPipe,
     CountryPipe,
     PhoneNumberPipe,
+    ContactFormComponent,
   ],
   exports: [
     HeaderComponent,
@@ -67,6 +69,7 @@ import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
     PhotoPopoverComponent,
     ChatModal,
     NotificationsComponent,
+    ContactFormComponent,
   ],
   providers: [ChatOpenerService, CurrencyPipe]
 })

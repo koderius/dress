@@ -6,6 +6,7 @@ import {IClientAuthorizeCallbackData} from 'ngx-paypal';
 import {RentDoc} from '../../src/app/models/Rent';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {payDepositBack, payForRent} from './paymentFunctions';
+import {sendEmailToSupport} from './EmailFunctions';
 
 
 // // Start writing Firebase Functions
@@ -209,4 +210,14 @@ export const approveDressBack = functions.https.onCall(async (rentId: string, co
   else
     throw new HttpsError('permission-denied', 'Caller is not the dress owner');
 
+});
+
+/**
+ * Send custom email to the support team
+ */
+export const reportToSupport = functions.https.onCall(async (data: {subject: string, text: string}, context) => {
+  await sendEmailToSupport(
+    data.subject + ' (Sent from app)',
+    `${data.text}<br><br>Sent by user ID: ${context.auth.uid}`
+  );
 });

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {UserDataService} from '../../services/user-data.service';
-import {PopoverController} from '@ionic/angular';
+import {ModalController, PopoverController} from '@ionic/angular';
 import {NotificationsComponent} from '../notifications/notifications.component';
 import {ChatService} from '../../services/chat.service';
+import {ContactFormComponent} from '../contact-form/contact-form.component';
 
 @Component({
   selector: 'app-main-header',
@@ -15,6 +16,7 @@ export class MainHeaderComponent implements OnInit {
     public userService: UserDataService,
     private popoverCtrl: PopoverController,
     private chatService: ChatService,
+    private modalCtrl: ModalController,
   ) { }
 
   ngOnInit() {}
@@ -33,6 +35,14 @@ export class MainHeaderComponent implements OnInit {
       event: ev,
     });
     p.present();
+  }
+
+  async openContactForm() {
+    const m = await this.modalCtrl.create({
+      component: ContactFormComponent,
+      backdropDismiss: false,
+    });
+    m.present();
   }
 
 }

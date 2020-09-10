@@ -5,6 +5,7 @@ import * as admin from 'firebase-admin';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {RentDoc} from '../../src/app/models/Rent';
 import {UserDoc} from '../../src/app/models/User';
+import {sendEmailToSupport} from './EmailFunctions';
 
 /** Base PayPal API address **/
 export const paypalAPI = 'https://api.sandbox.paypal.com/v1';
@@ -79,8 +80,14 @@ export const payForRent = async (rent: RentDoc, amount: IUnitAmount, shipping: I
         'Authorization': `Bearer ${token}`
       },
     }
-  );
-
+  ).catch(()=>{
+    sendEmailToSupport('Payment error (auto email)',
+      `The customer ${user.fullName} (ID: ${user.uid}; email: ${user.email}) did not get his payment for renting a dress.
+       Rent document ID: ${rent.id}. The amount should be payed: ${amount.currency_code + amount.value}
+       He might not have a PayPal account, or entered wrong payment data.
+       Please contact him/her for fixing the issue and commit the payment.
+     `);
+  });
 };
 
 /**
@@ -125,6 +132,12 @@ export const payDepositBack = async (rent: RentDoc) => {
         'Authorization': `Bearer ${token}`
       },
     }
-  );
+  ).catch(()=>{
+    sendEmailToSupport('Payment error (auto email)',
+      `The customer ${user.fullName} (ID: ${user.uid}; email: ${user.email}) did not get his deposit back after the rent was ended.
+       He might not have a PayPal account, or entered wrong payment data.
+       Please contact him/her for fixing the issue and commit the payment.
+    `);
+  });
 
 };

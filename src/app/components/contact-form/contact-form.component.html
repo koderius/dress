@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Support</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list inset>
+
+    <ion-item>
+      <ion-label>Subject</ion-label>
+      <ion-select [(ngModel)]="subject" placeholder="Choose">
+        <ion-select-option *ngFor="let sub of subjects">{{sub}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="subject == Subjects.OTHER">
+      <ion-input [(ngModel)]="customSubject" placeholder="Enter subject"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea rows="5" [(ngModel)]="text" placeholder="Write here..."></ion-textarea>
+    </ion-item>
+
+    <ion-button shape="round" (click)="send()" [disabled]="sendDisabled" class="ion-margin">
+      Send
+    </ion-button>
+
+  </ion-list>
+
+</ion-content>

@@ -1,5 +1,7 @@
 <ion-item lines="full">
+
   <p>Hello, {{userService.currentUser?.displayName}}</p>
+
   <ion-button slot="end" fill="clear" shape="round" class="msg-btn" color="dark"
               (click)="openNotes($event)"
               [disabled]="!chatsLoaded"
@@ -7,4 +9,9 @@
     <ion-icon name="chatbubble-ellipses" slot="icon-only"></ion-icon>
     <div class="badge" *ngIf="hasNotes"></div>
   </ion-button>
+
+  <ion-button slot="end" fill="clear" shape="round" color="danger" title="Support" (click)="openContactForm()">
+    <ion-icon slot="icon-only" name="mail"></ion-icon>
+  </ion-button>
+
 </ion-item>
