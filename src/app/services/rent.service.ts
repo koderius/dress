@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/functions';
 import {Rent, RentDoc, RentStatus} from '../models/Rent';
 import {AuthService} from './auth.service';
 
@@ -14,6 +15,18 @@ export class RentService {
   constructor(
     private authService: AuthService,
   ) {}
+
+  getNewRefId() : string {
+    return this.rentsRef.doc().id;
+  }
+
+  async getMyRents() : Promise<Rent[]> {
+    const snapshot = await this.rentsRef
+      .where('renterId', '==', this.authService.currentUser.uid)
+      .orderBy('timestamp', 'desc')
+      .get();
+    return snapshot.docs.map((doc) => new Rent (doc.data() as RentDoc));
+  }
 
   // Get the current rent document of the given dress
   // If the dress is not rented (or not exist), return null
@@ -33,6 +46,18 @@ export class RentService {
     }
     catch (e) {
       console.error(e);
+    }
+  }
+
+  async declareReturned(rentId: string) : Promise<boolean> {
+    const fn = firebase.functions().httpsCallable('approveDressBack');
+    try {
+      await fn(rentId);
+      return true;
+    }
+    catch (e) {
+      console.log(e);
+      return false;
     }
   }
 

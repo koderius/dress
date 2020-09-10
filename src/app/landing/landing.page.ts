@@ -40,6 +40,10 @@ export class LandingPage implements OnInit {
 
   isTermsRead: boolean;
 
+  get hasAuthLoaded() {
+    return this.authService.currentUser === null;
+  }
+
   constructor(
     public authService: AuthService,
     private alertService: AlertsService,
@@ -53,20 +57,19 @@ export class LandingPage implements OnInit {
 
   const user = this.authService.currentUser;
 
-    // Check user status
-    if(user && !user.emailVerified) {
-      this.pageStatus = PageStatus.VERIFICATION_SENT;
-    }
+  // Check user status
+  if(user && !user.emailVerified) {
+    this.pageStatus = PageStatus.VERIFICATION_SENT;
+  }
 
-    else {
-      // Check whether it's a reset password mode, and change the status accordingly
-      if(this.authService.mode == 'resetPassword')
-        this.pageStatus = PageStatus.NEW_PASSWORD;
-      else
-        this.pageStatus = PageStatus.LANDING;
+  else {
+    // Check whether it's a reset password mode, and change the status accordingly
+    if(this.authService.mode == 'resetPassword')
+      this.pageStatus = PageStatus.NEW_PASSWORD;
+    else
+      this.pageStatus = PageStatus.LANDING;
 
-    }
-
+  }
 
   }
 

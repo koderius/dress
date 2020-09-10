@@ -18,6 +18,11 @@
 
   <ion-list class="app-list" *ngIf="dress.status == DressStatus.RENTED && rentingUser">
 
+    <ion-button expand="block" color="secondary" (click)="declareReturn()">
+      <ion-icon name="thumbs-up" slot="start"></ion-icon>
+      Declare return
+    </ion-button>
+
     <ion-list-header>
       <ion-title>Customer Details</ion-title>
     </ion-list-header>
@@ -124,11 +129,21 @@
 
     <ion-item>
       <ion-label position="floating" color="light">* Rent price</ion-label>
-      <ion-input type="number" min="0" required [(ngModel)]="dress.price">
+      <ion-input type="number" min="0" required [(ngModel)]="dress.price" (ionChange)="setDeposit()" debounce="500">
         <ion-text *ngIf="dress.price">{{(null | appCurrency)}}</ion-text>
       </ion-input>
       <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
         <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" color="light">Deposit amount</ion-label>
+      <ion-input type="number" min="0" [value]="dress.deposit" readonly>
+        <ion-text>{{null | appCurrency}}</ion-text>
+      </ion-input>
+      <ion-button slot="end" fill="clear" shape="round" (click)="showDepositDetails()">
+        <ion-icon name="help-circle-outline" color="dark" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 
@@ -161,16 +176,6 @@
       ></ion-datetime>
       <ion-button slot="end" fill="clear" shape="round" (click)="toInput.open()" [disabled]="!dress.fromDate">
         <ion-icon src="../../assets/svg/icon_calendar.svg" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating" color="light">Deposit amount</ion-label>
-      <ion-input type="number" min="0" [(ngModel)]="dress.deposit">
-        <ion-text *ngIf="dress.deposit">{{null | appCurrency}}</ion-text>
-      </ion-input>
-      <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
-        <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-item>
 

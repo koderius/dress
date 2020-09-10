@@ -32,7 +32,7 @@ export class ChatModal implements OnInit, OnDestroy {
 
   lastRead: number;
 
-  messages = [];
+  messages: ChatMsg[] = [];
 
   isLastMsgSeen: boolean = true;
 

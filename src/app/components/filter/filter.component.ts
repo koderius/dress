@@ -1,11 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CategoriesService} from '../../services/categories.service';
 import {DressCategory} from '../../models/Dress';
-import {CountriesUtil, CountryData} from '../../Utils/CountriesUtil';
 import {ActivatedRoute} from '@angular/router';
 import {SearchFilters} from '../../models/SearchFilters';
 import {NavigationService} from '../../services/navigation.service';
 import {Subscription} from 'rxjs';
+import {CountryData, CountryPipe} from '../../pipes/country.pipe';
 
 @Component({
   selector: 'app-filter',
@@ -53,7 +53,7 @@ export class FilterComponent implements OnInit, OnDestroy {
   /** Get countries names list (using API) */
   refreshCountries(q = '') {
     q = q.toLowerCase();
-    this.countries = CountriesUtil.All()
+    this.countries = CountryPipe.All()
       .filter((c)=>c.name.toLowerCase().startsWith(q) || c.alpha3Code.toLowerCase().startsWith(q) || c.alpha2Code.toLowerCase().startsWith(q));
   }
 

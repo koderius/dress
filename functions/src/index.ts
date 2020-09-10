@@ -1,9 +1,11 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import * as axios from 'axios';
-import {PaypalClient, PaypalSecret} from './keys';
 import {FeedBack} from '../../src/app/models/Feedback';
 import {RankCalc} from '../../src/app/Utils/RankCalc';
+import {IClientAuthorizeCallbackData} from 'ngx-paypal';
+import {RentDoc} from '../../src/app/models/Rent';
+import {HttpsError} from 'firebase-functions/lib/providers/https';
+import {payDepositBack, payForRent} from './paymentFunctions';
 
 
 // // Start writing Firebase Functions
@@ -122,22 +124,89 @@ export const onFeedBack = functions.firestore.document('{collection}/{docId}/fee
 });
 
 
-export const getPaypalToken = functions.https.onCall(async (data, context) => {
+/**
+ * A function being auto called by the PayPal account, when a payment to the business account is being authorized.
+ * The function creates a new rent document, set the dress into "rented" and pays the dress owner his part.
+ */
+export const paypalWebhook = functions.https.onRequest((req, resp) => {
 
-  const resp = await axios.default.post(
-    'https://api.sandbox.paypal.com/v1/oauth2/token',
-    'grant_type=client_credentials',
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      auth: {
-        username: PaypalClient,
-        password: PaypalSecret,
-      },
+  // TODO: Separate capturing and authorizing: Check the payment details on capture, and then authorize it.
+
+  if (req.body.event_type == 'CHECKOUT.ORDER.APPROVED') {
+
+    // Get the purchase data out of the web hook resource
+    try {
+      const resource: IClientAuthorizeCallbackData = req.body.resource;
+      if(resource && resource.purchase_units) {
+        const purchase = resource.purchase_units[0];
+        if(purchase) {
+          admin.firestore().collection('payments').doc(purchase.custom_id).set(resource);
+          const refIds = (purchase.reference_id || '').split('_');
+          const dressId = refIds[0];
+          const renterId = refIds[1];
+          const items = purchase.items;
+          if(items) {
+            const price = items.find((item) => item.category == 'PHYSICAL_GOODS').unit_amount;
+            const deposit = items.find((item) => item.category == 'DIGITAL_GOODS').unit_amount;
+            // Create a rent document, and set the dress stats to rented
+            const timestamp = admin.firestore.Timestamp.now().toMillis();
+            admin.firestore().runTransaction(async transaction => {
+              const dressRef = admin.firestore().collection('dresses').doc(dressId);
+              const ownerId = (await transaction.get(dressRef)).get('owner');
+              await transaction.update(dressRef, 'status', 2);
+              const rent: RentDoc = {
+                id: purchase.custom_id,
+                status: 1,
+                dressId,
+                ownerId,
+                renterId,
+                deposit,
+                price,
+                timestamp,
+              };
+              await transaction.set(admin.firestore().collection('rents').doc(purchase.custom_id), rent);
+              // Pay the renter his part
+              await payForRent(rent, price, purchase.shipping);
+            });
+          }
+        }
+      }
     }
-  );
+    catch (e) {
+      // For any error in the process TODO: Report support
+      console.error(e);
+      throw new HttpsError('unimplemented', 'The dress owner might not received his payment', e);
+    }
+    resp.send('Payment received');
+  }
+  else
+    throw new HttpsError('unknown', 'Unknown payment event');
+});
 
-  return resp.data['access_token'];
+
+/**
+ * Called by the dress owner after he received his dress back.
+ * Pays the deposit back to the renter and closes the rent document.
+ */
+export const approveDressBack = functions.https.onCall(async (rentId: string, context) => {
+
+  // Get the rent document
+  const rentRef = admin.firestore().collection('rents').doc(rentId);
+  const rent = (await rentRef.get()).data() as RentDoc;
+  if(!rent)
+    throw new HttpsError('not-found', 'Rent document was not found');
+
+  // Check the caller is the dress owner
+  if(rent.ownerId == context.auth.uid) {
+    // Close the rent document and set the dress status back to public
+    await admin.firestore().runTransaction(async transaction => {
+      transaction.update(admin.firestore().collection('dresses').doc(rent.dressId), 'status', 1);
+      transaction.update(rentRef, 'status', 0);
+    });
+    // Pay the deposit
+    await payDepositBack(rent);
+  }
+  else
+    throw new HttpsError('permission-denied', 'Caller is not the dress owner');
 
 });

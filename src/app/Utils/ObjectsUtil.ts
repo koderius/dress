@@ -33,7 +33,7 @@ export class ObjectsUtil {
 
   // Clear the objects falsy values and check whether they have same values
   static SameValues(obj1: any, obj2: any, keepZeros = false) : boolean {
-    return JSON.stringify(ObjectsUtil.ClearFalsies(obj1, keepZeros)) == JSON.stringify(ObjectsUtil.ClearFalsies(obj2, keepZeros));
+    return (obj1 ? JSON.stringify(ObjectsUtil.ClearFalsies(obj1, keepZeros)) : null) == (obj2 ? JSON.stringify(ObjectsUtil.ClearFalsies(obj2, keepZeros)) : null);
   }
 
 }

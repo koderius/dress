@@ -1,6 +1,5 @@
 import {Injectable, NgZone} from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {NavigationService} from '../services/navigation.service';
 import {takeWhile} from 'rxjs/operators';
 import {UserDataService} from '../services/user-data.service';
@@ -16,17 +15,14 @@ export class LandingGuard implements CanActivate {
     private ngZone: NgZone
   ) {}
 
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
+  // Can enter the landing page as long as there is no user
+  // Keep subscribe until there is a valid user, and then redirect to the app's main page
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     return new Promise<boolean>(resolve => {
       this.userService.userDoc$.pipe(takeWhile((user)=>!user, true)).subscribe(user => {
         resolve(!user);
-        if(user) {
-          console.log('User loaded');
+        if(user)
           this.ngZone.run(()=>this.navService.app());
-        }
       });
     });
   }

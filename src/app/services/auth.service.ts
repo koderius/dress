@@ -7,7 +7,7 @@ import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 import {AlertsService} from './Alerts.service';
 import {UserDoc} from '../models/User';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 /**
  * This service is used for authentication actions.
@@ -30,18 +30,21 @@ export class AuthService {
   /** Firebase auth module - for the use of this service only **/
   private auth = firebase.auth();
 
+  /**
+   * Current user, as an observable or as a value.
+   * NULL = No logged-in user.
+   * UNDEFINED = Auth module has not been loaded yet.
+   * */
+  private _user = new BehaviorSubject<User | null | undefined>(undefined);
+  public readonly user$ = this._user.asObservable();
+  get currentUser(): User | null | undefined {
+    return this._user.value;
+  }
+
   /** The params that are being read from the URL (for email verification, reset password...) */
   private _mode: string;
   private _oobCode: string;
   private _emailFromURL: string;
-
-  /** On auth state changed, check user verification (and try verify, and then emit the user) */
-  public user$ = new Observable<User | null>(subscriber => {
-    subscriber.add(this.auth.onAuthStateChanged(async (user)=>{
-      await this.checkProviderVerification(user);
-      subscriber.next(user);
-    }));
-  });
 
   /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
   public static readonly PASSWORD_REGEX = '^[a-zA-Z0-9_]{6,}$';
@@ -53,7 +56,16 @@ export class AuthService {
   constructor(
     private activatedRoute: ActivatedRoute,
     private alertsService: AlertsService,
-  ) {}
+  ) {
+
+    // On auth state changed, check user verification (and try verify) and then emit the user
+    this.auth.onAuthStateChanged(async (user)=>{
+      await this.checkProviderVerification(user);
+      this._user.next(user);
+      console.log('User', this._user.value);
+    })
+
+  }
 
 
   /** Auth error notification */
@@ -70,11 +82,6 @@ export class AuthService {
   /** The email which the URL was redirected from */
   get emailFromURL() : string {
     return this._emailFromURL;
-  }
-
-  /** Current user according to auth module */
-  get currentUser(): User | null {
-    return this.auth.currentUser;
   }
 
   /** Act according to URL parameters */

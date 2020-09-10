@@ -6,6 +6,7 @@ import {AlertsService} from './Alerts.service';
 import {UserDataService} from './user-data.service';
 import {SearchFilters} from '../models/SearchFilters';
 import {Observable} from 'rxjs';
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 
 @Injectable({
   providedIn: 'root'
@@ -89,12 +90,11 @@ export class DressesService {
 
   }
 
-
   // Load single dress
   async loadDress(id: string) : Promise<Dress> {
     try {
-      const snapshot = await this.dressesRef.doc(id).get();
-      return new Dress(snapshot.data() as DressProps);
+      const props = (await this.dressesRef.doc(id).get()).data();
+      return new Dress(props);
     }
     catch (e) {
       this.alertsService.notice('Could not find dress', 'Error');

@@ -21,6 +21,10 @@ export class LeavePurchaseGuard implements CanDeactivate<PurchasePage> {
     nextState: RouterStateSnapshot
   ): Promise<boolean> {
 
+    // Allow leave after authorization
+    if(component && component.canLeave)
+      return true;
+
     const answer = await this.alertService.areYouSure('Leave purchase process?','','Leave', 'Stay');
     await this.alertService.alertCtrl.dismiss();
     this.alertService.alertCtrl.dismiss().catch(()=>{});

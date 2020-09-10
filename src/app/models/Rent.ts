@@ -1,4 +1,5 @@
 import {BaseModel, BaseModelProps} from './BaseModel';
+import {IUnitAmount} from 'ngx-paypal';
 
 export enum RentStatus {
   PAST = 0,
@@ -12,7 +13,10 @@ export interface RentDoc extends BaseModelProps {
   dressId?: string;
   renterId?: string;
   ownerId?: string;
+  price?: IUnitAmount;
+  deposit?: IUnitAmount;
   status?: RentStatus;
+  timestamp?: number;
 }
 
 export class Rent extends BaseModel implements RentDoc {

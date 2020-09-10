@@ -13,7 +13,6 @@ import {ChatOpenerService} from '../chat-modal/chat-opener.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
 import {DefaultUserImage} from '../Utils/Images';
-import {CountriesUtil} from '../Utils/CountriesUtil';
 
 @Component({
   selector: 'app-edit-profile',

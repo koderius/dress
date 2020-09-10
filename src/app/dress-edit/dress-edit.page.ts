@@ -16,6 +16,8 @@ import {Rent} from '../models/Rent';
 import {RentService} from '../services/rent.service';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
+import {PaypalService} from '../services/paypal.service';
+import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-dress-edit',
@@ -66,6 +68,8 @@ export class DressEditPage implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private userData: UserDataService,
     private rentService: RentService,
+    private paypalService: PaypalService,
+    private appCurrency: AppCurrencyPipe,
   ) { }
 
   ngOnInit() {
@@ -119,6 +123,24 @@ export class DressEditPage implements OnInit, OnDestroy {
   }
 
 
+  async declareReturn() {
+    if(await this.alertsService.areYouSure(
+      'The dress has been returned',
+      'By approving, you declare that the dress has been returned to you without any damage. The customer will get his deposit back.',
+      'Approve', 'Cancel')
+    ) {
+      this.alertsService.showLoader('Processing...');
+      if(await this.rentService.declareReturned(this.rentData.id)) {
+        this.alertsService.notice('Rent ended');
+        this.dress.status = DressStatus.OPEN;
+      }
+      else
+        this.alertsService.notice('Declare return failed', 'Error');
+      this.alertsService.dismissLoader();
+    }
+  }
+
+
   editClicked(ev) {
     const inputEl = ev.target.parentElement.getElementsByTagName('input')[0];
     // inputEl.parentElement.setAttribute('readonly', false);
@@ -127,6 +149,26 @@ export class DressEditPage implements OnInit, OnDestroy {
     }, 200);
   }
 
+  setDeposit() {
+    if(this.dress)
+      this.dress.deposit = this.paypalService.calcDeposit(this.dress.price);
+  }
+
+  showDepositDetails() {
+    const data = this.paypalService.depositData;
+    let text = '';
+    Object.keys(data).forEach((upperPrice, i, arr)=>{
+      if(upperPrice == 'high')
+        text += `<li>> ${this.appCurrency.transform(arr[i-1])} - ${data[upperPrice] * 100}%</li>`;
+      else
+        text += `<li>Up to ${this.appCurrency.transform(upperPrice)} - ${data[upperPrice] * 100}%</li>`;
+    });
+    this.alertsService.notice(
+      'The deposit is being defined according to the price:',
+      'Deposit info',
+      `<ul>${text}</ul>`
+    );
+  }
 
   async openColorPicker(input: IonInput) {
     const el = await input.getInputElement();

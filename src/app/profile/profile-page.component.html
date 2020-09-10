@@ -51,9 +51,14 @@
 
       <ion-item>
         <ion-label position="floating" color="light">Country</ion-label>
-        <ion-input [(ngModel)]="country.input"
-                   [pattern]="countryNamePattern"
+        <ion-input [(ngModel)]="userDoc.country"
+                   [pattern]="getPattern(!!userCountry)"
         ></ion-input>
+        <ion-note slot="end">{{userCountry?.alpha2Code}}</ion-note>
+        <ion-icon slot="end" *ngIf="userDoc.country" style="align-self: center"
+                  [color]="userCountry ? 'success' : 'danger'"
+                  [name]="userCountry ? 'checkmark-circle' : 'close-circle'"
+        ></ion-icon>
 <!--        <ion-icon *ngIf="country.getCountry()" slot="end" [src]="country.getCountry().flag" class="flag"></ion-icon>-->
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
@@ -62,9 +67,14 @@
 
       <ion-item>
         <ion-label position="floating" color="light">Phone</ion-label>
-        <ion-input type="tel" [(ngModel)]="phoneNum.phone"
-                   [pattern]="phoneNumPattern"
+        <ion-input type="tel" [(ngModel)]="userDoc.phoneNumber"
+                   [pattern]="getPattern(!!userPhone)"
         ></ion-input>
+        <ion-note slot="end">{{userPhoneCountry}}</ion-note>
+        <ion-icon slot="end" *ngIf="userDoc.phoneNumber" style="align-self: center"
+                  [color]="userPhone ? 'success' : 'danger'"
+                  [name]="userPhone ? 'checkmark-circle' : 'close-circle'"
+        ></ion-icon>
         <ion-button slot="end" fill="clear" shape="round" (click)="editClicked($event)">
           <ion-icon src="../../assets/svg/icon_edit2.svg" slot="icon-only"></ion-icon>
         </ion-button>
@@ -110,6 +120,25 @@
     <ion-item-group>
 
       <ion-list-header>
+        <ion-title>Payment Details</ion-title>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="https://www.paypalobjects.com/webstatic/developer/favicons/pp32.png">
+        </ion-avatar>
+        <ion-label position="floating" color="light">PayPal account</ion-label>
+        <ion-input [(ngModel)]="userDoc.paypalEmail" type="email" [pattern]="EmailRegex"></ion-input>
+        <ion-button slot="end" fill="clear" shape="round" (click)="showPaypalInfo()">
+          <ion-icon name="help-circle-outline" color="dark" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+    </ion-item-group>
+
+    <ion-item-group>
+
+      <ion-list-header>
         <ion-title>My Orders</ion-title>
       </ion-list-header>
 
@@ -117,11 +146,11 @@
         <ion-label color="light"><i>No orders yet...</i></ion-label>
       </ion-item>
 
-      <ion-row id="orders-row">
-        <ion-col size="6" *ngFor="let order of myRents">
-
-        </ion-col>
-      </ion-row>
+      <ion-slides [options]="dressSliderOptions">
+        <ion-slide *ngFor="let dress of myOrders">
+          <app-dress-card [dress]="dress"></app-dress-card>
+        </ion-slide>
+      </ion-slides>
 
     </ion-item-group>
 

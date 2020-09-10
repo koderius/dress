@@ -8,6 +8,7 @@ import { PurchasePageRoutingModule } from './purchase-routing.module';
 
 import { PurchasePage } from './purchase.page';
 import {ComponentsModule} from '../components/components.module';
+import {NgxPayPalModule} from 'ngx-paypal';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import {ComponentsModule} from '../components/components.module';
     FormsModule,
     IonicModule,
     PurchasePageRoutingModule,
-    ComponentsModule
+    ComponentsModule,
+    NgxPayPalModule,
   ],
   declarations: [PurchasePage]
 })

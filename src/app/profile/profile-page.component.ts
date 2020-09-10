@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {AlertsService} from '../services/Alerts.service';
-import {DressSize} from '../models/Dress';
+import {Dress, DressSize} from '../models/Dress';
 import {ObjectsUtil} from '../Utils/ObjectsUtil';
 import {DefaultUserImage} from '../Utils/Images';
 import {PhotoPopoverCtrlService} from '../components/photo-popover/photo-popover-ctrl.service';
@@ -9,8 +9,11 @@ import {FilesUploaderService} from '../services/files-uploader.service';
 import {Rent} from '../models/Rent';
 import {UserDataService} from '../services/user-data.service';
 import {UserDoc} from '../models/User';
-import {TelephoneUtil} from '../Utils/TelephoneUtil';
-import {CountriesUtil} from '../Utils/CountriesUtil';
+import {CountryPipe} from '../pipes/country.pipe';
+import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
+import {RentService} from '../services/rent.service';
+import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
+import {DressesService} from '../services/dresses.service';
 
 @Component({
   selector: 'app-profile',
@@ -19,23 +22,36 @@ import {CountriesUtil} from '../Utils/CountriesUtil';
 })
 export class ProfilePage implements OnInit{
 
+  EmailRegex = AuthService.EMAIL_REGEX;
+
   DefaultUserImage = DefaultUserImage;
+
+  first: boolean = true;
 
   userDoc: UserDoc;
 
   myRents: Rent[] = [];
+  myOrders: Dress[] = [];
 
   DressSizes = DressSize;
 
-  phoneNum: TelephoneUtil;
-  country: CountriesUtil;
+  dressSliderOptions = {slidesPerView: ScreenSizeUtil.CalcScreenSizeFactor() * 2 + 0.25};
 
-  get phoneNumPattern() {
-    return this.phoneNum.isValid() ? '.*?' : '^\w{0,0}$';
+  get userCountry() {
+    return CountryPipe.GetCountryByText(this.userDoc.country);
   }
 
-  get countryNamePattern() {
-    return this.country.hasValidCountry() ? '.*?' : '^\w{0,0}$';
+  get userPhone() {
+    return PhoneNumberPipe.GetPhoneNumber(this.userDoc.phoneNumber, this.userCountry ? this.userCountry.alpha2Code : null);
+  }
+
+  get userPhoneCountry() {
+    if(this.userPhone)
+      return PhoneNumberPipe.GetCountryCode(this.userPhone);
+  }
+
+  getPattern(valid: boolean) {
+    return valid ? '.*?' : '^\w{0,0}$';
   }
 
   constructor(
@@ -44,26 +60,40 @@ export class ProfilePage implements OnInit{
     private alertService: AlertsService,
     private photoPopover: PhotoPopoverCtrlService,
     private fileUploader: FilesUploaderService,
+    private rentsService: RentService,
+    public dressService: DressesService,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // Get copy of user document
     this.userDoc = this.userData.currentUser;
 
-    this.phoneNum = new TelephoneUtil(this.userDoc.phoneNumber, this.userDoc.country);
-    this.country = new CountriesUtil(this.userDoc.country);
+    // Show the country's name (The saved value is the country's code)
+    if(this.userDoc.country)
+      this.userDoc.country = this.userCountry.name;
+
+    // Get default paypal email
+    if(!this.userDoc.paypalEmail)
+      this.userDoc.paypalEmail = this.userDoc.email;
+
+    this.myRents = await this.rentsService.getMyRents();
+    this.myOrders.splice(0);
+    this.myRents.forEach(async (rent)=>{
+      this.myOrders.push(await this.dressService.loadDress(rent.dressId));
+    });
 
   }
 
   ionViewDidEnter() {
-    this.ngOnInit();
+    if(!this.first)
+      this.ngOnInit();
+    this.first = false;
   }
 
+  // Check whether there are changes in the user's fields. Do not consider equivalent country and phone values.
   hasChanges() {
-    return !ObjectsUtil.SameValues({...this.userDoc}, this.userData.currentUser) ||
-      (this.country.country && this.country.country.alpha2Code) != this.userDoc.country ||
-      this.phoneNum.toString() != (this.userDoc.phoneNumber || '');
+    return !ObjectsUtil.SameValues(this.convertUserData(), this.userData.currentUser);
   }
 
   editClicked(ev) {
@@ -74,17 +104,22 @@ export class ProfilePage implements OnInit{
     }, 200);
   }
 
+  convertUserData() : UserDoc {
+    // Format country and phone
+    return {
+      ...this.userDoc,
+      phoneNumber: PhoneNumberPipe.PhoneToString(this.userPhone),
+      country: this.userCountry ? this.userCountry.alpha2Code : '',
+    };
+  }
+
   async saveChanges() {
-    if(this.phoneNum.phone && !this.phoneNum.isValid())
+    if(this.userDoc.phoneNumber && !this.userPhone)
       return this.alertService.notice('Invalid phone number', 'Input Error');
-    else
-      this.userDoc.phoneNumber = this.phoneNum.toString();
-    if(this.country && !this.country.hasValidCountry())
+    if(this.userDoc.country && !this.userCountry)
       return this.alertService.notice('Unknown country', 'Input Error');
-    else
-      this.userDoc.country = this.country.country.alpha2Code;
     this.alertService.showLoader('Saving...');
-    await this.userData.editUserDocument({...this.userDoc});
+    await this.userData.editUserDocument(this.convertUserData());
     this.ngOnInit();
     this.alertService.dismissLoader();
   }
@@ -143,6 +178,14 @@ export class ProfilePage implements OnInit{
       await this.authService.sendResetPasswordEmail(this.userDoc.email);
       this.alertService.notice('Email has been sent. Check your inbox');
     }
+  }
+
+  showPaypalInfo() {
+    this.alertService.notice(
+      'Enter the email address which is linked to your PayPal account',
+      'PayPal account',
+      'You must have an account linked to your profile in order to get payments'
+    )
   }
 
 }

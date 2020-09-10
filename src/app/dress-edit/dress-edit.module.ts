@@ -8,6 +8,7 @@ import { DressEditPageRoutingModule } from './dress-edit-routing.module';
 
 import { DressEditPage } from './dress-edit.page';
 import {ComponentsModule} from '../components/components.module';
+import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import {ComponentsModule} from '../components/components.module';
     DressEditPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [DressEditPage]
+  declarations: [DressEditPage],
+  providers: [AppCurrencyPipe]
 })
 export class DressEditPageModule {}

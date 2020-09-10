@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AuthService} from './auth.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -6,35 +6,26 @@ import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {AlertsService} from './Alerts.service';
 import {FirebaseError, User} from 'firebase';
 import {UserDoc} from '../models/User';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserDataService {
 
-  public userDocRef(uid: string = this._currentUser && this._currentUser.uid) {
+  public userDocRef(uid: string = this.currentUser && this.currentUser.uid) {
     if(uid)
       return firebase.firestore().collection('users').doc(uid);
   }
 
   private unsubFn: ()=>void;
 
-  private _currentUser: UserDoc | null;
-  private onCurrentUser = new EventEmitter<UserDoc | null>();
-
-  get currentUser() : UserDoc | null {
-    return this._currentUser ? {...this._currentUser} : null;
-  }
-
   /** Observe the (verified) user document */
-  userDoc$ = new Observable<UserDoc | null>(subscriber => {
-    if(this._currentUser !== undefined)
-      subscriber.next(this.currentUser);
-    subscriber.add(this.onCurrentUser.subscribe(()=>{
-      subscriber.next(this.currentUser);
-    }));
-  });
+  private _userDoc = new BehaviorSubject<UserDoc | null | undefined>(undefined);
+  readonly userDoc$ = this._userDoc.asObservable();
+  get currentUser() : UserDoc | null | undefined {
+    return {...this._userDoc.getValue()};
+  }
 
   constructor(
     private alertService: AlertsService,
@@ -48,17 +39,14 @@ export class UserDataService {
       if(user && user.emailVerified) {
         this.unsubFn = this.userDocRef(user.uid).onSnapshot(async (snapshot: DocumentSnapshot<UserDoc>) => {
           if(snapshot.exists)
-            this._currentUser = snapshot.data();
-          else {
-            this._currentUser = await this.createUserDocument();
-          }
-          this.onCurrentUser.emit(this._currentUser);
+            this._userDoc.next(snapshot.data() as UserDoc);
+          else
+            this._userDoc.next(await this.createUserDocument());
+          console.log('User document loaded', this.currentUser);
         }, (e: FirebaseError) => this.errorMsg(e));
       }
-      else {
-        this._currentUser = null;
-        this.onCurrentUser.emit(null);
-      }
+      else if(user !== undefined)
+        this._userDoc.next(null);
     });
 
   }
@@ -68,8 +56,8 @@ export class UserDataService {
   If UID is not provided, or same as logged user ID, get the current user.
   */
   async getUserDoc(uid?: string) : Promise<UserDoc | null> {
-    if((this._currentUser && this._currentUser.uid == uid) || !uid)
-      return this._currentUser;
+    if((this.currentUser && this.currentUser.uid == uid) || !uid)
+      return this.currentUser;
     else {
       const snapshot: DocumentSnapshot<UserDoc> | void = await this.userDocRef(uid).get()
         .catch((e: FirebaseError) => this.errorMsg(e));

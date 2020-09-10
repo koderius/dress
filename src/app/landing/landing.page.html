@@ -4,7 +4,7 @@
     <ion-img src="../../assets/logo/logo_large.png"></ion-img>
   </div>
 
-  <div id="inner">
+  <div id="inner" *ngIf="hasAuthLoaded">
 
     <div *ngIf="pageStatus == PageStatus.LANDING">
 

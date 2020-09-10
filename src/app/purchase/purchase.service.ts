@@ -21,8 +21,6 @@ export class PurchaseService {
     return {...this._owner};
   }
 
-  private shippingAddress: UserDoc;
-
   constructor(
     private navCtrl: NavController,
     private dressService: DressesService,
@@ -46,19 +44,6 @@ export class PurchaseService {
 
   stopPurchase() {
     this._dressToRent = null;
-  }
-
-  setShippingAddress(shipping: UserDoc) : boolean {
-    // TODO: Check all required data
-    const valid = true;
-    if(valid)
-      this.shippingAddress = shipping;
-    return valid;
-  }
-
-  async setOrder() : Promise<boolean> {
-    // TODO
-    return true;
   }
 
 }

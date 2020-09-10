@@ -11,7 +11,7 @@
     </ion-list-header>
 
     <div class="gallery-grid">
-      <div *ngFor="let c of categoryService.allCategories" class="category" (click)="filterByCategory(c.id)">
+      <div *ngFor="let c of categories()" class="category" (click)="filterByCategory(c.id)">
         <img [src]="c.image" [alt]="c.title">
         <p>{{c.title}}</p>
       </div>
