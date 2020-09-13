@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="navService.back()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Write review</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="feedbacks.length">
+
+  <p class="ion-margin">
+    Write review about your experience
+  </p>
+
+  <ion-list inset>
+
+    <ion-item-group class="ion-margin-vertical" *ngFor="let feedbackUI of feedbacks">
+
+      <ion-item lines="none">
+        <ion-thumbnail slot="start" (click)="goTo(feedbackUI.dressOrUser)">
+          <img [src]="feedbackUI.dressOrUser.photo || feedbackUI.dressOrUser.photoURL || DefaultUserImage">
+        </ion-thumbnail>
+        <ion-label>
+          <h2>Write feedback about the {{feedbackUI.nameText}}, <strong>{{feedbackUI.dressOrUser.displayName || feedbackUI.dressOrUser.name}}</strong></h2>
+          <p *ngIf="feedbackUI.exists">
+            * You have already written a feedback about this {{feedbackUI.nameText}}. You can change it, or just keep it the same.
+          </p>
+        </ion-label>
+      </ion-item>
+
+      <div class="my-review">
+        <ion-label>Your rating</ion-label>
+        <app-stars [selectable]="true" [rank]="feedbackUI.feedback.rank" (selected)="feedbackUI.feedback.rank = $event"></app-stars>
+        <ion-input placeholder="Title" maxlength="15" [(ngModel)]="feedbackUI.feedback.title"></ion-input>
+        <ion-textarea placeholder="Your Feedback" [(ngModel)]="feedbackUI.feedback.text"></ion-textarea>
+      </div>
+
+    </ion-item-group>
+
+    <ion-item-group class="my-review">
+
+      <div>
+        <ion-label>
+          <h2>Anything else we should know?</h2>
+          <p>Shared only with us, will not be visible to the dress owner</p>
+        </ion-label>
+        <ion-textarea placeholder="Your comment..." [(ngModel)]="otherComment"></ion-textarea>
+      </div>
+
+    </ion-item-group>
+
+    <ion-button color="dark" shape="round" expand="block" (click)="sendFeedback()">Confirm</ion-button>
+
+  </ion-list>
+
+</ion-content>

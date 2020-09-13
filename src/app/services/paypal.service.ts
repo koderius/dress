@@ -17,7 +17,7 @@ type PaymentMetadata = {
 })
 export class PaypalService {
 
-  private readonly metadataRef = firebase.firestore().collection('payments').doc('metadata');
+  private readonly metadataRef = firebase.firestore().collection('app').doc('payments');
 
   private metadata: PaymentMetadata;
   get depositData() {

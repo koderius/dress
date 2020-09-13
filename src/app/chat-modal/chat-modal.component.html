@@ -25,7 +25,7 @@
         </div>
         <div *ngIf="msg.dress">
           <p class="msg-meta">Interested in:</p>
-          <app-dress-card [dress]="msg.dress" (checkClicked)="close()"></app-dress-card>
+          <app-dress-card [dress]="msg.dress" (btnClicked)="close()"></app-dress-card>
           <p class="msg-meta">* Shown details are correct to the<br>time of the message</p>
         </div>
         <div #unreadFromHere *ngIf="msg.timestamp == lastRead"></div>

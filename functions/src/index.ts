@@ -7,6 +7,7 @@ import {RentDoc} from '../../src/app/models/Rent';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {payDepositBack, payForRent} from './paymentFunctions';
 import {sendEmailToSupport} from './EmailFunctions';
+import {UserDoc} from '../../src/app/models/User';
 
 
 // // Start writing Firebase Functions
@@ -216,8 +217,10 @@ export const approveDressBack = functions.https.onCall(async (rentId: string, co
  * Send custom email to the support team
  */
 export const reportToSupport = functions.https.onCall(async (data: {subject: string, text: string}, context) => {
+  const user = (await admin.firestore().collection('users').doc(context.auth.uid).get()).data() as UserDoc;
   await sendEmailToSupport(
     data.subject + ' (Sent from app)',
-    `${data.text}<br><br>Sent by user ID: ${context.auth.uid}`
+    `${data.text}\n\nSent by ${user.fullName} (${user.displayName}, ID: ${user.uid})
+    User email: ${user.email}\nUser phone: ${user.phoneNumber || 'none'}`
   );
 });

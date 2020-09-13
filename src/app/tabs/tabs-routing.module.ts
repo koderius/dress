@@ -51,6 +51,10 @@ const routes: Routes = [
         canDeactivate: [LeavePurchaseGuard]
       },
       {
+        path: 'feedback',
+        loadChildren: () => import('../dress-feedback/dress-feedback.module').then(m => m.DressFeedbackPageModule)
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'

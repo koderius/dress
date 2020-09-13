@@ -14,11 +14,11 @@
       <ion-text class="ion-float-end">{{dress.country | country}}</ion-text>
     </div>
 
-    <div>
-      <ion-text id="dates-text">Available Dates <br>{{(dress.fromDate | date : 'dd/MM/yy')}} - {{(dress.toDate | date : 'dd/MM/yy')}}</ion-text>
-    </div>
+<!--    <div>-->
+<!--      <ion-text id="dates-text">Available Dates <br>{{(dress.fromDate | date : 'dd/MM/yy')}} - {{(dress.toDate | date : 'dd/MM/yy')}}</ion-text>-->
+<!--    </div>-->
 
-    <ion-button color="secondary" shape="round" class="normal-btn" (click)="viewDress()">Check It</ion-button>
+    <ion-button color="secondary" shape="round" class="normal-btn" (click)="viewDress()">{{btnText}}</ion-button>
 
   </ion-card-content>
 

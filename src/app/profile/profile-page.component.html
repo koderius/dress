@@ -10,6 +10,7 @@
 
       <ion-list-header>
         <ion-title>Profile</ion-title>
+        <ion-button strong (click)="goToView()">View</ion-button>
       </ion-list-header>
 
       <ion-item>
@@ -147,8 +148,13 @@
       </ion-item>
 
       <ion-slides [options]="dressSliderOptions">
-        <ion-slide *ngFor="let dress of myOrders">
-          <app-dress-card [dress]="dress"></app-dress-card>
+        <ion-slide *ngFor="let rent of myRents; let i = index">
+          <app-dress-card
+                  [dress]="myOrders[i]"
+                  btnText="My review"
+                  [goToDressView]="false"
+                  (btnClicked)="goToDressRank(rent.id)"
+          ></app-dress-card>
         </ion-slide>
       </ion-slides>
 

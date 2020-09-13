@@ -20,18 +20,12 @@ export class DressesService {
     .where('status', '==', DressStatus.OPEN)
     .orderBy('rank', 'desc');
 
-  private _dresses : DressProps[] = [];
-
   // All my dresses, split into drafts & non-drafts
   private _myDresses: DressProps[] = [];
   drafts: Dress[] = [];
   nonDrafts: Dress[] = [];
 
   private myDressesUnsubscribeFn: ()=>void;
-
-  get dresses() {
-    return this._dresses.map((d)=>new Dress(d));
-  }
 
   get myDresses() {
     return this._myDresses.map((d)=>new Dress(d));
@@ -41,19 +35,6 @@ export class DressesService {
     private userService: UserDataService,
     private alertsService: AlertsService,
   ) {
-
-    /** MOCK */
-    for (let i = 0; i < 4; i++)
-      this._dresses[i] ={
-        id: 'd'+i,
-        category: 'c1',
-        ranks: [132,43,123,563,123],
-        price: 230,
-        datesRange: [Date.now(), Date.now() + 12345678],
-        country: 'Israel',
-        photos: ['../../assets/MOCKs/dress.PNG'],
-      };
-
 
     // Start subscribing all my dresses
     this.userService.userDoc$.subscribe((user)=>{
@@ -137,24 +118,25 @@ export class DressesService {
 
     let ref = this.publicDressesRef;
 
-    // Filter by the first category
-    if(searchFilters.categories.length)
-      ref = ref.where('category', '==', searchFilters.categories.splice(0,1)[0]);
+    // Filter by countries (if less than 10)
+    if(searchFilters.countries.length && searchFilters.countries.length <= 10)
+      ref = ref.where('country', 'in', searchFilters.countries);
 
-    // Filter by the first country
-    if(searchFilters.countries.length)
-      ref = ref.where('country', '==', searchFilters.countries.splice(0,1)[0]);
+    // Or filter by categories
+    else if(searchFilters.categories.length && searchFilters.categories.length <= 10)
+      ref = ref.where('category', 'in', searchFilters.categories);
 
     // Filter by available dates? - todo
 
     const res = await ref.get();
     let dresses = res.docs.map((d)=>d.data()) as DressProps[];
 
-    // Filter the rest of the categories & countries in the front end
+    // Filter the categories & countries in the front end (in case not all filters were queried)
     if(searchFilters.categories.length)
-      dresses = dresses.filter((d)=>searchFilters.categories.slice(10).includes(d.category));
+      dresses = dresses.filter((d)=>searchFilters.categories.includes(d.category));
     if(searchFilters.countries.length)
-      dresses = dresses.filter((d)=>searchFilters.countries.slice(10).includes(d.country));
+      dresses = dresses.filter((d)=>searchFilters.countries.includes(d.country));
+
     // More fields (advanced)? - todo
 
     return dresses.map((d)=>new Dress(d));

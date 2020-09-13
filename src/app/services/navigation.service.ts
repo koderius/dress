@@ -60,4 +60,8 @@ export class NavigationService {
     return this.navCtrl.navigateForward('tabs/renter-profile/' + uid);
   }
 
+  feedback(rentId: string) {
+    return this.navCtrl.navigateForward('tabs/feedback/' + rentId);
+  }
+
 }

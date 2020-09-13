@@ -1,0 +1,19 @@
+.my-review {
+  margin: 1em 0 3em 0;
+  color: var(--ion-color-light);
+  ion-input, ion-textarea {
+    color: black;
+    --padding-top: 0.5em;
+    --padding-bottom: 0.5em;
+    border: solid var(--ion-color-light) 1px;
+    border-radius: 1em;
+  }
+  ion-input {
+    margin-top: 0.5em;
+    width: 40%;
+  }
+}
+
+ion-label > * {
+  white-space: normal;
+}

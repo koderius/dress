@@ -28,7 +28,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   /** Dresses to show as default */
   popular$: Observable<Dress[]> = this.dressService.mostPopular$(5);
-  forYou: Dress[] = this.dressService.dresses;
+  forYou: Dress[] = [];
   filteredDresses: Dress[] = [];
 
   get categories() {

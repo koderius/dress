@@ -24,8 +24,8 @@ export class FeedBacksService {
   ) {}
 
 
-  /** Get some user's (including current user) feed backs */
-  getFeedBacks(userOrDress: 'user' | 'dress', id: string, limit? : number) : Observable<FeedBack[]> {
+  /** Get some user's or dress's (including current user) feed backs */
+  feedBacks$(userOrDress: 'user' | 'dress', id: string, limit? : number) : Observable<FeedBack[]> {
 
     // Sort feed backs from latest to earliest
     const col = userOrDress == 'user' ? this.userFeedBacks(id) : this.dressFeedBacks(id);
@@ -46,6 +46,14 @@ export class FeedBacksService {
       console.error(e);
     }
 
+  }
+
+
+  /** Get the feedback the user wrote about some dress or other user */
+  async getMyFeedBack(userOrDress: 'user' | 'dress', id: string) : Promise<FeedBack> {
+    const col = userOrDress == 'user' ? this.userFeedBacks(id) : this.dressFeedBacks(id);
+    const snapshot = await col.doc(this.userService.currentUser.uid).get();
+    return snapshot.exists ? snapshot.data() as FeedBack : {};
   }
 
 

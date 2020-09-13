@@ -11,7 +11,11 @@ import {NavigationService} from '../../services/navigation.service';
 export class DressCardComponent implements OnInit {
 
   @Input() dress: Dress;
-  @Output() checkClicked = new EventEmitter<void>();
+
+  @Input() btnText = 'Check It';
+  @Input() goToDressView: boolean = true;
+
+  @Output() btnClicked = new EventEmitter<void>();
 
   constructor(
     private dressCategories: CategoriesService,
@@ -27,8 +31,9 @@ export class DressCardComponent implements OnInit {
   }
 
   viewDress() {
-    this.checkClicked.emit();
-    this.navService.dressView(this.dress.id);
+    this.btnClicked.emit();
+    if(this.goToDressView)
+      this.navService.dressView(this.dress.id);
   }
 
 

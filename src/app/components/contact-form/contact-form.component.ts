@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from 'firebase/app';
-import 'firebase/functions';
 import {ModalController} from '@ionic/angular';
 import {AlertsService} from '../../services/Alerts.service';
+import {CloudFunctions} from '../../../FirebaseCloudFunctions';
 
 enum Subjects {
   SUPPORT = 'Support',
@@ -34,14 +33,14 @@ export class ContactFormComponent implements OnInit {
   ngOnInit() {}
 
   async send() {
-    const fn = firebase.functions().httpsCallable('reportToSupport');
     const subject = this.subject == Subjects.OTHER
       ? (`${this.subject}: ${this.customSubject}`)
       : this.subject;
     this.alertService.showLoader('Sending...');
-    await fn({subject: subject, text: this.text});
+    await CloudFunctions.reportToSupport({subject: subject, text: this.text});
     this.alertService.dismissLoader();
-    this.alertService.notice('Your message has been sent to our support', 'Thanks!');
+    await this.alertService.notice('Your message has been sent to our support', 'Thanks!');
+    this.close();
   }
 
   close() {

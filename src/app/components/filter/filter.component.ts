@@ -50,6 +50,14 @@ export class FilterComponent implements OnInit, OnDestroy {
     this.unSub.unsubscribe();
   }
 
+  clearFilters() {
+    this.filters.clearFilters();
+    document.querySelectorAll('ion-checkbox').forEach((el)=>{
+      el.checked = false;
+    });
+    this.openedFilter = null;
+  }
+
   /** Get countries names list (using API) */
   refreshCountries(q = '') {
     q = q.toLowerCase();

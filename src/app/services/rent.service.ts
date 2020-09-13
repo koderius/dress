@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
-import 'firebase/functions';
 import {Rent, RentDoc, RentStatus} from '../models/Rent';
 import {AuthService} from './auth.service';
+import {CloudFunctions} from '../../FirebaseCloudFunctions';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,10 @@ export class RentService {
 
   getNewRefId() : string {
     return this.rentsRef.doc().id;
+  }
+
+  async getRentDoc(id: string) : Promise<RentDoc> {
+    return (await this.rentsRef.doc(id).get()).data() as RentDoc;
   }
 
   async getMyRents() : Promise<Rent[]> {
@@ -50,9 +54,8 @@ export class RentService {
   }
 
   async declareReturned(rentId: string) : Promise<boolean> {
-    const fn = firebase.functions().httpsCallable('approveDressBack');
     try {
-      await fn(rentId);
+      await CloudFunctions.approveDressBack(rentId);
       return true;
     }
     catch (e) {

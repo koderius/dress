@@ -1,13 +1,13 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import 'firebase/functions';
 import {FirebaseError, User} from 'firebase';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 import {AlertsService} from './Alerts.service';
 import {UserDoc} from '../models/User';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {CloudFunctions} from '../../FirebaseCloudFunctions';
 
 /**
  * This service is used for authentication actions.
@@ -203,9 +203,8 @@ export class AuthService {
   /** Call cloud function for verifying external providers (i.e facebook) that do not auto verify */
   private async checkProviderVerification(user: User, retry?: boolean) : Promise<void> {
     if(user && !user.emailVerified && user.providerId != 'password') {
-      const verifyEmail = firebase.functions().httpsCallable('tryVerifyUserEmail');
       console.log('Try verifying external auth provider...', retry ? 'retry...' : '');
-      const r = await verifyEmail();
+      const r = await CloudFunctions.tryVerifyUserEmail();
       if(r)
         await user.reload();
       else if(!retry)

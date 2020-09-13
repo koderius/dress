@@ -14,6 +14,7 @@ import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
 import {RentService} from '../services/rent.service';
 import {ScreenSizeUtil} from '../Utils/ScreenSizeUtil';
 import {DressesService} from '../services/dresses.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-profile',
@@ -62,6 +63,7 @@ export class ProfilePage implements OnInit{
     private fileUploader: FilesUploaderService,
     private rentsService: RentService,
     public dressService: DressesService,
+    private navService: NavigationService,
   ) {}
 
   async ngOnInit() {
@@ -94,6 +96,10 @@ export class ProfilePage implements OnInit{
   // Check whether there are changes in the user's fields. Do not consider equivalent country and phone values.
   hasChanges() {
     return !ObjectsUtil.SameValues(this.convertUserData(), this.userData.currentUser);
+  }
+
+  goToView() {
+    this.navService.renterView(this.userDoc.uid);
   }
 
   editClicked(ev) {
@@ -186,6 +192,10 @@ export class ProfilePage implements OnInit{
       'PayPal account',
       'You must have an account linked to your profile in order to get payments'
     )
+  }
+
+  goToDressRank(rentId: string) {
+    this.navService.feedback(rentId);
   }
 
 }

@@ -61,22 +61,22 @@
 
   <ion-list class="app-list" *ngIf="!isMe()">
 
-    <ion-item-group>
+<!--    <ion-item-group>-->
 
-      <ion-label>
-        <h2>Leave Feedback</h2>
-        <p *ngIf="!isSignedIn()">(For leaving a feedback you must be <a><b>signed in</b></a>)</p>
-      </ion-label>
+<!--      <ion-label>-->
+<!--        <h2>Leave Feedback</h2>-->
+<!--        <p *ngIf="!isSignedIn()">(For leaving a feedback you must be <a><b>signed in</b></a>)</p>-->
+<!--      </ion-label>-->
 
-      <div id="my-review">
-        <ion-label>Your rating</ion-label>
-        <app-stars [selectable]="true" (selected)="myFeedBack.rank = $event"></app-stars>
-        <ion-input placeholder="Title" [(ngModel)]="myFeedBack.title"></ion-input>
-        <ion-textarea placeholder="Your Feedback" [(ngModel)]="myFeedBack.text"></ion-textarea>
-        <ion-button color="dark" shape="round" size="small" class="ion-float-end" (click)="sendFeedBack()">Confirm</ion-button>
-      </div>
+<!--      <div id="my-review">-->
+<!--        <ion-label>Your rating</ion-label>-->
+<!--        <app-stars [selectable]="true" (selected)="myFeedBack.rank = $event"></app-stars>-->
+<!--        <ion-input placeholder="Title" [(ngModel)]="myFeedBack.title"></ion-input>-->
+<!--        <ion-textarea placeholder="Your Feedback" [(ngModel)]="myFeedBack.text"></ion-textarea>-->
+<!--        <ion-button color="dark" shape="round" size="small" class="ion-float-end" (click)="sendFeedBack()">Confirm</ion-button>-->
+<!--      </div>-->
 
-    </ion-item-group>
+<!--    </ion-item-group>-->
 
     <ion-row>
       <ion-button color="secondary" shape="round" class="normal-btn" style="margin: 1em auto"
