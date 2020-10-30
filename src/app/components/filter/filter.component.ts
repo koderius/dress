@@ -84,6 +84,17 @@ export class FilterComponent implements OnInit, OnDestroy {
       list.splice(list.indexOf(id), 1);
   }
 
+  checkSize(size: string, checked: boolean) {
+    if(checked) {
+      this.filters.size.push(size);
+    } else {
+      const idx = this.filters.size.indexOf(size);
+      if(idx > -1) {
+        this.filters.size.splice(idx, 1);
+      }
+    }
+  }
+
   /** Start filtering according to the selected filters (by navigating to home page under 'search' segment with query parameters */
   findDressClicked() {
     if(this.filters.hasFilters)

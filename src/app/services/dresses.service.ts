@@ -6,6 +6,7 @@ import {AlertsService} from './Alerts.service';
 import {UserDataService} from './user-data.service';
 import {SearchFilters} from '../models/SearchFilters';
 import {Observable} from 'rxjs';
+import {Colors} from '../Utils/Colors';
 
 @Injectable({
   providedIn: 'root'
@@ -137,6 +138,16 @@ export class DressesService {
       dresses = dresses.filter((d)=>searchFilters.countries.includes(d.country));
 
     // More fields (advanced)? - todo
+    if(searchFilters.size.length)
+      dresses = dresses.filter(d => searchFilters.size.includes(d.size));
+    if(searchFilters.style)
+      dresses = dresses.filter(d => d.style.toLowerCase().includes(searchFilters.style.toLowerCase()));
+    if(searchFilters.fromPrice)
+      dresses = dresses.filter(d => d.price >= searchFilters.fromPrice);
+    if(searchFilters.toPrice)
+      dresses = dresses.filter(d => d.price <= searchFilters.toPrice);
+    if(searchFilters.color)
+      dresses = dresses.filter(d => Colors.IsSimilar(d.color, searchFilters.color));
 
     return dresses.map((d)=>new Dress(d));
 
