@@ -77,7 +77,7 @@
 
   </ion-list>
 
-  <ion-list class="app-list">
+  <ion-list class="app-list" *ngIf="dress">
 
     <ion-list-header>
       <ion-title>Dress Description</ion-title>
@@ -195,19 +195,7 @@
       </ion-button>
     </ion-item>
 
-    <ion-item>
-      <ion-label position="stacked" color="light">* Color</ion-label>
-      <ion-input [(ngModel)]="dress.color" required placeholder="ex: '#ffa500' or 'orange'"></ion-input>
-      <ion-input type="color" class="ion-hide" #colorPicker [(ngModel)]="dress.color"></ion-input>
-      <ion-note slot="end">
-        Click to pick
-        <ion-icon name="arrow-forward" style="vertical-align: bottom"></ion-icon>
-      </ion-note>
-      <ion-avatar slot="end" class="color-avatar"
-                  [ngStyle]="{backgroundColor: dress.color}"
-                  (click)="openColorPicker(colorPicker)"
-      ></ion-avatar>
-    </ion-item>
+    <app-color-picker label="* Color" [(ngModel)]="dress.color" name="color" ngDefaultControl></app-color-picker>
 
     <ion-row>
       <ion-button shape="round" color="secondary" class="normal-btn" id="photos-btn" (click)="inputImage.click()">Upload Photos</ion-button>

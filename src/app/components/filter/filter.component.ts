@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CategoriesService} from '../../services/categories.service';
-import {DressCategory} from '../../models/Dress';
+import {DressCategory, DressSize} from '../../models/Dress';
 import {ActivatedRoute} from '@angular/router';
 import {SearchFilters} from '../../models/SearchFilters';
 import {NavigationService} from '../../services/navigation.service';
@@ -18,6 +18,16 @@ export class FilterComponent implements OnInit, OnDestroy {
 
   /** The opened filter list type (null if nothing is opened) */
   openedFilter: string;
+
+  /** The opened criteria inside the advanced filter */
+  openedStyle: boolean;
+  openedSize: boolean;
+  openedColor: boolean;
+  openedPrice: boolean;
+
+  get sizes() {
+    return DressSize.filter(s => !!s);
+  }
 
   /** All the categories to choose from */
   get categories() : DressCategory[] {

@@ -19,7 +19,7 @@ import {PaypalService} from '../services/paypal.service';
   templateUrl: './purchase.page.html',
   styleUrls: ['./purchase.page.scss'],
 })
-export class PurchasePage implements OnInit, OnDestroy {
+export class PurchasePage implements OnInit {
 
   DefaultUserImage = DefaultUserImage;
 
@@ -33,9 +33,6 @@ export class PurchasePage implements OnInit, OnDestroy {
 
   paypalConfig: IPayPalConfig;
 
-  paymentSub: Subscription;
-
-  canLeave: boolean;
 
   constructor(
     private userService: UserDataService,
@@ -52,7 +49,7 @@ export class PurchasePage implements OnInit, OnDestroy {
   }
 
   private async navToStep(step: number) {
-    await this.navCtrl.navigateForward(['../' + step], {relativeTo: this.activatedRoute});
+    await this.navCtrl.navigateForward('tabs/purchase/' + step);
   }
 
   async ngOnInit() {
@@ -60,17 +57,21 @@ export class PurchasePage implements OnInit, OnDestroy {
     this.dress = this.purchaseService.dressToRent;
     this.owner = this.purchaseService.owner;
     // Set the PayPal buttons configurations
-    this.paypalConfig = await this.paypalService.paypalInit(this.dress);
+    this.paypalConfig = await this.paypalService.cratePayment(this.dress);
     // Listen to payment authorization
-    this.paymentSub = this.paypalService.onPaymentAuthorized.pipe(first()).subscribe(async ()=>{
-      await this.alertsService.notice('Payment authorized!');
-      this.canLeave = true;
-      this.navService.home();
+    this.paypalConfig.onApprove = ((data, actions) => {
+      console.log(data, actions);
+      this.alertsService.showLoader('Authorizing...');
     });
-  }
-
-  ngOnDestroy() {
-    this.paymentSub.unsubscribe();
+    this.paypalConfig.onError = (err => {
+      console.error(err);
+      this.alertsService.dismissLoader();
+    });
+    this.paypalConfig.onClientAuthorization = async () => {
+      this.alertsService.dismissLoader();
+      await this.alertsService.notice('Payment authorized!');
+      this.navService.home();
+    };
   }
 
   confirmStep1() {

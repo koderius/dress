@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ICreateOrderRequest, IPayPalConfig} from 'ngx-paypal';
 import {Dress} from '../models/Dress';
 import * as firebase from 'firebase/app';
@@ -6,6 +6,7 @@ import 'firebase/firestore';
 import {UserDataService} from './user-data.service';
 import {RentService} from './rent.service';
 import {CountryPipe} from '../pipes/country.pipe';
+import {AppIdentifier, PaypalClient} from '../../../functions/src/keys';
 
 type PaymentMetadata = {
   handling: number,
@@ -24,12 +25,16 @@ export class PaypalService {
     return {...this.metadata.deposit};
   }
 
-  onPaymentAuthorized = new EventEmitter();
-
   constructor(
     private userService: UserDataService,
     private rentService: RentService,
   ) {}
+
+  init() {
+    this.metadataRef.onSnapshot(snapshot => {
+      this.metadata = snapshot.data() as PaymentMetadata;
+    });
+  }
 
   get payer() {
     return this.userService.currentUser;
@@ -43,10 +48,7 @@ export class PaypalService {
   }
 
 
-  async paypalInit(dress: Dress) : Promise<IPayPalConfig> {
-
-    // Load payment metadata
-    this.metadata = (await this.metadataRef.get()).data() as PaymentMetadata;
+  async cratePayment(dress: Dress) : Promise<IPayPalConfig> {
 
     // Make sure deposit is updated
     dress.deposit = this.calcDeposit(dress.price);
@@ -54,10 +56,18 @@ export class PaypalService {
     // User name
     const names = this.payer.fullName.split(' ').map((n)=>n.trim()).filter((v)=>v);
 
+    const refId: string = [
+      AppIdentifier,
+      dress.id,
+      this.payer.uid
+    ].join('_');
+
     return {
-      clientId: 'AZZLGDyUK3qag64YzcX18WYTIuywQkJGWFsGDpDSR8NQz5CifH81SfuthYuad4SEROhJsDMuEG6Xwdan',
+      clientId: PaypalClient,
       currency: 'USD',
       createOrderOnClient: data => <ICreateOrderRequest> {
+
+        // Payer default details => user details
         payer: {
           name: {
             given_name: names[0] || '',
@@ -72,16 +82,23 @@ export class PaypalService {
             postal_code: this.payer.zipCode || '',
           }
         },
+
+        // Purchase details
         purchase_units: [{
-          reference_id: dress.id + '_' + this.payer.uid,
+
+          // Dress and payer details
+          reference_id: refId,
+          // Rent ID
           custom_id: this.rentService.getNewRefId(),
+
+          // Total price = 85% dress price + deposit + 15% dress price as handling fee
           amount: {
             currency_code: 'USD',
             value: (dress.price + dress.deposit).toString(),
             breakdown: {
               item_total: {
                 currency_code: 'USD',
-                value: ((dress.price * 0.85) + dress.deposit).toString(),
+                value: ((dress.price * (1 - this.metadata.handling)) + dress.deposit).toString(),
               },
               handling: {
                 currency_code: 'USD',
@@ -110,11 +127,8 @@ export class PaypalService {
             }
           ],
         }],
+
       },
-      onClientAuthorization: async (data) => {
-        console.log(data);
-        this.onPaymentAuthorized.emit();
-      }
     }
 
   }

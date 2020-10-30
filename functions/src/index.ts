@@ -8,6 +8,7 @@ import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {payDepositBack, payForRent} from './paymentFunctions';
 import {sendEmailToSupport} from './EmailFunctions';
 import {UserDoc} from '../../src/app/models/User';
+import {AppIdentifier} from './keys';
 
 
 // // Start writing Firebase Functions
@@ -129,57 +130,81 @@ export const onFeedBack = functions.firestore.document('{collection}/{docId}/fee
 /**
  * A function being auto called by the PayPal account, when a payment to the business account is being authorized.
  * The function creates a new rent document, set the dress into "rented" and pays the dress owner his part.
+ * function URL: https://us-central1-dress-a06c9.cloudfunctions.net/paypalWebhook
  */
-export const paypalWebhook = functions.https.onRequest((req, resp) => {
+export const paypalWebhook = functions.https.onRequest(async (req, resp) => {
 
-  // TODO: Separate capturing and authorizing: Check the payment details on capture, and then authorize it.
+  // TODO: Change webhook to ON CAPTURE, check the payment details are true and then call authorize
 
   if (req.body.event_type == 'CHECKOUT.ORDER.APPROVED') {
 
     // Get the purchase data out of the web hook resource
-    try {
-      const resource: IClientAuthorizeCallbackData = req.body.resource;
-      if(resource && resource.purchase_units) {
-        const purchase = resource.purchase_units[0];
-        if(purchase) {
-          admin.firestore().collection('payments').doc(purchase.custom_id).set(resource);
-          const refIds = (purchase.reference_id || '').split('_');
-          const dressId = refIds[0];
-          const renterId = refIds[1];
+    const resource: IClientAuthorizeCallbackData = req.body.resource;
+    if(resource && resource.purchase_units) {
+      const purchase = resource.purchase_units[0];
+
+      if(purchase) {
+
+        // Parse the reference ID
+        const refIds = (purchase.reference_id || '').split('_');
+        const appId = refIds[0];
+        const dressId = refIds[1];
+        const renterId = refIds[2];
+
+        if(appId != AppIdentifier) {
+          console.log('Payment received not by app');
+          resp.status(400).send('Payment received not by app');
+          return;
+        }
+
+        // Save the payment details under the deal ID (Will be also the rent ID)
+        const payRef = admin.firestore().collection('payments').doc(purchase.custom_id);
+        if((await payRef.get()).exists)
+          throw new HttpsError('already-exists', 'Multiple call: Payment already exist');
+        payRef.set(resource)
+          .catch(e => console.error('Notice: Payment details were not saved on firestore'));
+
+        try {
+          // Create a rent document according to the payment details, and set the dress status to RENTED
           const items = purchase.items;
           if(items) {
             const price = items.find((item) => item.category == 'PHYSICAL_GOODS').unit_amount;
             const deposit = items.find((item) => item.category == 'DIGITAL_GOODS').unit_amount;
-            // Create a rent document, and set the dress stats to rented
-            const timestamp = admin.firestore.Timestamp.now().toMillis();
-            admin.firestore().runTransaction(async transaction => {
+            const rent = await admin.firestore().runTransaction<RentDoc>(async transaction => {
               const dressRef = admin.firestore().collection('dresses').doc(dressId);
               const ownerId = (await transaction.get(dressRef)).get('owner');
               await transaction.update(dressRef, 'status', 2);
               const rent: RentDoc = {
                 id: purchase.custom_id,
+                timestamp: admin.firestore.Timestamp.now().toMillis(),
                 status: 1,
                 dressId,
                 ownerId,
                 renterId,
                 deposit,
                 price,
-                timestamp,
               };
-              await transaction.set(admin.firestore().collection('rents').doc(purchase.custom_id), rent);
-              // Pay the renter his part
-              await payForRent(rent, price, purchase.shipping);
+              await transaction.set(admin.firestore().collection('rents').doc(rent.id), rent);
+              return rent;
             });
+            // Pay the renter his part
+            await payForRent(rent, price, purchase.shipping);
           }
         }
+        catch (e) {
+          // For any error in the process (before trying to pay)
+          sendEmailToSupport('Rent error (auto email)',
+            `Some error occurred after payment, and the rent was not implemented.
+            Dress ID: ${dressId}
+            Payer user ID: ${renterId}`
+          );
+          console.error(e);
+          throw new HttpsError('unimplemented', 'The dress owner might not received his payment', e);
+        }
+
       }
     }
-    catch (e) {
-      // For any error in the process TODO: Report support
-      console.error(e);
-      throw new HttpsError('unimplemented', 'The dress owner might not received his payment', e);
-    }
-    resp.send('Payment received');
+    resp.status(200).send('Payment received');
   }
   else
     throw new HttpsError('unknown', 'Unknown payment event');

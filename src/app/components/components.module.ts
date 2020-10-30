@@ -20,6 +20,7 @@ import {AppCurrencyPipe} from '../pipes/app-currency.pipe';
 import {CountryPipe} from '../pipes/country.pipe';
 import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
 import {ContactFormComponent} from './contact-form/contact-form.component';
+import {ColorPickerComponent} from './color-picker/color-picker.component';
 
 
 
@@ -47,6 +48,7 @@ import {ContactFormComponent} from './contact-form/contact-form.component';
     CountryPipe,
     PhoneNumberPipe,
     ContactFormComponent,
+    ColorPickerComponent,
   ],
   exports: [
     HeaderComponent,
@@ -63,6 +65,7 @@ import {ContactFormComponent} from './contact-form/contact-form.component';
     AppCurrencyPipe,
     CountryPipe,
     PhoneNumberPipe,
+    ColorPickerComponent,
   ],
   entryComponents: [
     TermsComponent,

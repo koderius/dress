@@ -1,5 +1,7 @@
 {
   "name": "dress",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

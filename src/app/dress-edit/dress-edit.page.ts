@@ -159,20 +159,17 @@ export class DressEditPage implements OnInit, OnDestroy {
     let text = '';
     Object.keys(data).forEach((upperPrice, i, arr)=>{
       if(upperPrice == 'high')
-        text += `<li>> ${this.appCurrency.transform(arr[i-1])} - ${data[upperPrice] * 100}%</li>`;
+        text += `<li>More than ${this.appCurrency.transform(arr[i-1])} - ${data[upperPrice] * 100}%</li>`;
       else
         text += `<li>Up to ${this.appCurrency.transform(upperPrice)} - ${data[upperPrice] * 100}%</li>`;
     });
-    this.alertsService.notice(
-      'The deposit is being defined according to the price:',
-      'Deposit info',
-      `<ul>${text}</ul>`
-    );
-  }
-
-  async openColorPicker(input: IonInput) {
-    const el = await input.getInputElement();
-    el.click()
+    this.alertsService.alertCtrl.create({
+      header: 'Deposit info',
+      subHeader: 'The deposit is being defined according to the price:',
+      message: `<ul>${text}</ul>`,
+      cssClass: 'mediumUL',
+      buttons: ['Dismiss']
+    }).then(a => a.present());
   }
 
   async onPhotosSelected(ev) {

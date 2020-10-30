@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as nodemailer from 'nodemailer';
-import {NoreplyPass} from './keys';
+import {NoReplyEmailPassword} from './keys';
 
 // export const sendEmailToSupport = async (subject: string, text: string = '', html: string = '') => {
 //   const snapshot = await admin.firestore().collection('app').doc('support').get();
@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: noreplyEmail,
-    pass: NoreplyPass,
+    pass: NoReplyEmailPassword,
   }
 });
 

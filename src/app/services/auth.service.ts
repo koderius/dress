@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import {FirebaseError, User} from 'firebase';
@@ -6,8 +6,9 @@ import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
 import {AlertsService} from './Alerts.service';
 import {UserDoc} from '../models/User';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {CloudFunctions} from '../../FirebaseCloudFunctions';
+import {Platform} from '@ionic/angular';
 
 /**
  * This service is used for authentication actions.
@@ -37,6 +38,7 @@ export class AuthService {
    * */
   private _user = new BehaviorSubject<User | null | undefined>(undefined);
   public readonly user$ = this._user.asObservable();
+
   get currentUser(): User | null | undefined {
     return this._user.value;
   }
@@ -56,14 +58,17 @@ export class AuthService {
   constructor(
     private activatedRoute: ActivatedRoute,
     private alertsService: AlertsService,
+    private pltfrm: Platform,
   ) {
 
     // On auth state changed, check user verification (and try verify) and then emit the user
-    this.auth.onAuthStateChanged(async (user)=>{
+    this.auth.onAuthStateChanged(async (user) => {
       await this.checkProviderVerification(user);
       this._user.next(user);
       console.log('User', this._user.value);
-    })
+    });
+
+    this.auth.getRedirectResult().catch();
 
   }
 
@@ -75,12 +80,12 @@ export class AuthService {
   }
 
   /** Mode that redirected from URL (reset password / email verification) */
-  get mode() : string {
+  get mode(): string {
     return this._mode;
   }
 
   /** The email which the URL was redirected from */
-  get emailFromURL() : string {
+  get emailFromURL(): string {
     return this._emailFromURL;
   }
 
@@ -88,8 +93,9 @@ export class AuthService {
   async checkURL() {
 
     // Prevent reading URL twice
-    if(this._mode)
+    if (this._mode) {
       return;
+    }
 
     // Get URL parameters
     const params = this.activatedRoute.snapshot.queryParams;
@@ -105,7 +111,7 @@ export class AuthService {
 
         case 'verifyEmail':
           const info = await this.auth.checkActionCode(this._oobCode);
-          if(info) {
+          if (info) {
             this._emailFromURL = info.data.email;
             await this.auth.applyActionCode(this._oobCode);
             await this.alertsService.notice(`Email ${this._emailFromURL} verified`);
@@ -114,8 +120,7 @@ export class AuthService {
           break;
 
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
 
@@ -123,7 +128,7 @@ export class AuthService {
 
 
   /** Sign up new users with email & password */
-  async signUpWithEmail(email: string, password: string, name?: string, photo?: string) : Promise<UserCredential> {
+  async signUpWithEmail(email: string, password: string, name?: string, photo?: string): Promise<UserCredential> {
 
     try {
 
@@ -141,8 +146,7 @@ export class AuthService {
 
       return cred;
 
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
 
@@ -150,11 +154,10 @@ export class AuthService {
 
 
   /** Sign in existing users with email & password */
-  async signInWithEmail(email: string, password: string) : Promise<UserCredential> {
+  async signInWithEmail(email: string, password: string): Promise<UserCredential> {
     try {
       return await this.auth.signInWithEmailAndPassword(email, password);
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
@@ -163,66 +166,60 @@ export class AuthService {
   /**
    * Sign in users with google or facebook provider
    * @param type - The provider type: 'google' or 'facebook'
-   * @param method - Can be popup window, or redirect to page (recommended for mobiles)
    */
-  async signInWithProvider(type: 'google' | 'facebook', method?: 'popup' | 'redirect') : Promise<UserCredential> {
+  async signInWithProvider(type: 'google' | 'facebook'): Promise<UserCredential> {
 
     // Create provider for google or facebook sign-in
     let provider;
     switch (type) {
-      case 'google': provider = new firebase.auth.GoogleAuthProvider(); break;
-      case 'facebook': provider = new firebase.auth.FacebookAuthProvider(); break;
+      case 'google':
+        provider = new firebase.auth.GoogleAuthProvider();
+        break;
+      case 'facebook':
+        provider = new firebase.auth.FacebookAuthProvider();
+        break;
     }
-
-    // If method was not defined in the argument, choose it according to the platform
-    if(!method)
-      // method = this.platform.is('mobile') ? 'redirect' : 'popup';
-      method = 'popup';
-    //TODO: Redirect does not work well
 
     try {
 
       // Use redirect or popup
-      let cred: UserCredential;
-      if(method == 'popup')
-        cred = await this.auth.signInWithPopup(provider);
-      if(method == 'redirect') {
+      if (this.pltfrm.is('cordova')) {
         await this.auth.signInWithRedirect(provider);
-        cred = await this.auth.getRedirectResult();
+        return await this.auth.getRedirectResult();
+      } else {
+        return  await this.auth.signInWithPopup(provider);
       }
 
-      return cred;
-
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
 
   }
 
   /** Call cloud function for verifying external providers (i.e facebook) that do not auto verify */
-  private async checkProviderVerification(user: User, retry?: boolean) : Promise<void> {
-    if(user && !user.emailVerified && user.providerId != 'password') {
+  private async checkProviderVerification(user: User, retry?: boolean): Promise<void> {
+    if (user && !user.emailVerified && user.providerId != 'password') {
       console.log('Try verifying external auth provider...', retry ? 'retry...' : '');
       const r = await CloudFunctions.tryVerifyUserEmail();
-      if(r)
+      if (r) {
         await user.reload();
-      else if(!retry)
+      } else if (!retry) {
         await this.checkProviderVerification(user, true);
+      }
     }
   }
 
   /** Update the user authentication data */
-  async updateUserData(profile: {username?: string, photoURL?: string, phoneNumber?: string}) : Promise<boolean> {
+  async updateUserData(profile: { username?: string, photoURL?: string, phoneNumber?: string }): Promise<boolean> {
     try {
-      if(profile.phoneNumber) {
+      if (profile.phoneNumber) {
         // TODO? this.currentUser.updatePhoneNumber()
       }
-      if(profile.username || profile.photoURL)
+      if (profile.username || profile.photoURL) {
         await this.currentUser.updateProfile(profile);
+      }
       return true;
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
@@ -231,8 +228,7 @@ export class AuthService {
   async sendEmailVerification() {
     try {
       await this.currentUser.sendEmailVerification();
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
@@ -241,32 +237,29 @@ export class AuthService {
   async sendResetPasswordEmail(email: string) {
     try {
       await this.auth.sendPasswordResetEmail(email);
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
 
   /** Reset the password after entering the app through the reset password link */
-  async resetPassword(newPassword: string) : Promise<void> {
+  async resetPassword(newPassword: string): Promise<void> {
     try {
-      if(this._oobCode) {
+      if (this._oobCode) {
         await this.auth.confirmPasswordReset(this._oobCode, newPassword);
         await this.signInWithEmail(this._emailFromURL, newPassword);
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
 
 
   /** Sign out... */
-  async signOut() : Promise<void> {
+  async signOut(): Promise<void> {
     try {
       await this.auth.signOut();
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }
@@ -276,8 +269,7 @@ export class AuthService {
   async deleteUser() {
     try {
       await this.currentUser.delete();
-    }
-    catch (e) {
+    } catch (e) {
       this.onAuthError(e);
     }
   }

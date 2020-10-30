@@ -108,6 +108,7 @@ export class UserDataService {
       photoURL: user.photoURL,
       phoneNumber: user.phoneNumber,
       fullName: user.displayName,
+      paypalEmail: user.email,
     };
 
     // Delete all undefined

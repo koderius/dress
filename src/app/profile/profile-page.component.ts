@@ -75,10 +75,6 @@ export class ProfilePage implements OnInit{
     if(this.userDoc.country)
       this.userDoc.country = this.userCountry.name;
 
-    // Get default paypal email
-    if(!this.userDoc.paypalEmail)
-      this.userDoc.paypalEmail = this.userDoc.email;
-
     this.myRents = await this.rentsService.getMyRents();
     this.myOrders.splice(0);
     this.myRents.forEach(async (rent)=>{

@@ -1,0 +1,13 @@
+<ion-item [color]="theme">
+  <ion-label position="stacked" color="light" *ngIf="label">{{label}}</ion-label>
+  <ion-input [(ngModel)]="color" required placeholder="ex: '#ffa500' or 'orange'"></ion-input>
+  <ion-input type="color" class="ion-hide" #colorPicker [(ngModel)]="color"></ion-input>
+  <ion-note slot="end">
+    Click to pick
+    <ion-icon name="arrow-forward" style="vertical-align: bottom"></ion-icon>
+  </ion-note>
+  <ion-avatar slot="end" class="color-avatar"
+              [ngStyle]="{backgroundColor: color}"
+              (click)="openColorPicker(colorPicker)"
+  ></ion-avatar>
+</ion-item>

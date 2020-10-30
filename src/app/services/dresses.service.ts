@@ -6,7 +6,6 @@ import {AlertsService} from './Alerts.service';
 import {UserDataService} from './user-data.service';
 import {SearchFilters} from '../models/SearchFilters';
 import {Observable} from 'rxjs';
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 
 @Injectable({
   providedIn: 'root'

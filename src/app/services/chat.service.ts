@@ -6,6 +6,8 @@ import {ChatDoc, ChatMsg, ChatPreview, DBMsg} from '../models/ChatMsg';
 import {Dress, DressProps} from '../models/Dress';
 import DocumentReference = firebase.firestore.DocumentReference;
 import {UserDataService} from './user-data.service';
+import {Censor} from '../Utils/Censor';
+import {AlertsService} from './Alerts.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +34,8 @@ export class ChatService {
   public lastChats: ChatPreview[];
   private lastChatsUnsub: ()=>void;
 
+  private censor: Censor;
+
   get myUid() : string{
     return this.authService.currentUser ? this.authService.currentUser.uid : null;
   }
@@ -39,6 +43,7 @@ export class ChatService {
   constructor(
     private authService: AuthService,
     private userData: UserDataService,
+    private alerts: AlertsService,
   ) {
 
     // Subscribe user's last chats
@@ -73,6 +78,13 @@ export class ChatService {
     this.leaveConversation();
 
     this.partner = userId;
+
+    this.censor = new Censor();
+    this.censor.chatBlock$.subscribe(() => {
+      this.chatRef.delete();
+      this.leaveConversation();
+      this.alerts.notice('Suspicious messages content', 'Chat was blocked!', 'We suspect your interlocutor was trying to contact you outside the app.')
+    });
 
     try {
 
@@ -122,6 +134,12 @@ export class ChatService {
 
     // Translate message and emit it in event
     const msg = this.fromDBToFront(key, value, this.ids);
+
+    // Incoming messages pass through the censorship
+    if(msg.type === 'i') {
+      msg.text = this.censor.filterMsg(msg.text);
+    }
+
     this.onMessage.emit(msg);
 
     // Update new messages last read
