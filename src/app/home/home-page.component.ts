@@ -92,7 +92,7 @@ export class HomePage implements OnInit, OnDestroy {
     const filters = new SearchFilters({
       // todo:
     });
-    this.navService.home(filters);
+    this.navService.home(filters.toRaw());
   }
 
   async filter(params: SearchFiltersRaw) {
