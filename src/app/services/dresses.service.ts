@@ -126,8 +126,6 @@ export class DressesService {
     else if(searchFilters.categories.length && searchFilters.categories.length <= 10)
       ref = ref.where('category', 'in', searchFilters.categories);
 
-    // Filter by available dates? - todo
-
     const res = await ref.get();
     let dresses = res.docs.map((d)=>d.data()) as DressProps[];
 
@@ -137,7 +135,15 @@ export class DressesService {
     if(searchFilters.countries.length)
       dresses = dresses.filter((d)=>searchFilters.countries.includes(d.country));
 
-    // More fields (advanced)? - todo
+    // Filter by date // TODO: Filter in query
+    if(searchFilters.fromDate)
+      // Filter "from date" is inside the dress range
+      dresses = dresses.filter(d => d.datesRange[0] <= +searchFilters.fromDate && d.datesRange[1] >= +searchFilters.fromDate);
+    if(searchFilters.toDate)
+      // Filter "to date" is inside the dress range
+      dresses = dresses.filter(d => d.datesRange[0] <= +searchFilters.toDate && d.datesRange[1] >= +searchFilters.toDate);
+
+    // More fields (advanced)
     if(searchFilters.size.length)
       dresses = dresses.filter(d => searchFilters.size.includes(d.size));
     if(searchFilters.style)

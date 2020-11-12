@@ -49,8 +49,8 @@ export class SearchFilters {
     const raw : SearchFiltersRaw = {
       category: this.categories.join('_'),
       country: this.countries.join('_'),
-      fromdate: this.fromDate ? this.fromDate.getTime().toString() : '',
-      todate: this.toDate ? this.toDate.getTime().toString() : '',
+      fromdate: this.fromDate ? this.fromDate.toJSON().slice(0,10) : '',
+      todate: this.toDate ? this.toDate.toJSON().slice(0,10) : '',
       style: this.style,
       size: this.size.join('_'),
       color: this.color,

@@ -72,21 +72,18 @@
   <div class="input-item">
     <p>BETWEEN</p>
     <div class="inputs">
-      <ion-input placeholder="dd" maxlength="2" type="tel"></ion-input>
-      <ion-input placeholder="mm" maxlength="2" type="tel"></ion-input>
-      <ion-input placeholder="yy" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date1.d" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date1.m" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date1.y" (ionBlur)="setDate()"></ion-input>
     </div>
   </div>
   <div class="input-item">
     <p>TO</p>
     <div class="inputs">
-      <ion-input placeholder="dd" maxlength="2" type="tel"></ion-input>
-      <ion-input placeholder="mm" maxlength="2" type="tel"></ion-input>
-      <ion-input placeholder="yy" maxlength="2" type="tel"></ion-input>
+      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date2.d" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date2.m" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date2.y" (ionBlur)="setDate()"></ion-input>
     </div>
-  </div>
-  <div class="input-item">
-    <ion-button shape="round" class="confirm-btn" strong="true">CONFIRM</ion-button>
   </div>
 </ion-list>
 
@@ -137,9 +134,9 @@
 
   </div>
 
-  <div class="input-item">
-    <ion-button shape="round" class="confirm-btn" strong="true" (click)="openedFilter = null; findDressClicked()">CONFIRM</ion-button>
-  </div>
+<!--  <div class="input-item">-->
+<!--    <ion-button shape="round" class="confirm-btn" strong="true" (click)="openedFilter = null; findDressClicked()">CONFIRM</ion-button>-->
+<!--  </div>-->
 
 </ion-list>
 

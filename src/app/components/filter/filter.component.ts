@@ -6,6 +6,7 @@ import {SearchFilters} from '../../models/SearchFilters';
 import {NavigationService} from '../../services/navigation.service';
 import {Subscription} from 'rxjs';
 import {CountryData, CountryPipe} from '../../pipes/country.pipe';
+import {DateInputs, DateUtil} from '../../Utils/DateUtil';
 
 @Component({
   selector: 'app-filter',
@@ -39,6 +40,9 @@ export class FilterComponent implements OnInit, OnDestroy {
   /** The selected filters */
   filters: SearchFilters = new SearchFilters();
 
+  date1 = new DateInputs();
+  date2 = new DateInputs();
+
   constructor(
     private categoriesService: CategoriesService,
     private activeRoute: ActivatedRoute,
@@ -66,6 +70,7 @@ export class FilterComponent implements OnInit, OnDestroy {
       el.checked = false;
     });
     this.openedFilter = null;
+    this.findDressClicked();
   }
 
   /** Get countries names list (using API) */
@@ -95,10 +100,14 @@ export class FilterComponent implements OnInit, OnDestroy {
     }
   }
 
+  setDate() {
+    this.filters.fromDate = this.date1.toDate();
+    this.filters.toDate = this.date2.toDate();
+  }
+
   /** Start filtering according to the selected filters (by navigating to home page under 'search' segment with query parameters */
   findDressClicked() {
-    if(this.filters.hasFilters)
-      this.navService.home(this.filters.toRaw());
+    this.navService.home(this.filters.toRaw());
   }
 
 }

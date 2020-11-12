@@ -21,6 +21,7 @@ import {CountryPipe} from '../pipes/country.pipe';
 import {PhoneNumberPipe} from '../pipes/phone-number.pipe';
 import {ContactFormComponent} from './contact-form/contact-form.component';
 import {ColorPickerComponent} from './color-picker/color-picker.component';
+import {NaturalNumberDirective} from '../directives/natural-number.directive';
 
 
 
@@ -49,6 +50,7 @@ import {ColorPickerComponent} from './color-picker/color-picker.component';
     PhoneNumberPipe,
     ContactFormComponent,
     ColorPickerComponent,
+    NaturalNumberDirective,
   ],
   exports: [
     HeaderComponent,
@@ -66,6 +68,7 @@ import {ColorPickerComponent} from './color-picker/color-picker.component';
     CountryPipe,
     PhoneNumberPipe,
     ColorPickerComponent,
+    NaturalNumberDirective,
   ],
   entryComponents: [
     TermsComponent,
