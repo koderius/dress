@@ -72,17 +72,17 @@
   <div class="input-item">
     <p>BETWEEN</p>
     <div class="inputs">
-      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date1.d" (ionBlur)="setDate()"></ion-input>
-      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date1.m" (ionBlur)="setDate()"></ion-input>
-      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date1.y" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date1.d" (ionChange)="setDate()"></ion-input>
+      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date1.m" (ionChange)="setDate()"></ion-input>
+      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date1.y" (ionChange)="setDate()"></ion-input>
     </div>
   </div>
   <div class="input-item">
     <p>TO</p>
     <div class="inputs">
-      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date2.d" (ionBlur)="setDate()"></ion-input>
-      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date2.m" (ionBlur)="setDate()"></ion-input>
-      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date2.y" (ionBlur)="setDate()"></ion-input>
+      <ion-input placeholder="dd" min="1" max="31" appNaturalNumber type="number" [(ngModel)]="date2.d" (ionChange)="setDate()"></ion-input>
+      <ion-input placeholder="mm" min="1" max="12" appNaturalNumber type="number" [(ngModel)]="date2.m" (ionChange)="setDate()"></ion-input>
+      <ion-input placeholder="yyyy" min="0" max="9999" appNaturalNumber type="number" [(ngModel)]="date2.y" (ionChange)="setDate()"></ion-input>
     </div>
   </div>
 </ion-list>
