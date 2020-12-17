@@ -99,6 +99,16 @@ export const tryVerifyUserEmail = functions.https.onCall(async (data, context) =
 //
 // });
 
+/** Make sure that the dress always has "rank" property, otherwise, it will not be shown **/
+export const onDressCreate = functions.firestore.document('dresses/{id}').onWrite((change, context) => {
+  if(change.after) {
+    const rank = change.after.get('rank');
+    if(!rank) {
+      change.after.ref.update({rank: 0});
+    }
+  }
+});
+
 
 export const onFeedBack = functions.firestore.document('{collection}/{docId}/feedbacks/{writerId}').onWrite((change) => {
 

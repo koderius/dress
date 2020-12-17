@@ -9,6 +9,7 @@ import {UserDoc} from '../models/User';
 import {BehaviorSubject} from 'rxjs';
 import {CloudFunctions} from '../../FirebaseCloudFunctions';
 import {Platform} from '@ionic/angular';
+import {filter} from 'rxjs/operators';
 
 /**
  * This service is used for authentication actions.
@@ -37,7 +38,7 @@ export class AuthService {
    * UNDEFINED = Auth module has not been loaded yet.
    * */
   private _user = new BehaviorSubject<User | null | undefined>(undefined);
-  public readonly user$ = this._user.asObservable();
+  public readonly user$ = this._user.pipe(filter(user => user !== undefined));
 
   get currentUser(): User | null | undefined {
     return this._user.value;
@@ -136,7 +137,7 @@ export class AuthService {
       const cred = await this.auth.createUserWithEmailAndPassword(email, password);
 
       // Set basic details
-      cred.user.updateProfile({
+      await cred.user.updateProfile({
         displayName: name || null,
         photoURL: photo || null
       } as UserDoc);
@@ -198,7 +199,7 @@ export class AuthService {
 
   /** Call cloud function for verifying external providers (i.e facebook) that do not auto verify */
   private async checkProviderVerification(user: User, retry?: boolean): Promise<void> {
-    if (user && !user.emailVerified && user.providerId != 'password') {
+    if (user && !user.emailVerified && user.providerData.some(p => p.providerId !== 'password')) {
       console.log('Try verifying external auth provider...', retry ? 'retry...' : '');
       const r = await CloudFunctions.tryVerifyUserEmail();
       if (r) {

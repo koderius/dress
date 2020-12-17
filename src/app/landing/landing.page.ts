@@ -4,6 +4,7 @@ import {AlertsService} from '../services/Alerts.service';
 import {ModalController} from '@ionic/angular';
 import {TermsComponent} from '../components/terms/terms.component';
 import {Subscription} from 'rxjs';
+import {first} from 'rxjs/operators';
 
 enum PageStatus {
 
@@ -41,7 +42,7 @@ export class LandingPage implements OnInit {
   isTermsRead: boolean;
 
   get hasAuthLoaded() {
-    return this.authService.currentUser === null;
+    return this.authService.currentUser !== undefined;
   }
 
   constructor(
@@ -52,24 +53,24 @@ export class LandingPage implements OnInit {
 
   async ngOnInit() {
 
-  // First check for URL auth actions
-  await this.authService.checkURL();
+    // First check for URL auth actions
+    await this.authService.checkURL();
 
-  const user = this.authService.currentUser;
+    const user = await this.authService.user$.pipe(first()).toPromise();
 
-  // Check user status
-  if(user && !user.emailVerified) {
-    this.pageStatus = PageStatus.VERIFICATION_SENT;
-  }
+    // Check user status
+    if(user && !user.emailVerified) {
+      this.pageStatus = PageStatus.VERIFICATION_SENT;
+    }
 
-  else {
-    // Check whether it's a reset password mode, and change the status accordingly
-    if(this.authService.mode == 'resetPassword')
-      this.pageStatus = PageStatus.NEW_PASSWORD;
-    else
-      this.pageStatus = PageStatus.LANDING;
+    else {
+      // Check whether it's a reset password mode, and change the status accordingly
+      if(this.authService.mode == 'resetPassword')
+        this.pageStatus = PageStatus.NEW_PASSWORD;
+      else
+        this.pageStatus = PageStatus.LANDING;
 
-  }
+    }
 
   }
 

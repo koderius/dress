@@ -179,6 +179,10 @@ export class DressEditPage implements OnInit, OnDestroy {
     for(let i = 0; i < fileList.length; i++)
       files.push(fileList[i]);
 
+    // Save before uploading
+    if(!this.dress.id)
+      await this.save();
+
     const progresses = await this.filesUploader.uploadDressPhotos(this.dress.id, files);
     progresses.forEach((p)=>{
       this.photosInProgress.push(p);

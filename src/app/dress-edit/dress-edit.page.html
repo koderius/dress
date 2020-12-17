@@ -74,7 +74,6 @@
 
     </ion-item-group>
 
-
   </ion-list>
 
   <ion-list class="app-list" *ngIf="dress">
@@ -220,7 +219,7 @@
 
 </ion-content>
 
-<ion-footer *ngIf="dress">
+<ion-footer *ngIf="dress && dress.status < DressStatus.RENTED">
   <ion-button expand="full" color="secondary"
               [disabled]="(!hasChanges() && dress.status != DressStatus.DRAFT) || hasUploadsInProgress()"
               (click)="save(true)"
@@ -228,6 +227,5 @@
   <ion-button expand="full" color="medium"
               [disabled]="(!hasChanges() && dress.status == DressStatus.DRAFT) || hasUploadsInProgress()"
               (click)="save()"
-              *ngIf="dress.status < DressStatus.RENTED"
   >Save as draft</ion-button>
 </ion-footer>
